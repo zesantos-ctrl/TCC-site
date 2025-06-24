@@ -1730,42 +1730,42 @@ body.dark-mode .login-modal .modal-body button:disabled {
   background-color: #0056b3;
 }
 
-/* Modal de sequência */
-.modal {
-  /* Exemplo simples de modal, ajuste conforme seu projeto */
-  display: none; /* controlado via JS */
+
+/* Apenas para o Modal do Jogo de Sequência Lógica */
+.sequence-modal {
+  display: none; /* Controlado via JS */
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.6);
+  background-color: rgba(0, 0, 0, 0.6);
   justify-content: center;
   align-items: center;
   z-index: 9999;
 }
 
-.modal-content {
+.sequence-modal .modal-content {
   background: white;
   border-radius: 8px;
   max-width: 400px;
   width: 90%;
   padding: 20px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   position: relative;
 }
 
-.modal-header {
+.sequence-modal .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.modal-header h3 {
+.sequence-modal .modal-header h3 {
   margin: 0;
 }
 
-.modal-header button {
+.sequence-modal .modal-header button {
   background: none;
   border: none;
   font-size: 22px;
@@ -1824,7 +1824,7 @@ body.dark-mode .login-modal .modal-body button:disabled {
   color: #c62828;
 }
 
-.tool-btn {
+.sequence-modal .tool-btn {
   background-color: #28a745;
   color: white;
   border: none;
@@ -1837,6 +1837,6 @@ body.dark-mode .login-modal .modal-body button:disabled {
   transition: background-color 0.3s;
 }
 
-.tool-btn:hover {
+.sequence-modal .tool-btn:hover {
   background-color: #1e7e34;
 }
