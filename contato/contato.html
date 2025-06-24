@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contato - NeuroGame</title>
+    <link rel="stylesheet" href="contato.css" />
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <header class="header">
+      <nav class="nav-container">
+        <div class="logo">NeuroGame</div>
+        <ul class="nav-menu">
+          <li><a href="../index.html">Home</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <section id="contato" style="margin-top: 100px">
+      <div class="container">
+        <h2>📩 Fale com a gente</h2>
+        <p>Mande sugestões, críticas ou dúvidas:</p>
+
+        <form
+          id="contatoForm"
+          action="https://formsubmit.co/seu@email.com"
+          method="POST"
+        >
+          <label for="nome">Nome:</label>
+          <input
+            type="text"
+            id="nome"
+            name="name"
+            placeholder="Seu nome"
+            required
+          />
+
+          <label for="email">Email:</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="seu@email.com"
+            required
+          />
+
+          <label for="mensagem">Mensagem:</label>
+          <textarea
+            id="mensagem"
+            name="message"
+            placeholder="Sua sugestão ou dúvida"
+            required
+          ></textarea>
+
+          <!-- Honeypot para evitar spam -->
+          <input type="text" name="_honey" style="display:none" />
+
+          <!-- Redirecionamento após envio -->
+          <input
+            type="hidden"
+            name="_next"
+            value="https://seudominio.com/jvitnhosa@gmail.com/contato/sucesso.html"
+          />
+
+          <button type="submit">Enviar</button>
+        </form>
+
+        <div class="contato-card">
+          <h3>📞 Outras formas de contato</h3>
+          <div class="contato-itens">
+            <div class="item">
+              <strong>Email:</strong> contato@neurogame.com
+            </div>
+            <div class="item"><strong>Telefone:</strong> (11) 99999-9999</div>
+            <div class="item">
+              <strong>Instagram:</strong>
+              <a href="https://www.instagram.com/seuperfil" target="_blank"
+                >@seuperfil</a
+              >
+            </div>
+          </div>
+        </div>
+
+        <p id="mensagemStatus"></p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>&copy; 2025 NeuroGame - Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="../script.js"></script>
+    <script src="../theme/theme.js"></script>
+  </body>
+</html>
