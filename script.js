@@ -1314,3 +1314,307 @@ function selectOption(selected) {
         // currentLevel = 0; // Se quiser reiniciar ao errar, descomente
     }
 }
+
+// Variáveis do jogo
+let colorGameState = {
+    score: 0,
+    highScore: localStorage.getItem('colorGameHighScore') || 0,
+    timeLeft: 60,
+    targetColor: '',
+    colors: ['red', 'blue', 'green', 'yellow', 'purple', 'orange'],
+    colorNames: {
+        red: 'Vermelho',
+        blue: 'Azul',
+        green: 'Verde',
+        yellow: 'Amarelo',
+        purple: 'Roxo',
+        orange: 'Laranja'
+    },
+    timer: null,
+    isRunning: false
+};
+
+// Iniciar o jogo
+function startColorGame() {
+    if (colorGameState.isRunning) return;
+    
+    colorGameState.isRunning = true;
+    colorGameState.score = 0;
+    colorGameState.timeLeft = 60;
+    updateColorGameUI();
+    
+    // Iniciar contagem regressiva
+    colorGameState.timer = setInterval(() => {
+        colorGameState.timeLeft--;
+        updateColorGameUI();
+        
+        if (colorGameState.timeLeft <= 0) {
+            endColorGame();
+        }
+    }, 1000);
+    
+    // Primeira cor
+    nextColor();
+}
+
+// Próxima cor
+function nextColor() {
+    const randomIndex = Math.floor(Math.random() * colorGameState.colors.length);
+    colorGameState.targetColor = colorGameState.colors[randomIndex];
+    
+    const targetElement = document.querySelector('.target-color-text');
+    targetElement.textContent = colorGameState.colorNames[colorGameState.targetColor];
+    targetElement.style.color = colorGameState.targetColor;
+}
+
+// Verificar resposta
+function checkColor(selectedColor) {
+    if (!colorGameState.isRunning) return;
+    
+    const btn = document.querySelector(`.color-btn.${selectedColor}`);
+    btn.classList.add('color-click');
+    setTimeout(() => btn.classList.remove('color-click'), 300);
+    
+    const feedback = document.getElementById('colorGameFeedback');
+    
+    if (selectedColor === colorGameState.targetColor) {
+        colorGameState.score++;
+        if (colorGameState.score > colorGameState.highScore) {
+            colorGameState.highScore = colorGameState.score;
+            localStorage.setItem('colorGameHighScore', colorGameState.highScore);
+        }
+        
+        feedback.textContent = `✅ Correto! +1 ponto`;
+        feedback.className = 'game-feedback success';
+    } else {
+        feedback.textContent = `❌ Errado! Era ${colorGameState.colorNames[colorGameState.targetColor]}`;
+        feedback.className = 'game-feedback error';
+    }
+    
+    updateColorGameUI();
+    nextColor();
+}
+
+// Atualizar UI
+function updateColorGameUI() {
+    document.getElementById('colorGameScore').textContent = colorGameState.score;
+    document.getElementById('colorGameTime').textContent = `${colorGameState.timeLeft}s`;
+    document.getElementById('colorGameHighScore').textContent = colorGameState.highScore;
+}
+
+// Finalizar jogo
+function endColorGame() {
+    clearInterval(colorGameState.timer);
+    colorGameState.isRunning = false;
+    
+    const feedback = document.getElementById('colorGameFeedback');
+    feedback.textContent = `🎉 Fim do jogo! Pontuação final: ${colorGameState.score}`;
+    feedback.className = 'game-feedback success';
+}
+
+// Reiniciar jogo
+function resetColorGame() {
+    clearInterval(colorGameState.timer);
+    colorGameState.isRunning = false;
+    colorGameState.score = 0;
+    colorGameState.timeLeft = 60;
+    updateColorGameUI();
+    
+    const feedback = document.getElementById('colorGameFeedback');
+    feedback.textContent = '';
+    feedback.className = 'game-feedback';
+    
+    document.querySelector('.target-color-text').textContent = '-';
+}
+
+// Abrir o modal do jogo
+function openColorGame() {
+    openModal('colorGameModal');
+    resetColorGame();
+    updateColorGameUI();
+}
+
+// Variáveis do cronograma
+let scheduleState = {
+  tasks: JSON.parse(localStorage.getItem('scheduleTasks')) || [],
+  editingTaskId: null,
+  timeSlots: Array.from({length: 14}, (_, i) => `${7 + i}:00 - ${8 + i}:00`)
+};
+
+// Inicializar cronograma
+function initSchedule() {
+  renderSchedule();
+  
+  // Adicionar event listeners para as células
+  document.querySelectorAll('.schedule-cell').forEach(cell => {
+    cell.addEventListener('click', function() {
+      const day = this.dataset.day;
+      const time = this.dataset.time;
+      openTaskModal(day, time);
+    });
+  });
+}
+
+// Renderizar cronograma
+function renderSchedule() {
+  const scheduleRows = document.getElementById('scheduleRows');
+  scheduleRows.innerHTML = '';
+  
+  // Criar linhas do cronograma
+  scheduleState.timeSlots.forEach((time, index) => {
+    const row = document.createElement('div');
+    row.className = 'schedule-row';
+    row.innerHTML = `
+      <div class="time-slot">${time}</div>
+      <div class="schedule-cell" data-day="monday" data-time="${time}"></div>
+      <div class="schedule-cell" data-day="tuesday" data-time="${time}"></div>
+      <div class="schedule-cell" data-day="wednesday" data-time="${time}"></div>
+      <div class="schedule-cell" data-day="thursday" data-time="${time}"></div>
+      <div class="schedule-cell" data-day="friday" data-time="${time}"></div>
+    `;
+    scheduleRows.appendChild(row);
+  });
+  
+  // Adicionar tarefas
+  scheduleState.tasks.forEach(task => {
+    addTaskToSchedule(task);
+  });
+  
+  // Tornar tarefas arrastáveis
+  makeTasksDraggable();
+}
+
+// Adicionar tarefa ao cronograma
+function addTaskToSchedule(task) {
+  const cell = document.querySelector(`.schedule-cell[data-day="${task.day}"][data-time="${task.time}"]`);
+  if (!cell) return;
+  
+  const taskElement = document.createElement('div');
+  taskElement.className = 'schedule-task';
+  taskElement.innerHTML = task.name;
+  taskElement.style.background = task.color;
+  taskElement.dataset.taskId = task.id;
+  
+  // Adicionar botão de remover
+  const removeBtn = document.createElement('button');
+  removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+  removeBtn.className = 'task-remove-btn';
+  removeBtn.onclick = (e) => {
+    e.stopPropagation();
+    removeTask(task.id);
+  };
+  
+  taskElement.appendChild(removeBtn);
+  cell.appendChild(taskElement);
+}
+
+// Abrir modal de tarefa
+function openTaskModal(day, time) {
+  scheduleState.editingTaskId = null;
+  document.getElementById('modalTaskTitle').textContent = 'Adicionar Tarefa';
+  document.getElementById('taskName').value = '';
+  document.getElementById('taskDay').value = day || 'monday';
+  
+  // Preencher opções de horário
+  const timeSelect = document.getElementById('taskTime');
+  timeSelect.innerHTML = '';
+  scheduleState.timeSlots.forEach(slot => {
+    const option = document.createElement('option');
+    option.value = slot;
+    option.textContent = slot;
+    option.selected = slot === time;
+    timeSelect.appendChild(option);
+  });
+  
+  document.getElementById('taskColor').value = '#4e79a7';
+  openModal('taskModal');
+}
+
+// Salvar tarefa
+function saveTask() {
+  const name = document.getElementById('taskName').value.trim();
+  const day = document.getElementById('taskDay').value;
+  const time = document.getElementById('taskTime').value;
+  const color = document.getElementById('taskColor').value;
+  
+  if (!name) {
+    alert('Por favor, digite um nome para a tarefa');
+    return;
+  }
+  
+  const task = {
+    id: scheduleState.editingTaskId || Date.now(),
+    name,
+    day,
+    time,
+    color
+  };
+  
+  if (scheduleState.editingTaskId) {
+    // Atualizar tarefa existente
+    const index = scheduleState.tasks.findIndex(t => t.id === scheduleState.editingTaskId);
+    if (index !== -1) {
+      scheduleState.tasks[index] = task;
+    }
+  } else {
+    // Adicionar nova tarefa
+    scheduleState.tasks.push(task);
+  }
+  
+  saveSchedule();
+  closeModal('taskModal');
+}
+
+// Remover tarefa
+function removeTask(taskId) {
+  scheduleState.tasks = scheduleState.tasks.filter(task => task.id !== taskId);
+  saveSchedule();
+}
+
+// Salvar no localStorage
+function saveSchedule() {
+  localStorage.setItem('scheduleTasks', JSON.stringify(scheduleState.tasks));
+  renderSchedule();
+}
+
+// Adicionar nova tarefa
+function addNewTask() {
+  openTaskModal();
+}
+
+// Tornar tarefas arrastáveis
+function makeTasksDraggable() {
+  const tasks = document.querySelectorAll('.schedule-task');
+  
+  tasks.forEach(task => {
+    task.draggable = true;
+    
+    task.addEventListener('dragstart', function(e) {
+      e.dataTransfer.setData('text/plain', this.dataset.taskId);
+    });
+  });
+  
+  const cells = document.querySelectorAll('.schedule-cell');
+  cells.forEach(cell => {
+    cell.addEventListener('dragover', function(e) {
+      e.preventDefault();
+    });
+    
+    cell.addEventListener('drop', function(e) {
+      e.preventDefault();
+      const taskId = e.dataTransfer.getData('text/plain');
+      const task = scheduleState.tasks.find(t => t.id === parseInt(taskId));
+      
+      if (task) {
+        task.day = this.dataset.day;
+        task.time = this.dataset.time;
+        saveSchedule();
+      }
+    });
+  });
+}
+
+// Chamar initSchedule quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+  initSchedule();
+});
