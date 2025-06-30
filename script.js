@@ -19,7 +19,8 @@ let neuroGameState = {
         isRunning: false,
         interval: null
     },
-    authMode: 'login' // 'login' ou 'register'
+    authMode: 'login', // 'login' ou 'register'
+    apiBaseUrl: 'https://api.example.com/neurogame' // URL da sua API
 };
 
 // Base de conhecimento específica para TDAH
@@ -179,17 +180,35 @@ function addNeuroBotMessage(content, sender) {
     });
 }
 
-function processNeuroBotMessage(message) {
+async function processNeuroBotMessage(message) {
     const lowerMessage = message.toLowerCase();
     
-    // Verificar respostas automáticas
+    // Primeiro verifica respostas automáticas
     for (const [key, response] of Object.entries(neuroBotResponses)) {
         if (lowerMessage.includes(key)) {
             return response;
         }
     }
     
-    // Buscar na base de conhecimento
+    try {
+        // Chamada à API para respostas sobre TDAH
+        const response = await fetch(`${neuroGameState.apiBaseUrl}/neurobot`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: lowerMessage })
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            return data.answer || generateSmartNeuroBotResponse(message);
+        }
+    } catch (error) {
+        console.error('Erro na API:', error);
+    }
+    
+    // Fallback para base de conhecimento local
     const knowledgeResponse = searchNeuroBotKnowledge(lowerMessage);
     if (knowledgeResponse) {
         return knowledgeResponse;
@@ -261,6 +280,58 @@ function processQuickAction(action) {
     }
 }
 
+// Funções auxiliares (que precisam ser implementadas)
+function updateProgressDisplay() {
+    // Implementação necessária
+}
+
+function updateNeuroBotBadge() {
+    // Implementação necessária
+}
+
+function applySavedTheme() {
+    // Implementação necessária
+}
+
+function renderKanbanBoard() {
+    // Implementação necessária
+}
+
+function updatePomodoroDisplay() {
+    // Implementação necessária
+}
+
+function validateLoginForm() {
+    // Implementação necessária
+}
+
+function performAuth() {
+    // Implementação necessária
+}
+
+function toggleAuthMode() {
+    // Implementação necessária
+}
+
+function toggleTheme() {
+    // Implementação necessária
+}
+
+function startPomodoro() {
+    // Implementação necessária
+}
+
+function openKanban() {
+    // Implementação necessária
+}
+
+function openProgress() {
+    // Implementação necessária
+}
+
+function openTips() {
+    // Implementação necessária
+}
 // Funções dos jogos
 function openGame(gameType) {
     neuroGameState.progress.gamesPlayed++;
@@ -972,6 +1043,7 @@ let gridLetters = [];
 let selectedIndexes = [];
 
 // Variáveis do jogo de sequência numérica
+// Atualize o array de sequências para incluir as novas sequências
 const sequences = [
   { sequence: [2, 4, 6, null], answer: 8 },
   { sequence: [1, 3, 5, null], answer: 7 },
@@ -979,6 +1051,15 @@ const sequences = [
   { sequence: [10, 9, 8, null], answer: 7 },
   { sequence: [2, 6, 18, null], answer: 54 },
   { sequence: [1, 4, 9, null], answer: 16 },
+  // Novas sequências adicionadas
+  { sequence: [10, 8, 6, null], answer: 4 },
+  { sequence: [9, 18, 27, null], answer: 36 },
+  { sequence: [45, 40, 30, null], answer: 15 },
+  { sequence: [3, 6, 9, null], answer: 12 },
+  { sequence: [16, 32, 64, null], answer: 128 },
+  { sequence: [5, 10, 20, null], answer: 40 },
+  { sequence: [120, 60, 30, null], answer: 15 },
+  { sequence: [23, 24, 25, null], answer: 26 }
 ];
 let currentLevel = 0;
 
@@ -1092,38 +1173,195 @@ function finishOrganizeGame() {
 function startTrueFalseGame() {
     currentTFIndex = 0;
     trueFalseScore = 0;
-    showNextTFQuestion();
+    document.getElementById('trueFalseQuestion').style.opacity = 0;
+    
+    // Resetar estilo do modal
+    const modalContent = document.querySelector('#trueFalseGameModal .modal-content');
+    modalContent.classList.remove('game-completed', 'excellent', 'good', 'average');
+    modalContent.style.background = "var(--bg-primary)";
+    
+    // Mostrar contador inicial
+    document.getElementById('trueFalseScore').innerHTML = `
+        <div class="score-container">
+            <div class="score-circle">
+                <span>0</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" style="width: 0%"></div>
+                <span class="progress-text">0/${trueFalseQuestions.length}</span>
+            </div>
+        </div>
+        <div class="category-display" id="currentCategory"></div>
+    `;
+    
+    setTimeout(showNextTFQuestion, 500);
 }
 
 function showNextTFQuestion() {
+    const questionElement = document.getElementById('trueFalseQuestion');
+    const feedbackElement = document.getElementById('trueFalseFeedback');
+    
+    // Resetar estilos
+    questionElement.classList.remove('fade-in');
+    feedbackElement.classList.remove('show-feedback');
+    feedbackElement.innerHTML = '';
+    
     if (currentTFIndex >= trueFalseQuestions.length) {
-        document.getElementById('trueFalseQuestion').innerText = "Fim do jogo!";
-        document.getElementById('trueFalseFeedback').innerText = `Você acertou ${trueFalseScore} de ${trueFalseQuestions.length} perguntas!`;
+        // Fim do jogo
+        questionElement.innerHTML = "<i class='fas fa-trophy'></i> Fim do jogo!";
+        questionElement.style.opacity = 1;
+        
+        const percentage = Math.round((trueFalseScore / trueFalseQuestions.length) * 100);
+        let message, medalClass;
+        
+        if (percentage >= 80) {
+            message = "Excelente! Você domina o assunto!";
+            medalClass = "excellent";
+        } else if (percentage >= 60) {
+            message = "Muito bom! Você está no caminho certo!";
+            medalClass = "good";
+        } else {
+            message = "Bom começo! Continue aprendendo!";
+            medalClass = "average";
+        }
+        
+        feedbackElement.innerHTML = `
+            <div class="final-results">
+                <div class="result-circle ${medalClass}">
+                    <span>${percentage}%</span>
+                    <div class="medal-icon">
+                        ${percentage >= 80 ? "<i class='fas fa-medal gold'></i>" : 
+                          percentage >= 60 ? "<i class='fas fa-medal silver'></i>" : 
+                          "<i class='fas fa-star bronze'></i>"}
+                    </div>
+                </div>
+                <div class="result-details">
+                    <h3>${message}</h3>
+                    <p>Você acertou ${trueFalseScore} de ${trueFalseQuestions.length} perguntas</p>
+                    <button class="restart-btn" onclick="startTrueFalseGame()">
+                        <i class="fas fa-redo"></i> Jogar novamente
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Estilizar o fundo conforme desempenho
+        const modalContent = document.querySelector('#trueFalseGameModal .modal-content');
+        modalContent.classList.add('game-completed', medalClass);
+        
         if (typeof neuroGameState !== 'undefined') {
             neuroGameState.progress.gamesPlayed++;
             updateProgress();
             checkAchievements();
         }
+        
         return;
     }
 
     const q = trueFalseQuestions[currentTFIndex];
-    document.getElementById('trueFalseQuestion').innerText = q.question;
-    document.getElementById('trueFalseFeedback').innerText = '';
-    document.getElementById('trueFalseScore').innerText = `Pergunta ${currentTFIndex + 1} de ${trueFalseQuestions.length}`;
+    
+    // Atualizar categoria
+    document.getElementById('currentCategory').textContent = q.category;
+    
+    // Animação de transição
+    setTimeout(() => {
+        questionElement.innerHTML = q.question;
+        questionElement.style.opacity = 1;
+        questionElement.classList.add('fade-in');
+        
+        // Atualizar progresso
+        const progressPercent = (currentTFIndex / trueFalseQuestions.length) * 100;
+        document.querySelector('.progress-bar').style.width = `${progressPercent}%`;
+        document.querySelector('.progress-text').textContent = 
+            `${currentTFIndex}/${trueFalseQuestions.length}`;
+    }, 300);
 }
 
 function answerTrueFalse(userAnswer) {
     const q = trueFalseQuestions[currentTFIndex];
-    if (userAnswer === q.correct) {
-        trueFalseScore++;
-        document.getElementById('trueFalseFeedback').innerText = `✅ Correto! ${q.explanation}`;
+    const feedbackElement = document.getElementById('trueFalseFeedback');
+    const trueBtn = document.querySelector('#trueFalseGameModal button[onclick*="true"]');
+    const falseBtn = document.querySelector('#trueFalseGameModal button[onclick*="false"]');
+    
+    // Desativar botões durante o feedback
+    trueBtn.disabled = falseBtn.disabled = true;
+    
+    // Efeito visual nos botões
+    if (userAnswer === 'true') {
+        trueBtn.classList.add('selected');
     } else {
-        document.getElementById('trueFalseFeedback').innerText = `❌ Errado! ${q.explanation}`;
+        falseBtn.classList.add('selected');
     }
-    currentTFIndex++;
-    setTimeout(showNextTFQuestion, 2000);
+    
+    setTimeout(() => {
+        if (userAnswer === q.correct) {
+            trueFalseScore++;
+            feedbackElement.innerHTML = `
+                <div class="feedback-correct">
+                    <div class="feedback-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="feedback-content">
+                        <h3>Resposta Correta!</h3>
+                        <p>${q.explanation}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Atualizar pontuação com animação
+            const scoreElement = document.querySelector('.score-circle span');
+            scoreElement.textContent = trueFalseScore;
+            scoreElement.classList.add('score-pop');
+            setTimeout(() => scoreElement.classList.remove('score-pop'), 500);
+        } else {
+            feedbackElement.innerHTML = `
+                <div class="feedback-incorrect">
+                    <div class="feedback-icon">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="feedback-content">
+                        <h3>Resposta Incorreta</h3>
+                        <p>A resposta correta era: <strong>${q.correct === 'true' ? 'Verdadeiro' : 'Falso'}</strong></p>
+                        <p>${q.explanation}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Mostrar feedback com animação
+        feedbackElement.classList.add('show-feedback');
+        
+        // Limpar estilos e avançar para próxima pergunta
+        setTimeout(() => {
+            trueBtn.classList.remove('selected');
+            falseBtn.classList.remove('selected');
+            trueBtn.disabled = falseBtn.disabled = false;
+            currentTFIndex++;
+            document.getElementById('trueFalseQuestion').style.opacity = 0;
+            showNextTFQuestion();
+        }, 2500);
+    }, 300);
 }
+// Em answerTrueFalse, após mostrar a explicação:
+if (q.category === "TDAH") {
+    feedbackElement.innerHTML += `
+        <div class="tdah-tip">
+            <i class="fas fa-lightbulb"></i>
+            <strong>Dica para TDAH:</strong> ${getTDAHTip(q)} 
+        </div>
+    `;
+}
+function getTDAHTip(question) {
+    const tips = {
+        "Pessoas com TDAH sempre têm hiperatividade motora.": 
+            "Conheça os subtipos: desatento (mais comum em adultos), hiperativo e combinado.",
+        "Listas e planners são sempre eficazes...":
+            "Experimente técnicas como Pomodoro (25min foco + 5min pausa) ou apps com lembretes visuais.",
+        // Adicione dicas para outras perguntas...
+    };
+    return tips[question.question] || "Estratégias externas (como alarmes ou accountability partners) podem ajudar na organização.";
+}
+
 
 // ------------------ Jogo: Pares de Memória ------------------
 
@@ -1465,7 +1703,7 @@ function renderSchedule() {
     const row = document.createElement('div');
     row.className = 'schedule-row';
     row.innerHTML = `
-      <div class="time-slot">${time}</div>
+      <div class="time-slot" data-time="${time}">${time.split(' - ')[0]}</div>
       <div class="schedule-cell" data-day="monday" data-time="${time}"></div>
       <div class="schedule-cell" data-day="tuesday" data-time="${time}"></div>
       <div class="schedule-cell" data-day="wednesday" data-time="${time}"></div>
@@ -1617,4 +1855,27 @@ function makeTasksDraggable() {
 // Chamar initSchedule quando a página carregar
 document.addEventListener('DOMContentLoaded', function() {
   initSchedule();
+});
+// Chamar initSchedule quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+  initSchedule();
+});
+
+// Fechar menu ao clicar em um link
+document.querySelectorAll('.nav-menu a').forEach(link => {
+  link.addEventListener('click', () => {
+    const navMenu = document.querySelector('.nav-menu');
+    const hamburger = document.querySelector('.hamburger');
+    if (navMenu.classList.contains('active')) {
+      navMenu.classList.remove('active');
+      hamburger.classList.remove('active');
+    }
+  });
+});
+
+// Prevenir zoom em inputs em mobile
+document.addEventListener('DOMContentLoaded', function() {
+  document.documentElement.style.fontSize = '16px';
+  let metaViewport = document.querySelector('meta[name="viewport"]');
+  metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
 });

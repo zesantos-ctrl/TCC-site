@@ -1,30 +1,61 @@
+🎮 Projeto TCC – NeuroGame
+Nome da Consultoria (Grupo): BrightMind Studios
+Nome do Site: NeuroGame
+Tema: Desenvolvimento de um site interativo com foco em TDAH e Educação Cognitiva
 
-# 🎮 Projeto TCC – NeuroGame
+🧠 Sobre o Projeto
+O NeuroGame é uma plataforma educativa e interativa criada para ajudar jovens com TDAH a desenvolverem habilidades cognitivas essenciais, como foco, memória, organização e autocontrole, de forma leve e divertida.
 
-**Nome da Consultoria (Grupo):** [Nome final da sua empresa fictícia - Exemplo: BrightMind Studios]  
-**Nome do Site:** NeuroGame  
-**Tema:** Desenvolvimento de um site interativo com foco em TDAH e Educação Cognitiva
+O projeto combina jogos cognitivos, ferramentas de organização e um assistente virtual para oferecer uma experiência personalizada e eficaz.
 
----
+Objetivos:
+Promover o desenvolvimento de funções executivas.
 
-## 🧠 Sobre o Projeto
+Oferecer estratégias práticas para o dia a dia.
 
-O **NeuroGame** é um site educativo e interativo criado para ajudar **jovens com TDAH** a desenvolverem **foco**, **memória**, **organização** e **autocontrole** de forma leve e divertida.
+Utilizar gamificação para engajar os usuários.
 
-O projeto conta com **jogos simples**, **dicas de organização**, **cronômetro Pomodoro**, além de um **chatbot assistente virtual (NeuroBot)** para suporte ao usuário.
+🌱 ODS Atendidas
+ODS 3: Saúde e Bem-Estar
 
----
+Melhora a qualidade de vida de jovens com TDAH através de ferramentas de apoio cognitivo.
 
-## 🌱 ODS Atendidas
+ODS 4: Educação de Qualidade
 
-- **ODS 3:** Saúde e Bem-Estar  
-- **ODS 4:** Educação de Qualidade  
+Proporciona acesso a recursos educacionais inclusivos e adaptados.
 
----
+🚀 Tecnologias Utilizadas
+Frontend:
+HTML5 e CSS3 para estrutura e design responsivo.
 
-## 📁 Estrutura de Pastas
+JavaScript para interatividade e lógica dos jogos.
 
-```
+Font Awesome para ícones e elementos visuais.
+
+Google Fonts (Poppins) para tipografia moderna e legível.
+
+Funcionalidades Avançadas:
+LocalStorage para salvar progresso e preferências do usuário.
+
+Design Responsivo para acesso em dispositivos móveis e desktop.
+
+Modo Claro/Escuro para melhor acessibilidade visual.
+
+Chatbot (NeuroBot) com respostas inteligentes baseadas em conhecimento sobre TDAH.
+
+Jogos e Ferramentas:
+Jogo da Memória para treinar memória visual.
+
+Caça-Palavras para estimular o foco.
+
+Organizador de Tarefas (Kanban) para melhorar a organização.
+
+Cronômetro Pomodoro para gerenciamento de tempo.
+
+Desafios de Verdadeiro ou Falso para reforçar conhecimentos sobre TDAH.
+
+📁 Estrutura do Projeto
+text
 /NeuroGame/
 ├── index.html          (Página inicial)
 ├── jogos.html          (Página de jogos)
@@ -32,43 +63,42 @@ O projeto conta com **jogos simples**, **dicas de organização**, **cronômetro
 ├── sobre.html          (Sobre o projeto)
 ├── contato.html        (Página de contato)
 ├── neurobot.html       (Assistente virtual NeuroBot)
-├── style.css           (Estilo visual do site)
-├── script.js           (Scripts gerais)
-├── README.md           (Este arquivo)
-└── [imagens/]          (Pasta opcional para imagens e logos)
-```
+├── style.css           (Estilos do site)
+├── script.js           (Lógica e interatividade)
+├── README.md           (Documentação do projeto)
+└── assets/             (Pasta de imagens e recursos)
+🎯 Público-Alvo
+Jovens com TDAH que buscam melhorar suas habilidades cognitivas.
 
----
+Pais e educadores que desejam apoiar o desenvolvimento de crianças e adolescentes.
 
-## 🚀 Como Abrir o Site Localmente
+Profissionais de saúde interessados em recursos complementares para terapia.
 
-1. Baixe todos os arquivos e coloque em uma única pasta.
-2. Abra o arquivo `index.html` no navegador.
-3. Para testar o chatbot, abra o arquivo `neurobot.html`.
-4. Navegue entre as páginas usando os menus do site.
+🚀 Como Executar o Projeto
+Baixe os arquivos do repositório e extraia em uma pasta local.
 
----
+Abra o arquivo index.html no navegador para acessar a página inicial.
 
-## ✅ Tecnologias Utilizadas
+Navegue pelo site usando o menu ou os botões de ação.
 
-- HTML5
-- CSS3
-- JavaScript
-- Design responsivo
-- Animações e efeitos visuais simples
+Teste os jogos e ferramentas:
 
----
+Acesse o NeuroBot para tirar dúvidas.
 
-## 👥 Equipe Desenvolvedora (Consultoria fictícia)
+Experimente o Pomodoro ou o organizador de tarefas.
 
-- Integrante 1:  
-- Integrante 2:  
-- Integrante 3:    
+Jogue os desafios cognitivos.
 
-*(Preencher com os nomes do grupo)*
+👥 Equipe Desenvolvedora
+Integrante 1 - Frontend e Design
 
----
+Integrante 2 - Lógica e JavaScript
 
-## 🎯 Objetivo do TCC
+Integrante 3 - Conteúdo e Pesquisa sobre TDAH
 
-Criar uma solução digital acessível, lúdica e educativa que auxilie jovens com TDAH a melhorar suas funções executivas através da tecnologia e da gamificação.
+(Preencher com os nomes reais do grupo)
+
+📌 Considerações Finais
+O NeuroGame é uma solução inovadora que combina tecnologia, educação e saúde mental para oferecer um apoio real a jovens com TDAH. Através de uma abordagem lúdica e interativa, o projeto busca transformar desafios em oportunidades de crescimento.
+
+✨ Junte-se a nós nessa jornada de aprendizado e desenvolvimento!
