@@ -1175,23 +1175,26 @@ function startTrueFalseGame() {
     trueFalseScore = 0;
     document.getElementById('trueFalseQuestion').style.opacity = 0;
     
-    // Resetar estilo do modal
+    // Resetar estilo do modal completamente
     const modalContent = document.querySelector('#trueFalseGameModal .modal-content');
-    modalContent.classList.remove('game-completed', 'excellent', 'good', 'average');
+    modalContent.classList.remove('game-completed', 'excellent', 'good', 'average', 'poor');
     modalContent.style.background = "var(--bg-primary)";
     
-    // Mostrar contador inicial
+    // Mostrar contador inicial com design aprimorado
     document.getElementById('trueFalseScore').innerHTML = `
         <div class="score-container">
             <div class="score-circle">
-                <span>0</span>
+                <span class="current-score">0</span>
+                <div class="score-shadow"></div>
             </div>
             <div class="progress-container">
                 <div class="progress-bar" style="width: 0%"></div>
-                <span class="progress-text">0/${trueFalseQuestions.length}</span>
+                <span class="progress-text">0/${trueFalseQuestions.length} questões</span>
             </div>
         </div>
-        <div class="category-display" id="currentCategory"></div>
+        <div class="category-display" id="currentCategory">
+            <i class="fas fa-tag"></i> <span class="category-name">Carregando...</span>
+        </div>
     `;
     
     setTimeout(showNextTFQuestion, 500);
@@ -1201,56 +1204,80 @@ function showNextTFQuestion() {
     const questionElement = document.getElementById('trueFalseQuestion');
     const feedbackElement = document.getElementById('trueFalseFeedback');
     
-    // Resetar estilos
-    questionElement.classList.remove('fade-in');
-    feedbackElement.classList.remove('show-feedback');
+    // Resetar completamente os estilos
+    questionElement.classList.remove('fade-in', 'pulse-animation');
+    feedbackElement.classList.remove('show-feedback', 'feedback-swing');
     feedbackElement.innerHTML = '';
+    document.querySelectorAll('.tf-btn').forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('selected', 'correct', 'incorrect');
+    });
     
     if (currentTFIndex >= trueFalseQuestions.length) {
-        // Fim do jogo
-        questionElement.innerHTML = "<i class='fas fa-trophy'></i> Fim do jogo!";
+        // Final do jogo com feedback detalhado
+        questionElement.innerHTML = `
+            <div class="game-complete-header">
+                <i class='fas fa-trophy golden-trophy'></i>
+                <h2>Quiz Concluído!</h2>
+            </div>
+        `;
         questionElement.style.opacity = 1;
         
         const percentage = Math.round((trueFalseScore / trueFalseQuestions.length) * 100);
-        let message, medalClass;
+        let message, medalClass, encouragement;
         
-        if (percentage >= 80) {
-            message = "Excelente! Você domina o assunto!";
+        if (percentage >= 90) {
+            message = "Desempenho Excepcional! Você é um verdadeiro especialista!";
             medalClass = "excellent";
-        } else if (percentage >= 60) {
-            message = "Muito bom! Você está no caminho certo!";
+            encouragement = "Seu conhecimento está no nível mais avançado. Continue compartilhando seu saber!";
+        } else if (percentage >= 75) {
+            message = "Ótimo Resultado! Você demonstrou domínio do conteúdo!";
             medalClass = "good";
-        } else {
-            message = "Bom começo! Continue aprendendo!";
+            encouragement = "Você está muito próximo da maestria. Revise os poucos erros para aperfeiçoar ainda mais.";
+        } else if (percentage >= 50) {
+            message = "Bom Progresso! Você compreende os conceitos básicos!";
             medalClass = "average";
+            encouragement = "Com um pouco mais de estudo e prática, você alcançará um nível excelente.";
+        } else {
+            message = "Primeiros Passos! Todo aprendizado começa assim!";
+            medalClass = "poor";
+            encouragement = "Não desanime! Reveja os conceitos e tente novamente - a jornada do conhecimento é contínua.";
         }
         
         feedbackElement.innerHTML = `
             <div class="final-results">
-                <div class="result-circle ${medalClass}">
+                <div class="result-circle ${medalClass} pulse-animation">
                     <span>${percentage}%</span>
                     <div class="medal-icon">
-                        ${percentage >= 80 ? "<i class='fas fa-medal gold'></i>" : 
-                          percentage >= 60 ? "<i class='fas fa-medal silver'></i>" : 
-                          "<i class='fas fa-star bronze'></i>"}
+                        ${percentage >= 90 ? "<i class='fas fa-medal gold-spin'></i>" : 
+                          percentage >= 75 ? "<i class='fas fa-medal silver-glitter'></i>" : 
+                          percentage >= 50 ? "<i class='fas fa-star bronze-shine'></i>" : 
+                          "<i class='fas fa-seedling growing-icon'></i>"}
                     </div>
                 </div>
                 <div class="result-details">
                     <h3>${message}</h3>
-                    <p>Você acertou ${trueFalseScore} de ${trueFalseQuestions.length} perguntas</p>
-                    <button class="restart-btn" onclick="startTrueFalseGame()">
-                        <i class="fas fa-redo"></i> Jogar novamente
-                    </button>
+                    <p class="score-detail">Você acertou <strong>${trueFalseScore}</strong> de <strong>${trueFalseQuestions.length}</strong> perguntas</p>
+                    <p class="encouragement">${encouragement}</p>
+                    <div class="action-buttons">
+                        <button class="restart-btn" onclick="startTrueFalseGame()">
+                            <i class="fas fa-redo"></i> Tentar Novamente
+                        </button>
+                        <button class="review-btn" onclick="reviewMistakes()">
+                            <i class="fas fa-book-open"></i> Revisar Erros
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
         
-        // Estilizar o fundo conforme desempenho
+        // Estilização dinâmica do modal
         const modalContent = document.querySelector('#trueFalseGameModal .modal-content');
         modalContent.classList.add('game-completed', medalClass);
         
         if (typeof neuroGameState !== 'undefined') {
             neuroGameState.progress.gamesPlayed++;
+            neuroGameState.progress.trueFalseScores.push(percentage);
             updateProgress();
             checkAchievements();
         }
@@ -1260,20 +1287,29 @@ function showNextTFQuestion() {
 
     const q = trueFalseQuestions[currentTFIndex];
     
-    // Atualizar categoria
-    document.getElementById('currentCategory').textContent = q.category;
+    // Atualizar categoria com ícone dinâmico
+    const categoryIcon = getCategoryIcon(q.category);
+    document.getElementById('currentCategory').innerHTML = `
+        ${categoryIcon} <span class="category-name">${q.category}</span>
+    `;
     
-    // Animação de transição
+    // Animação de transição suave
     setTimeout(() => {
-        questionElement.innerHTML = q.question;
+        questionElement.innerHTML = `
+            <div class="question-text">${q.question}</div>
+            ${q.image ? `<div class="question-image"><img src="${q.image}" alt="Ilustração"></div>` : ''}
+        `;
         questionElement.style.opacity = 1;
-        questionElement.classList.add('fade-in');
+        questionElement.classList.add('fade-in', 'pulse-animation');
         
-        // Atualizar progresso
+        // Atualizar progresso visual
         const progressPercent = (currentTFIndex / trueFalseQuestions.length) * 100;
         document.querySelector('.progress-bar').style.width = `${progressPercent}%`;
         document.querySelector('.progress-text').textContent = 
-            `${currentTFIndex}/${trueFalseQuestions.length}`;
+            `${currentTFIndex}/${trueFalseQuestions.length} questões`;
+            
+        // Atualizar pontuação atual
+        document.querySelector('.current-score').textContent = trueFalseScore;
     }, 300);
 }
 
@@ -1284,85 +1320,114 @@ function answerTrueFalse(userAnswer) {
     const falseBtn = document.querySelector('#trueFalseGameModal button[onclick*="false"]');
     
     // Desativar botões durante o feedback
-    trueBtn.disabled = falseBtn.disabled = true;
+    document.querySelectorAll('.tf-btn').forEach(btn => btn.disabled = true);
     
     // Efeito visual nos botões
-    if (userAnswer === 'true') {
-        trueBtn.classList.add('selected');
-    } else {
-        falseBtn.classList.add('selected');
-    }
+    const selectedBtn = userAnswer === 'true' ? trueBtn : falseBtn;
+    const correctBtn = q.correct === 'true' ? trueBtn : falseBtn;
+    
+    selectedBtn.classList.add('selected');
     
     setTimeout(() => {
-        if (userAnswer === q.correct) {
+        const isCorrect = userAnswer === q.correct;
+        
+        if (isCorrect) {
             trueFalseScore++;
+            selectedBtn.classList.add('correct');
             feedbackElement.innerHTML = `
-                <div class="feedback-correct">
+                <div class="feedback-correct feedback-swing">
                     <div class="feedback-icon">
-                        <i class="fas fa-check-circle"></i>
+                        <i class="fas fa-check-circle bounce-icon"></i>
                     </div>
                     <div class="feedback-content">
                         <h3>Resposta Correta!</h3>
-                        <p>${q.explanation}</p>
+                        <p class="explanation-text">${q.explanation}</p>
+                        ${q.detail ? `<p class="additional-detail"><i class="fas fa-info-circle"></i> ${q.detail}</p>` : ''}
                     </div>
                 </div>
             `;
             
-            // Atualizar pontuação com animação
-            const scoreElement = document.querySelector('.score-circle span');
+            // Animação de pontuação
+            const scoreElement = document.querySelector('.current-score');
             scoreElement.textContent = trueFalseScore;
             scoreElement.classList.add('score-pop');
-            setTimeout(() => scoreElement.classList.remove('score-pop'), 500);
+            setTimeout(() => scoreElement.classList.remove('score-pop'), 600);
         } else {
+            selectedBtn.classList.add('incorrect');
+            correctBtn.classList.add('correct');
             feedbackElement.innerHTML = `
-                <div class="feedback-incorrect">
+                <div class="feedback-incorrect feedback-swing">
                     <div class="feedback-icon">
-                        <i class="fas fa-times-circle"></i>
+                        <i class="fas fa-times-circle shake-icon"></i>
                     </div>
                     <div class="feedback-content">
                         <h3>Resposta Incorreta</h3>
-                        <p>A resposta correta era: <strong>${q.correct === 'true' ? 'Verdadeiro' : 'Falso'}</strong></p>
-                        <p>${q.explanation}</p>
+                        <p class="correct-answer">A resposta correta era: <strong>${q.correct === 'true' ? 'Verdadeiro' : 'Falso'}</strong></p>
+                        <p class="explanation-text">${q.explanation}</p>
+                        ${q.detail ? `<p class="additional-detail"><i class="fas fa-info-circle"></i> ${q.detail}</p>` : ''}
                     </div>
                 </div>
             `;
         }
         
-        // Mostrar feedback com animação
+        // Adicionar dicas específicas para TDAH quando aplicável
+        if (q.category === "TDAH" || q.tags?.includes("TDAH")) {
+            feedbackElement.innerHTML += `
+                <div class="neuro-tip">
+                    <div class="tip-header">
+                        <i class="fas fa-brain"></i>
+                        <strong>Estratégia Neurodivergente:</strong>
+                    </div>
+                    <p class="tip-content">${getNeuroTip(q)}</p>
+                </div>
+            `;
+        }
+        
         feedbackElement.classList.add('show-feedback');
         
-        // Limpar estilos e avançar para próxima pergunta
+        // Transição para próxima pergunta
         setTimeout(() => {
-            trueBtn.classList.remove('selected');
-            falseBtn.classList.remove('selected');
-            trueBtn.disabled = falseBtn.disabled = false;
-            currentTFIndex++;
+            document.querySelectorAll('.tf-btn').forEach(btn => {
+                btn.classList.remove('selected', 'correct', 'incorrect');
+                btn.disabled = false;
+            });
             document.getElementById('trueFalseQuestion').style.opacity = 0;
+            currentTFIndex++;
             showNextTFQuestion();
-        }, 2500);
+        }, 3500);
     }, 300);
 }
-// Em answerTrueFalse, após mostrar a explicação:
-if (q.category === "TDAH") {
-    feedbackElement.innerHTML += `
-        <div class="tdah-tip">
-            <i class="fas fa-lightbulb"></i>
-            <strong>Dica para TDAH:</strong> ${getTDAHTip(q)} 
-        </div>
-    `;
-}
-function getTDAHTip(question) {
-    const tips = {
+
+// Funções auxiliares melhoradas
+function getNeuroTip(question) {
+    const neuroTips = {
         "Pessoas com TDAH sempre têm hiperatividade motora.": 
-            "Conheça os subtipos: desatento (mais comum em adultos), hiperativo e combinado.",
-        "Listas e planners são sempre eficazes...":
-            "Experimente técnicas como Pomodoro (25min foco + 5min pausa) ou apps com lembretes visuais.",
-        // Adicione dicas para outras perguntas...
+            "O TDAH apresenta subtipos distintos: predominantemente desatento (mais comum em mulheres e adultos), hiperativo-impulsivo e combinado. Muitos adultos desenvolvem estratégias de compensação que mascaram os sintomas.",
+        "Listas e planners são sempre eficazes para organização.":
+            "Para cérebros neurodivergentes, métodos tradicionais podem falhar. Experimente técnicas adaptadas como: Pomodoro modificado (15min foco + 5min pausa), body doubling (estudar com companhia), ou apps com lembretes visuais e sonoros.",
+        "Medicação é a única solução eficaz para TDAH.":
+            "Embora a medicação ajude muitos indivíduos, abordagens complementares são essenciais: terapia cognitivo-comportamental, exercícios físicos regulares, técnicas de mindfulness adaptadas e ajustes ambientais podem fazer diferença significativa."
     };
-    return tips[question.question] || "Estratégias externas (como alarmes ou accountability partners) podem ajudar na organização.";
+    
+    return neuroTips[question.question] || 
+        "Estratégias externas (como alarmes físicos, parceiros de accountability e ambientes com estímulos controlados) podem ajudar na organização e execução de tarefas para mentes neurodivergentes.";
 }
 
+function getCategoryIcon(category) {
+    const icons = {
+        "TDAH": "fas fa-bolt",
+        "Neurociência": "fas fa-brain",
+        "Psicologia": "fas fa-mind-share",
+        "Memória": "fas fa-memory",
+        "Aprendizado": "fas fa-book-open"
+    };
+    return `<i class="${icons[category] || 'fas fa-question'}"></i>`;
+}
 
+function reviewMistakes() {
+    // Implementar lógica para revisão de erros
+    alert("Funcionalidade de revisão em desenvolvimento! Em breve você poderá revisitar suas respostas incorretas.");
+}
 // ------------------ Jogo: Pares de Memória ------------------
 
 function startMemoryPairsGame() {
