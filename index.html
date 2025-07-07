@@ -13,7 +13,6 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="icon" href="./assets/image/brain.jfif" type="image/png">
   </head>
   <body>
     <header class="header">
@@ -21,7 +20,7 @@
         <div class="nav-container">
           <div class="logo">
             <i class="fas fa-brain"></i>
-            <span><a href="index.html"></a>NeuroGame</span>
+            <span>NeuroGame</span>
           </div>
           <ul class="nav-menu">
             <li><a href="#home">Início</a></li>
@@ -318,116 +317,6 @@
       </div>
     </section>
 
-
-
-
-
-
-
-
-    <section id="schedule" class="schedule-section">
-  <div class="container">
-    <h2>📅 Cronograma Semanal</h2>
-    <p class="section-subtitle">Organize sua semana de forma eficiente</p>
-    
-    <div class="schedule-container">
-      <div class="schedule-content">
-        <div class="schedule-grid">
-          <!-- Cabeçalho com dias da semana -->
-          <div class="schedule-header">
-            <div class="time-column">Horário</div>
-            <div class="day-header">Segunda</div>
-            <div class="day-header">Terça</div>
-            <div class="day-header">Quarta</div>
-            <div class="day-header">Quinta</div>
-            <div class="day-header">Sexta</div>
-          </div>
-          
-          <!-- Linhas do cronograma -->
-          <div class="schedule-rows" id="scheduleRows">
-            <!-- As linhas serão geradas pelo JavaScript -->
-          </div>
-        </div>
-        
-        <div class="schedule-controls">
-          <button class="btn-primary" onclick="addNewTask()">
-            <i class="fas fa-plus"></i> Adicionar Tarefa
-          </button>
-          <button class="btn-secondary" onclick="saveSchedule()">
-            <i class="fas fa-save"></i> Salvar Cronograma
-          </button>
-        </div>
-      </div>
-      
-      <div class="schedule-explanation">
-        <div class="explanation-card">
-          <div class="explanation-image">
-            <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Organização eficiente">
-          </div>
-          <div class="explanation-content">
-            <h3>Como usar seu cronograma</h3>
-            <ul>
-              <li><i class="fas fa-check-circle"></i> Clique em qualquer célula para adicionar uma tarefa</li>
-              <li><i class="fas fa-check-circle"></i> Arraste tarefas para reorganizá-las</li>
-              <li><i class="fas fa-check-circle"></i> Use cores diferentes para categorias</li>
-              <li><i class="fas fa-check-circle"></i> Salve seu progresso automaticamente</li>
-              <li><i class="fas fa-check-circle"></i> Priorize tarefas importantes</li>
-            </ul>
-            <p>Dica: Reserve blocos de tempo para cada tipo de atividade e inclua pausas regulares!</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Modal para adicionar/editar tarefas -->
-<div class="modal" id="taskModal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3 id="modalTaskTitle">Adicionar Tarefa</h3>
-      <button class="close-modal" onclick="closeModal('taskModal')">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label for="taskName">Nome da Tarefa:</label>
-        <input type="text" id="taskName" placeholder="Ex: Aula de Matemática">
-      </div>
-      <div class="form-group">
-        <label for="taskDay">Dia da Semana:</label>
-        <select id="taskDay">
-          <option value="monday">Segunda-feira</option>
-          <option value="tuesday">Terça-feira</option>
-          <option value="wednesday">Quarta-feira</option>
-          <option value="thursday">Quinta-feira</option>
-          <option value="friday">Sexta-feira</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="taskTime">Horário:</label>
-        <select id="taskTime">
-          <!-- Opções serão preenchidas pelo JavaScript -->
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="taskColor">Cor:</label>
-        <select id="taskColor">
-          <option value="#4e79a7">Azul (Estudo)</option>
-          <option value="#f28e2b">Laranja (Trabalho)</option>
-          <option value="#e15759">Vermelho (Importante)</option>
-          <option value="#76b7b2">Verde (Lazer)</option>
-          <option value="#59a14f">Verde Escuro (Exercício)</option>
-        </select>
-      </div>
-      <div class="form-actions">
-        <button class="btn-primary" onclick="saveTask()">Salvar Tarefa</button>
-        <button class="btn-secondary" onclick="closeModal('taskModal')">Cancelar</button>
-      </div>
-    </div>
-  </div>
-</div>
     <section id="about" class="about-section">
       <div class="container">
         <h2>🧠 Sobre TDAH</h2>
@@ -478,57 +367,6 @@
       </div>
     </section>
 
-<section class="sobre-neurogame">
-  <div class="container">
-    <div class="conteudo-wrapper">
-      <div class="imagem-col">
-        <img src="./assets/image/6def233b6051cc907346fc9c3db2027a.gif" alt="Criança jogando e aprendendo com NeuroGame" class="imagem-destaque">
-      </div>
-      
-      <div class="texto-col">
-        <h2>
-          <span class="icone-destaque">🌟</span>
-          Sobre a NeuroGame
-        </h2>
-        
-        <p class="destaque">
-          A <span class="destaque-texto">NeuroGame</span> nasceu da necessidade de ajudar pessoas com <span class="destaque-tdah">TDAH</span> a desenvolverem suas <span class="destaque-habilidade">habilidades cognitivas</span> de forma divertida e eficiente.
-        </p>
-        
-        <div class="caixa-solucao">
-          <p>🎯 <strong>Nossa solução:</strong> Jogos interativos que estimulam a <span class="destaque-habilidade">memória</span>, <span class="destaque-habilidade">foco</span> e <span class="destaque-habilidade">raciocínio</span>, tornando o aprendizado leve e motivador.</p>
-        </div>
-        
-        <div class="publicos-section">
-          <h3>
-            <span class="icone-publicos">👥</span>
-            Nossos principais públicos
-          </h3>
-          <ul class="lista-publicos">
-            <li class="publico-item">
-              <span class="emoji-publico">👦</span>
-              <span>Pessoas com <strong>TDAH</strong> buscando formas acessíveis de aprendizado</span>
-            </li>
-            <li class="publico-item">
-              <span class="emoji-publico">👨‍👩‍👧‍👦</span>
-              <span><strong>Famílias e cuidadores</strong> que apoiam o desenvolvimento cognitivo</span>
-            </li>
-            <li class="publico-item">
-              <span class="emoji-publico">👩‍⚕️</span>
-              <span><strong>Profissionais de saúde</strong> que usam jogos como ferramenta terapêutica</span>
-            </li>
-          </ul>
-        </div>
-        
-        <div class="missao-destaque">
-          <p>
-            A <span class="destaque-texto">NeuroGame</span> acredita que <span class="slogan">jogar pode ajudar</span> — unimos <span class="destaque-valor">tecnologia</span>, <span class="destaque-valor">diversão</span> e <span class="destaque-valor">inclusão</span> para transformar o aprendizado.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
     <footer class="footer">
       <div class="container">
         <div class="footer-content">
@@ -911,7 +749,7 @@
     </div>
 
     <!-- //Notas -->
-  <div class="modal" id="colorGameModal">
+    <div class="modal" id="colorGameModal">
     <div class="modal-content">
         <div class="modal-header">
             <h3>🎮 Jogo de Atenção Rápida</h3>
@@ -919,60 +757,20 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <div class="modal-body color-game-body">
-            <div class="game-stats">
-                <div class="stat-box">
-                    <span class="stat-label">Pontuação</span>
-                    <span class="stat-value" id="colorGameScore">0</span>
-                </div>
-                <div class="stat-box">
-                    <span class="stat-label">Tempo</span>
-                    <span class="stat-value" id="colorGameTime">60s</span>
-                </div>
-                <div class="stat-box">
-                    <span class="stat-label">Recorde</span>
-                    <span class="stat-value" id="colorGameHighScore">0</span>
-                </div>
+        <div class="modal-body">
+            <p id="targetColor" style="font-weight:bold; font-size: 1.2rem;">Clique na cor: -</p>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button style="background:red; width:60px; height:60px; border:none; border-radius:50%;" onclick="checkColor('red')"></button>
+                <button style="background:blue; width:60px; height:60px; border:none; border-radius:50%;" onclick="checkColor('blue')"></button>
+                <button style="background:green; width:60px; height:60px; border:none; border-radius:50%;" onclick="checkColor('green')"></button>
+                <button style="background:yellow; width:60px; height:60px; border:none; border-radius:50%;" onclick="checkColor('yellow')"></button>
             </div>
-            
-            <div class="color-instruction">
-                <p id="targetColor">Clique na cor: <span class="target-color-text">-</span></p>
-            </div>
-            
-            <div class="color-buttons-grid">
-                <button class="color-btn red" onclick="checkColor('red')">
-                    <span class="color-name">Vermelho</span>
-                </button>
-                <button class="color-btn blue" onclick="checkColor('blue')">
-                    <span class="color-name">Azul</span>
-                </button>
-                <button class="color-btn green" onclick="checkColor('green')">
-                    <span class="color-name">Verde</span>
-                </button>
-                <button class="color-btn yellow" onclick="checkColor('yellow')">
-                    <span class="color-name">Amarelo</span>
-                </button>
-                <button class="color-btn purple" onclick="checkColor('purple')">
-                    <span class="color-name">Roxo</span>
-                </button>
-                <button class="color-btn orange" onclick="checkColor('orange')">
-                    <span class="color-name">Laranja</span>
-                </button>
-            </div>
-            
-            <div class="game-controls">
-                <button class="game-btn start-btn" onclick="startColorGame()">
-                    <i class="fas fa-play"></i> Começar
-                </button>
-                <button class="game-btn restart-btn" onclick="resetColorGame()">
-                    <i class="fas fa-redo"></i> Reiniciar
-                </button>
-            </div>
-            
-            <div class="game-feedback" id="colorGameFeedback"></div>
+            <p>Pontos: <span id="colorGameScore">0</span></p>
+            <button onclick="startColorGame()">Recomeçar Jogo</button>
         </div>
     </div>
 </div>
+
     <!-- // Organize Game Modal -->
 <div class="modal" id="organizeGameModal">
   <div class="modal-content">
@@ -1094,25 +892,19 @@
 <div class="modal" id="trueFalseGameModal">
   <div class="modal-content">
     <div class="modal-header">
-      <h3><i class="fas fa-brain"></i> Desafio TDAH: Verdadeiro ou Falso</h3>
+      <h3>🧠 Desafio de Produtividade</h3>
       <button class="close-modal" onclick="closeModal('trueFalseGameModal')">
         <i class="fas fa-times"></i>
       </button>
     </div>
     <div class="modal-body">
-      <div id="trueFalseScore"></div>
-      <div id="trueFalseQuestion">Carregando perguntas...</div>
-      
-      <div class="answer-buttons">
-        <button class="true-btn" onclick="answerTrueFalse('true')">
-          <i class="fas fa-check"></i> Verdadeiro
-        </button>
-        <button class="false-btn" onclick="answerTrueFalse('false')">
-          <i class="fas fa-times"></i> Falso
-        </button>
+      <p id="trueFalseQuestion">Carregando pergunta...</p>
+      <div style="display:flex; gap:10px; justify-content:center;">
+        <button class="tool-btn" onclick="answerTrueFalse('true')">Verdadeiro ✅</button>
+        <button class="tool-btn" onclick="answerTrueFalse('false')">Falso ❌</button>
       </div>
-      
-      <div id="trueFalseFeedback"></div>
+      <p id="trueFalseFeedback" style="margin-top:10px; font-weight:bold;"></p>
+      <p id="trueFalseScore" style="margin-top:10px;"></p>
     </div>
   </div>
 </div>
@@ -1180,55 +972,6 @@
       <p id="sequenceFeedback" class="sequence-feedback"></p>
 
       <button class="tool-btn" onclick="startSequenceGame()">Iniciar / Próximo</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- Modal para adicionar/editar tarefas -->
-<div class="modal" id="taskModal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3 id="modalTaskTitle">Adicionar Tarefa</h3>
-      <button class="close-modal" onclick="closeModal('taskModal')">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label for="taskName">Nome da Tarefa:</label>
-        <input type="text" id="taskName" placeholder="Ex: Aula de Matemática">
-      </div>
-      <div class="form-group">
-        <label for="taskDay">Dia da Semana:</label>
-        <select id="taskDay">
-          <option value="monday">Segunda-feira</option>
-          <option value="tuesday">Terça-feira</option>
-          <option value="wednesday">Quarta-feira</option>
-          <option value="thursday">Quinta-feira</option>
-          <option value="friday">Sexta-feira</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="taskTime">Horário:</label>
-        <select id="taskTime">
-          <!-- Opções serão preenchidas pelo JavaScript -->
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="taskColor">Cor:</label>
-        <select id="taskColor">
-          <option value="#4e79a7">Azul (Estudo)</option>
-          <option value="#f28e2b">Laranja (Trabalho)</option>
-          <option value="#e15759">Vermelho (Importante)</option>
-          <option value="#76b7b2">Verde (Lazer)</option>
-          <option value="#59a14f">Verde Escuro (Exercício)</option>
-        </select>
-      </div>
-      <div class="form-actions">
-        <button class="btn-primary" onclick="saveTask()">Salvar Tarefa</button>
-        <button class="btn-secondary" onclick="closeModal('taskModal')">Cancelar</button>
-      </div>
     </div>
   </div>
 </div>
