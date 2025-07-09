@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calendário de Tarefas - NeuroGame</title>
+  <link rel="stylesheet" href="calender.css" />
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<!-- Modal -->
+<div id="taskModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="selectedDateTitle">Tarefas do Dia</h3>
+      <button class="close-modal" onclick="closeTaskModal()">✖</button>
+    </div>
+    <div class="modal-body">
+      <ul id="taskList"></ul>
+      <input type="text" id="newTaskInput" placeholder="Nova tarefa..." />
+      <button onclick="addTaskToDate()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+  <section class="calendar-container">
+    <div class="calendar-nav">
+      <button class="nav-btn" id="prevMonth">◀</button>
+      <h2 id="monthYear">Mês Ano</h2>
+      <button class="nav-btn" id="nextMonth">▶</button>
+    </div>
+
+    <div id="calendarGrid" class="calendar-grid"></div>
+    <a href="../index.html" class="tool-btn">← Voltar ao Site</a>
+
+  </section>
+
+  <!-- Modal de Tarefas -->
+  <div id="taskModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="selectedDateTitle">Tarefas do Dia</h3>
+        <button class="close-modal" onclick="closeTaskModal()">✖</button>
+      </div>
+      <div class="modal-body">
+        <ul id="taskList"></ul>
+        <input type="text" id="newTaskInput" placeholder="Nova tarefa..." />
+        <button onclick="addTaskToDate()">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  
+  <script src="calender.js"></script>
+  <script src="../theme/theme.js"></script>
+</body>
+</html>
