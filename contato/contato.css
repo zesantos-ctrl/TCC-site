@@ -92,3 +92,20 @@ body.dark-mode #contato button {
     position: relative;
     right: 550px;
 }
+
+.dark-mode label {
+    
+    color: white;
+}
+
+
+.dark-mode #contato p {
+    color: white;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.footer {
+    display: flex ;
+    justify-content: center;
+}
