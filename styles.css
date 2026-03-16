@@ -1,52 +1,59 @@
-/* =============================================
-   NEUROGAME — CSS Melhorado
-   Mais fluido, polido e moderno
-   ============================================= */
-
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
-
 /* Reset e configurações básicas */
-*, *::before, *::after {
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-
-/* =============================================
-   1. VARIÁVEIS DE TEMA
-   ============================================= */
+    
 :root {
-    /* Backgrounds */
+  --bg-primary: #f9fafb;
+  --bg-secondary: #ffffff;
+  --text-primary: #1f2937;
+  --text-tertiary: #4b5563;
+  --text-inverted: #ffffff;
+  --text-highlight: #2563eb;
+  --bg-gradient-start: #60a5fa;
+  --bg-gradient-end: #3b82f6;
+  --border-color: #d1d5db;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shadow-color-hover: rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode {
+  --bg-primary: #1f2937;
+  --bg-secondary: #374151;
+  --text-primary: #f9fafb;
+  --text-tertiary: #d1d5db;
+  --text-inverted: #1f2937;
+  --text-highlight: #60a5fa;
+  --bg-gradient-start: #3b82f6;
+  --bg-gradient-end: #2563eb;
+  --border-color: #4b5563;
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --shadow-color-hover: rgba(0, 0, 0, 0.7);
+}
+
+/* 1. DEFINIÇÃO DAS VARIÁVEIS DE TEMA */
+:root {
     --bg-primary: #ffffff;
     --bg-secondary: #f8fafc;
     --bg-tertiary: #f1f5f9;
-
-    /* Gradientes principais */
     --bg-gradient-start: #667eea;
     --bg-gradient-end: #764ba2;
     --bg-accent-gradient-start: #ffd700;
     --bg-accent-gradient-end: #ffed4e;
-
-    /* Textos */
+    
     --text-primary: #1a202c;
     --text-secondary: #4a5568;
-    --text-tertiary: #718096;
+    --text-tertiary: #666;
     --text-inverted: #ffffff;
     --text-accent: #667eea;
     --text-highlight: #ffd700;
 
-    /* Bordas e sombras */
     --border-color: #e2e8f0;
-    --shadow-sm: 0 2px 8px rgba(102, 126, 234, 0.08);
-    --shadow-md: 0 8px 24px rgba(102, 126, 234, 0.12);
-    --shadow-lg: 0 16px 48px rgba(102, 126, 234, 0.18);
-    --shadow-color: rgba(0, 0, 0, 0.08);
-    --shadow-color-hover: rgba(102, 126, 234, 0.25);
-
-    /* Accent */
-    --accent-color-light: rgba(102, 126, 234, 0.15);
-
-    /* Botões */
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --shadow-color-hover: rgba(0, 0, 0, 0.15);
+    --accent-color-light: rgba(255, 215, 0, 0.2);
     --button-primary-bg: #ffd700;
     --button-primary-text: #333;
     --button-primary-hover-bg: #ffed4e;
@@ -54,93 +61,58 @@
     --button-secondary-text: white;
     --button-secondary-hover-bg: white;
     --button-secondary-hover-text: #333;
-
-    /* Estado */
-    --error-color: #e53e3e;
-    --success-color: #38a169;
-
-    /* Transições */
-    --transition-fast: 0.15s ease;
-    --transition-base: 0.3s ease;
-    --transition-slow: 0.5s ease;
-    --transition-bounce: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-
-    /* Raios */
-    --radius-sm: 8px;
-    --radius-md: 16px;
-    --radius-lg: 24px;
-    --radius-xl: 32px;
-    --radius-full: 9999px;
+    --error-color: red;
+    --success-color: green;
 }
 
 body.dark-mode {
-    --bg-primary: #0f1117;
-    --bg-secondary: #1a1f2e;
-    --bg-tertiary: #252d3d;
-
-    --bg-gradient-start: #7c5cbf;
-    --bg-gradient-end: #4a3f8a;
-    --bg-accent-gradient-start: #ffd700;
-    --bg-accent-gradient-end: #ffed4e;
-
+    --bg-primary: #1a202c;
+    --bg-secondary: #2d3748;
+    --bg-tertiary: #4a5568;
+    
     --text-primary: #f7fafc;
-    --text-secondary: #e2e8f0;
-    --text-tertiary: #a0aec0;
-    --text-inverted: #0f1117;
-    --text-accent: #a78bfa;
+    --text-secondary: #000000;
+    --text-tertiary: #cbd5e0;
+    --text-inverted: #1a202c;
+    --text-accent: #9f7aea;
     --text-highlight: #ffd700;
 
-    --border-color: #2d3748;
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
-    --shadow-color: rgba(0, 0, 0, 0.3);
-    --shadow-color-hover: rgba(124, 92, 191, 0.4);
-
-    --accent-color-light: rgba(167, 139, 250, 0.12);
-    --button-primary-bg: #a78bfa;
+    --border-color: #4a5568;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    --shadow-color-hover: rgba(0, 0, 0, 0.6);
+    --accent-color-light: rgba(159, 122, 234, 0.2);
+    --button-primary-bg: #9f7aea;
     --button-primary-text: #fff;
-    --button-primary-hover-bg: #c4b5fd;
-    --button-secondary-border: rgba(255,255,255,0.3);
-    --button-secondary-text: rgba(255,255,255,0.9);
-    --button-secondary-hover-bg: rgba(255,255,255,0.1);
+    --button-primary-hover-bg: #b794f4;
+    --button-secondary-border: #b7b1b1;
+    --button-secondary-text: #b7b1b1;
+    --button-secondary-hover-bg: #9f7aea;
     --button-secondary-hover-text: white;
 }
 
-/* =============================================
-   2. BASE
-   ============================================= */
-html {
-    scroll-behavior: smooth;
-}
-
 body {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Poppins', sans-serif;
     line-height: 1.6;
     background-color: var(--bg-primary);
     color: var(--text-secondary);
     overflow-x: hidden;
-    transition: background-color 0.4s ease, color 0.4s ease;
-    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 20px;
 }
 
-/* =============================================
-   3. HEADER & NAV
-   ============================================= */
+/* Header */
 .header {
     background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 1000;
-    box-shadow: 0 4px 24px rgba(102, 126, 234, 0.3);
-    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 20px var(--shadow-color);
 }
 
 .navbar {
@@ -153,7 +125,7 @@ body {
     align-items: center;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 20px;
 }
 
 .logo {
@@ -162,14 +134,12 @@ body {
     gap: 10px;
     color: var(--text-inverted);
     font-size: 1.5rem;
-    font-weight: 800;
-    letter-spacing: -0.5px;
+    font-weight: 700;
 }
 
 .logo i {
     font-size: 2rem;
     color: var(--text-highlight);
-    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
 }
 
 .nav-menu {
@@ -179,54 +149,31 @@ body {
 }
 
 .nav-menu a {
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--text-inverted);
     text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: color var(--transition-base);
-    position: relative;
-    padding-bottom: 2px;
-}
-
-.nav-menu a::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: var(--text-highlight);
-    border-radius: 2px;
-    transition: width var(--transition-base);
+    font-weight: 500;
+    transition: color 0.3s;
 }
 
 .nav-menu a:hover {
     color: var(--text-highlight);
 }
 
-.nav-menu a:hover::after {
-    width: 100%;
-}
-
 .hamburger {
     display: none;
     flex-direction: column;
     cursor: pointer;
-    gap: 5px;
-    padding: 4px;
 }
 
 .hamburger span {
-    width: 24px;
-    height: 2.5px;
+    width: 25px;
+    height: 3px;
     background: var(--text-inverted);
-    border-radius: 2px;
-    transition: var(--transition-base);
+    margin: 3px 0;
+    transition: 0.3s;
 }
 
-/* =============================================
-   4. HERO SECTION
-   ============================================= */
+/* Hero Section */
 .hero {
     background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
     min-height: 100vh;
@@ -240,23 +187,12 @@ body {
 .hero::before {
     content: '';
     position: absolute;
-    inset: 0;
-    background:
-        radial-gradient(ellipse at 20% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 20%, rgba(255, 215, 0, 0.08) 0%, transparent 50%);
-    pointer-events: none;
-}
-
-/* Partículas decorativas */
-.hero::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-        radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
-    background-size: 40px 40px;
-    opacity: 0.4;
-    pointer-events: none;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
 }
 
 .hero-container {
@@ -271,21 +207,19 @@ body {
 .hero-content h1 {
     padding: 18px 50px;
     font-size: 3.5rem;
-    font-weight: 900;
+    font-weight: 700;
     margin-bottom: 0.1rem;
-    line-height: 1.15;
-    letter-spacing: -1px;
+    line-height: 1.2;
 }
 
 .highlight {
     color: var(--text-highlight);
-    text-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-    animation: glow 2s ease-in-out infinite alternate;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
 }
 
 .hero-content p {
     padding: 0px 30px;
-    font-size: 1.15rem;
+    font-size: 1.2rem;
     margin-bottom: 0.1rem;
     opacity: 0.9;
     position: relative;
@@ -293,14 +227,12 @@ body {
 }
 
 .hero-subtitle {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     padding: 0 30px;
     color: var(--text-highlight);
     margin-bottom: 2rem !important;
     position: relative;
     left: 20px;
-    font-weight: 600;
-    opacity: 0.9;
 }
 
 .hero-buttons {
@@ -310,56 +242,44 @@ body {
     margin-top: 2rem;
 }
 
-/* =============================================
-   5. BOTÕES
-   ============================================= */
 .btn-primary, .btn-secondary {
-    padding: 0.9rem 1.8rem;
+    padding: 1rem 2rem;
     border: none;
-    border-radius: var(--radius-full);
+    border-radius: 50px;
     font-size: 1rem;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
-    transition: all var(--transition-bounce);
-    display: inline-flex;
+    transition: all 0.3s;
+    display: flex;
     align-items: center;
     gap: 0.5rem;
     text-decoration: none;
-    letter-spacing: 0.2px;
 }
 
 .btn-primary {
     background: var(--button-primary-bg);
     color: var(--button-primary-text);
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.35);
 }
 
 .btn-primary:hover {
     background: var(--button-primary-hover-bg);
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 12px 28px rgba(255, 215, 0, 0.45);
-}
-
-.btn-primary:active {
-    transform: translateY(-1px) scale(0.99);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
 }
 
 .btn-secondary {
-    background: rgba(255, 255, 255, 0.08);
+    background: transparent;
     color: var(--button-secondary-text);
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(8px);
+    border: 2px solid var(--button-secondary-border);
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.18);
-    border-color: rgba(255, 255, 255, 0.8);
-    transform: translateY(-3px) scale(1.02);
+    background: var(--button-secondary-hover-bg);
+    color: var(--button-secondary-hover-text);
+    transform: translateY(-2px);
 }
 
-/* =============================================
-   6. ANIMAÇÃO DO CÉREBRO
-   ============================================= */
+/* Brain Animation */
 .hero-image {
     display: flex;
     justify-content: center;
@@ -379,40 +299,50 @@ body {
     color: var(--text-highlight);
     z-index: 2;
     position: relative;
-    animation: float 4s ease-in-out infinite;
-    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
+    animation: float 3s ease-in-out infinite;
 }
 
 .pulse-ring {
     position: absolute;
-    border: 2px solid rgba(255, 255, 255, 0.15);
+    border: 3px solid var(--accent-color-light);
     border-radius: 50%;
-    animation: pulse 2.5s ease-out infinite;
+    animation: pulse 2s infinite;
 }
 
-.pulse-ring { width: 200px; height: 200px; }
-.pulse-ring.delay-1 { width: 260px; height: 260px; animation-delay: 0.8s; }
-.pulse-ring.delay-2 { width: 320px; height: 320px; animation-delay: 1.6s; }
+.pulse-ring {
+    width: 200px;
+    height: 200px;
+}
+
+.pulse-ring.delay-1 {
+    width: 250px;
+    height: 250px;
+    animation-delay: 0.5s;
+}
+
+.pulse-ring.delay-2 {
+    width: 300px;
+    height: 300px;
+    animation-delay: 1s;
+}
 
 @keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    33%  { transform: translateY(-15px) rotate(2deg); }
-    66%  { transform: translateY(-8px) rotate(-1deg); }
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
 }
 
 @keyframes pulse {
-    0%   { transform: scale(0.85); opacity: 0.6; }
-    100% { transform: scale(1.25); opacity: 0; }
+    0% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.2);
+        opacity: 0;
+    }
 }
 
-@keyframes glow {
-    from { text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
-    to   { text-shadow: 0 0 25px rgba(255, 215, 0, 0.9), 0 0 50px rgba(255, 215, 0, 0.3); }
-}
-
-/* =============================================
-   7. SECTIONS
-   ============================================= */
+/* Sections */
 section {
     padding: 5rem 0;
     background-color: var(--bg-primary);
@@ -420,23 +350,19 @@ section {
 
 section h2 {
     text-align: center;
-    font-size: 2.4rem;
-    font-weight: 800;
-    margin-bottom: 0.75rem;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
     color: var(--text-primary);
-    letter-spacing: -0.5px;
 }
 
 .section-subtitle {
     text-align: center;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     color: var(--text-tertiary);
     margin-bottom: 3rem;
 }
 
-/* =============================================
-   8. GAMES SECTION
-   ============================================= */
+/* Games Section */
 .games-section {
     background: var(--bg-secondary);
 }
@@ -444,42 +370,24 @@ section h2 {
 .games-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.75rem;
+    gap: 2rem;
     margin-top: 3rem;
 }
 
 .game-card {
     background: var(--bg-primary);
     padding: 2rem;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px var(--shadow-color);
     text-align: center;
     cursor: pointer;
-    transition: transform var(--transition-bounce), box-shadow var(--transition-base), border-color var(--transition-base);
-    border: 2px solid transparent;
-    position: relative;
-    overflow: hidden;
-}
-
-.game-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-    opacity: 0;
-    transition: opacity var(--transition-base);
-    z-index: 0;
-    border-radius: inherit;
-}
-
-.game-card > * {
-    position: relative;
-    z-index: 1;
+    transition: all 0.3s;
+    border: 3px solid transparent;
 }
 
 .game-card:hover {
-    transform: translateY(-12px) scale(1.01);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px var(--shadow-color-hover);
     border-color: var(--bg-gradient-start);
 }
 
@@ -494,71 +402,52 @@ section h2 {
     margin: 0 auto 1.5rem;
     color: var(--text-inverted);
     font-size: 2rem;
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-    transition: transform var(--transition-bounce);
-}
-
-.game-card:hover .game-icon {
-    transform: scale(1.12) rotate(-5deg);
 }
 
 .game-card h3 {
-    font-size: 1.4rem;
-    font-weight: 800;
-    margin-bottom: 0.75rem;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
     color: var(--text-primary);
-    letter-spacing: -0.3px;
 }
 
 .game-card p {
     color: var(--text-tertiary);
     margin-bottom: 1.5rem;
-    font-size: 0.95rem;
-    line-height: 1.6;
 }
 
 .game-stats {
     display: flex;
     justify-content: space-between;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
 }
 
 .game-stats span {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.5rem;
 }
 
-/* =============================================
-   9. TOOLS SECTION
-   ============================================= */
+/* Tools Section */
 .tools-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.75rem;
+    gap: 2rem;
     margin-top: 3rem;
 }
 
 .tool-card {
     background: var(--bg-primary);
     padding: 2rem;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px var(--shadow-color);
     text-align: center;
-    transition: transform var(--transition-bounce), box-shadow var(--transition-base);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 260px;
-    border: 1px solid var(--border-color);
+    transition: all 0.3s;
 }
 
 .tool-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
-    border-color: transparent;
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px var(--shadow-color-hover);
 }
 
 .tool-icon {
@@ -570,75 +459,55 @@ section h2 {
     align-items: center;
     justify-content: center;
     margin: 0 auto 1.5rem;
-    color: #333;
+    color: var(--button-primary-text);
     font-size: 1.8rem;
-    box-shadow: 0 6px 18px rgba(255, 215, 0, 0.3);
-    transition: transform var(--transition-bounce);
-}
-
-.tool-card:hover .tool-icon {
-    transform: scale(1.1) rotate(5deg);
 }
 
 .tool-card h3 {
     font-size: 1.3rem;
-    font-weight: 800;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
     color: var(--text-primary);
 }
 
 .tool-card p {
     color: var(--text-tertiary);
     margin-bottom: 1.5rem;
-    font-size: 0.95rem;
 }
 
-.tool-btn, .tool-card a.tool-btn {
+.tool-btn {
     background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
     color: var(--text-inverted);
     border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--radius-full);
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
     cursor: pointer;
-    font-weight: 700;
-    font-family: 'Nunito', sans-serif;
-    transition: all var(--transition-bounce);
-    display: inline-flex;
+    font-weight: 600;
+    transition: all 0.3s;
+    display: flex;
     align-items: center;
     gap: 0.5rem;
     margin: 0 auto;
-    text-decoration: none;
-    font-size: 0.95rem;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
-.tool-btn:hover, .tool-card a.tool-btn:hover {
-    transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.45);
+.tool-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px var(--shadow-color);
 }
 
-/* =============================================
-   10. POMODORO TIMER
-   ============================================= */
+/* Pomodoro Timer */
 .pomodoro-timer {
     background: var(--bg-secondary);
     padding: 1.5rem;
-    border-radius: var(--radius-md);
+    border-radius: 15px;
     margin-top: 1rem;
-    border: 1px solid var(--border-color);
 }
 
 .timer-display {
-    font-size: 2.8rem;
+    font-size: 2.5rem;
     font-weight: 700;
-    font-family: 'Space Mono', monospace;
     color: var(--text-primary);
     margin-bottom: 1rem;
-    letter-spacing: 2px;
-    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-family: 'Courier New', monospace;
 }
 
 .timer-controls {
@@ -655,24 +524,20 @@ section h2 {
     background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
     color: var(--text-inverted);
     cursor: pointer;
-    transition: transform var(--transition-bounce), box-shadow var(--transition-base);
+    transition: all 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .timer-btn:hover {
-    transform: scale(1.15);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.45);
+    transform: scale(1.1);
 }
 
-/* =============================================
-   11. ABOUT SECTION
-   ============================================= */
+/* About Section */
 .about-section {
-    background: linear-gradient(160deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--border-color) 100%);
 }
 
 .about-content {
@@ -684,16 +549,15 @@ section h2 {
 
 .about-text h3 {
     font-size: 1.8rem;
-    font-weight: 800;
     margin-bottom: 1rem;
     color: var(--text-primary);
 }
 
 .about-text p {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     color: var(--text-tertiary);
     margin-bottom: 2rem;
-    line-height: 1.85;
+    line-height: 1.8;
 }
 
 .about-text ul {
@@ -702,56 +566,43 @@ section h2 {
 }
 
 .about-text li {
-    padding: 0.9rem 0;
+    padding: 0.8rem 0;
     border-bottom: 1px solid var(--border-color);
     font-size: 1rem;
     color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: color var(--transition-fast);
 }
 
-.about-text li:last-child { border-bottom: none; }
-.about-text li:hover { color: var(--text-accent); }
+.about-text li:last-child {
+    border-bottom: none;
+}
 
 .about-stats {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1.5rem;
 }
 
 .stat-card {
     background: var(--bg-primary);
     padding: 2rem;
-    border-radius: var(--radius-md);
+    border-radius: 15px;
     text-align: center;
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--border-color);
-    transition: transform var(--transition-bounce);
+    box-shadow: 0 10px 30px var(--shadow-color);
 }
-
-.stat-card:hover { transform: translateY(-4px); }
 
 .stat-number {
     font-size: 2.5rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-weight: 700;
+    color: var(--text-accent);
     margin-bottom: 0.5rem;
 }
 
 .stat-label {
     color: var(--text-tertiary);
     font-size: 0.9rem;
-    font-weight: 600;
 }
 
-/* =============================================
-   12. FOOTER
-   ============================================= */
+/* Footer */
 .footer {
     background: var(--text-primary);
     color: var(--text-inverted);
@@ -768,32 +619,34 @@ section h2 {
 .footer-section h4 {
     margin-bottom: 1rem;
     color: var(--text-highlight);
-    font-weight: 700;
 }
 
-.footer-section ul { list-style: none; }
-.footer-section ul li { margin-bottom: 0.5rem; }
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section ul li {
+    margin-bottom: 0.5rem;
+}
 
 .footer-section a {
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--bg-primary);
     text-decoration: none;
-    transition: color var(--transition-fast);
-    font-size: 0.95rem;
+    transition: color 0.3s;
 }
 
-.footer-section a:hover { color: var(--text-highlight); }
+.footer-section a:hover {
+    color: var(--text-highlight);
+}
 
 .footer-bottom {
     text-align: center;
     padding-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.9rem;
+    border-top: 1px solid var(--bg-secondary);
+    color: var(--text-);
 }
 
-/* =============================================
-   13. NEUROBOT CHAT
-   ============================================= */
+/* NeuroBot Chat Styles */
 .chat-container {
     position: fixed;
     bottom: 20px;
@@ -801,41 +654,40 @@ section h2 {
     width: 380px;
     height: 600px;
     background: var(--bg-secondary);
-    border-radius: var(--radius-xl);
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2), 0 0 0 1px var(--border-color);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px var(--shadow-color-hover);
     display: none;
     flex-direction: column;
     overflow: hidden;
     z-index: 1000;
-    animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: slideUp 0.3s ease-out;
+    border: 3px solid var(--bg-gradient-start);
 }
 
 .chat-header {
     background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
     color: var(--text-inverted);
-    padding: 18px 20px;
+    padding: 20px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 15px;
 }
 
 .bot-avatar {
-    width: 44px;
-    height: 44px;
-    background: rgba(255, 255, 255, 0.15);
+    width: 45px;
+    height: 45px;
+    background: var(--accent-color-light);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 20px;
     color: var(--text-highlight);
-    border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .bot-info h3 {
-    font-size: 17px;
-    font-weight: 800;
-    margin-bottom: 2px;
+    font-size: 18px;
+    margin-bottom: 5px;
 }
 
 .status {
@@ -847,39 +699,27 @@ section h2 {
     content: '●';
     color: #4ade80;
     margin-right: 5px;
-    font-size: 10px;
-    animation: statusPulse 2s ease-in-out infinite;
-}
-
-@keyframes statusPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
 }
 
 .chat-actions {
     margin-left: auto;
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 .minimize-btn, .close-btn {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.2);
     border: none;
     color: var(--text-inverted);
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     cursor: pointer;
-    transition: background-color var(--transition-fast), transform var(--transition-fast);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
+    transition: background-color 0.3s;
 }
 
 .minimize-btn:hover, .close-btn:hover {
-    background: rgba(255, 255, 255, 0.28);
-    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .chat-messages {
@@ -887,32 +727,29 @@ section h2 {
     padding: 20px;
     overflow-y: auto;
     background: var(--bg-secondary);
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
 }
 
 .message {
     display: flex;
-    gap: 10px;
-    animation: fadeIn 0.25s ease-out;
+    gap: 12px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.3s ease-out;
 }
 
 .message-avatar {
-    width: 34px;
-    height: 34px;
+    width: 35px;
+    height: 35px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 15px;
+    font-size: 16px;
     flex-shrink: 0;
 }
 
 .bot-message .message-avatar {
     background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
     color: var(--text-inverted);
-    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
 }
 
 .user-message {
@@ -920,43 +757,50 @@ section h2 {
 }
 
 .user-message .message-avatar {
-    background: linear-gradient(135deg, var(--bg-accent-gradient-start), var(--bg-accent-gradient-end));
-    color: #333;
+    background: var(--button-primary-bg);
+    color: var(--button-primary-text);
 }
 
 .message-content {
     background: var(--bg-primary);
-    padding: 12px 16px;
+    padding: 15px;
     border-radius: 18px;
-    border-bottom-left-radius: 4px;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 2px 8px var(--shadow-color);
     max-width: 280px;
     word-wrap: break-word;
     color: var(--text-primary);
-    font-size: 0.9rem;
-    line-height: 1.5;
-    border: 1px solid var(--border-color);
 }
 
 .user-message .message-content {
     background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
     color: var(--text-inverted);
-    border-bottom-left-radius: 18px;
-    border-bottom-right-radius: 4px;
-    border: none;
 }
 
-.message-content p { margin-bottom: 8px; }
-.message-content p:last-child { margin-bottom: 0; }
-.message-content ul { margin: 8px 0; padding-left: 18px; }
-.message-content li { margin-bottom: 4px; }
+.message-content p {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.message-content p:last-child {
+    margin-bottom: 0;
+}
+
+.message-content ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.message-content li {
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
 
 .quick-actions {
-    padding: 12px 16px;
+    padding: 15px 20px;
     background: var(--bg-primary);
     border-top: 1px solid var(--border-color);
     display: flex;
-    gap: 8px;
+    gap: 10px;
     flex-wrap: wrap;
 }
 
@@ -964,16 +808,14 @@ section h2 {
     background: var(--bg-tertiary);
     border: 1px solid var(--border-color);
     color: var(--text-secondary);
-    padding: 7px 12px;
-    border-radius: var(--radius-full);
+    padding: 8px 12px;
+    border-radius: 20px;
     cursor: pointer;
     font-size: 12px;
-    font-family: 'Nunito', sans-serif;
-    font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 5px;
-    transition: all var(--transition-base);
+    gap: 6px;
+    transition: all 0.3s;
     flex: 1;
     justify-content: center;
 }
@@ -981,13 +823,11 @@ section h2 {
 .quick-btn:hover {
     background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
     color: var(--text-inverted);
-    border-color: transparent;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .chat-input {
-    padding: 16px 20px;
+    padding: 20px;
     background: var(--bg-primary);
     border-top: 1px solid var(--border-color);
 }
@@ -1000,25 +840,23 @@ section h2 {
 
 #neuroBotInput {
     flex: 1;
-    padding: 10px 16px;
+    padding: 12px 16px;
     border: 2px solid var(--border-color);
-    border-radius: var(--radius-full);
+    border-radius: 25px;
     outline: none;
     font-size: 14px;
-    font-family: 'Nunito', sans-serif;
-    transition: border-color var(--transition-base), box-shadow var(--transition-base);
-    background-color: var(--bg-secondary);
+    transition: border-color 0.3s;
+    background-color: var(--bg-primary);
     color: var(--text-primary);
 }
 
 #neuroBotInput:focus {
     border-color: var(--bg-gradient-start);
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
 }
 
 .send-btn {
-    width: 44px;
-    height: 44px;
+    width: 45px;
+    height: 45px;
     background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
     border: none;
     border-radius: 50%;
@@ -1027,21 +865,19 @@ section h2 {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform var(--transition-bounce), box-shadow var(--transition-base);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    transition: transform 0.3s;
 }
 
 .send-btn:hover {
-    transform: scale(1.12);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.45);
+    transform: scale(1.1);
 }
 
 .neurobot-toggle {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 62px;
-    height: 62px;
+    width: 60px;
+    height: 60px;
     background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
     border-radius: 50%;
     display: flex;
@@ -1050,97 +886,87 @@ section h2 {
     color: var(--text-inverted);
     font-size: 24px;
     cursor: pointer;
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.45);
-    transition: transform var(--transition-bounce), box-shadow var(--transition-base);
+    box-shadow: 0 8px 25px var(--shadow-color);
+    transition: all 0.3s;
     z-index: 999;
 }
 
 .neurobot-toggle:hover {
-    transform: scale(1.12) rotate(-10deg);
-    box-shadow: 0 16px 40px rgba(102, 126, 234, 0.55);
+    transform: scale(1.1);
+    box-shadow: 0 12px 35px var(--shadow-color-hover);
 }
 
 .notification-badge {
     position: absolute;
-    top: -4px;
-    right: -4px;
+    top: -5px;
+    right: -5px;
     background: var(--text-highlight);
-    color: #333;
-    width: 22px;
-    height: 22px;
+    color: var(--button-primary-text);
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
-    font-weight: 800;
-    border: 2px solid var(--bg-primary);
-    animation: badgePulse 2s ease-in-out infinite;
+    font-size: 12px;
+    font-weight: bold;
 }
 
-@keyframes badgePulse {
-    0%, 100% { transform: scale(1); }
-    50%       { transform: scale(1.15); }
-}
-
-/* =============================================
-   14. MODAIS
-   ============================================= */
+/* Modais */
 .modal {
     position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(6px);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
     display: none;
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    padding: 20px;
 }
 
 .modal-content {
     background: var(--bg-primary);
-    border-radius: var(--radius-xl);
+    border-radius: 15px;
     width: 90%;
     max-width: 800px;
-    max-height: 85vh;
+    max-height: 80vh;
     overflow-y: auto;
-    animation: modalSlide 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: modalSlide 0.3s ease-out;
     color: var(--text-primary);
-    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--border-color);
 }
 
-.kanban-modal { max-width: 1000px; }
-.login-modal  { max-width: 420px; }
+.kanban-modal {
+    max-width: 1000px;
+}
 
 .modal-header {
-    padding: 20px 24px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
     color: var(--text-inverted);
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    border-radius: 15px 15px 0 0;
 }
 
 .modal-header h3 {
-    font-size: 1.2rem;
-    font-weight: 800;
+    font-size: 20px;
 }
 
 .close-modal {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.2);
     border: none;
-    font-size: 18px;
+    font-size: 20px;
     color: var(--text-inverted);
     cursor: pointer;
     padding: 8px;
     border-radius: 50%;
-    transition: background-color var(--transition-fast), transform var(--transition-fast);
-    width: 36px;
-    height: 36px;
+    transition: background-color 0.3s;
+    width: 35px;
+    height: 35px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1148,59 +974,51 @@ section h2 {
 
 .close-modal:hover {
     background: rgba(255, 255, 255, 0.3);
-    transform: rotate(90deg);
 }
 
-.modal-body { padding: 24px; }
+.modal-body {
+    padding: 20px;
+}
 
-/* =============================================
-   15. KANBAN
-   ============================================= */
+/* Kanban Board */
 .kanban-board {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    gap: 20px;
     min-height: 400px;
 }
 
 .kanban-column {
     background: var(--bg-secondary);
-    border-radius: var(--radius-md);
-    padding: 16px;
-    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 15px;
 }
 
 .kanban-column h4 {
     text-align: center;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     color: var(--text-primary);
-    font-size: 1rem;
-    font-weight: 800;
+    font-size: 1.1rem;
 }
 
-.kanban-tasks { min-height: 280px; }
+.kanban-tasks {
+    min-height: 300px;
+}
 
 .task-input {
     display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: 10px;
+    margin-bottom: 15px;
 }
 
 .task-input input {
     flex: 1;
     padding: 8px 12px;
     border: 2px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    border-radius: 8px;
     font-size: 14px;
-    font-family: 'Nunito', sans-serif;
     background-color: var(--bg-primary);
     color: var(--text-primary);
-    transition: border-color var(--transition-base);
-}
-
-.task-input input:focus {
-    outline: none;
-    border-color: var(--bg-gradient-start);
 }
 
 .task-input button {
@@ -1208,72 +1026,55 @@ section h2 {
     border: none;
     color: var(--text-inverted);
     padding: 8px 12px;
-    border-radius: var(--radius-sm);
+    border-radius: 8px;
     cursor: pointer;
-    font-weight: 700;
-    transition: all var(--transition-bounce);
 }
-
-.task-input button:hover { transform: scale(1.08); }
 
 .kanban-task {
     background: var(--bg-primary);
     padding: 12px;
-    border-radius: var(--radius-sm);
-    margin-bottom: 8px;
-    box-shadow: var(--shadow-sm);
-    cursor: grab;
-    transition: transform var(--transition-bounce), box-shadow var(--transition-base);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    cursor: move;
+    transition: all 0.3s;
     color: var(--text-primary);
-    font-size: 0.9rem;
-    border: 1px solid var(--border-color);
 }
 
 .kanban-task:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-color-hover);
 }
 
-.kanban-task:active { cursor: grabbing; }
-
-/* =============================================
-   16. TIPS CONTAINER
-   ============================================= */
+/* Tips Container */
 .tips-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.25rem;
+    gap: 20px;
 }
 
 .tip-card {
     background: var(--bg-secondary);
-    padding: 1.5rem;
-    border-radius: var(--radius-md);
+    padding: 20px;
+    border-radius: 10px;
     border-left: 4px solid var(--bg-gradient-start);
-    transition: transform var(--transition-bounce), box-shadow var(--transition-base);
-    border-top: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
-    border-right: 1px solid var(--border-color);
-}
-
-.tip-card:hover {
-    transform: translateX(4px);
-    box-shadow: var(--shadow-md);
 }
 
 .tip-card h4 {
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     color: var(--text-primary);
-    font-weight: 700;
 }
 
-.tip-card ul { list-style: none; padding: 0; }
+.tip-card ul {
+    list-style: none;
+    padding: 0;
+}
 
 .tip-card li {
-    padding: 7px 0 7px 22px;
+    padding: 8px 0;
     color: var(--text-tertiary);
     position: relative;
-    font-size: 0.93rem;
+    padding-left: 20px;
 }
 
 .tip-card li::before {
@@ -1281,32 +1082,26 @@ section h2 {
     position: absolute;
     left: 0;
     color: var(--bg-gradient-start);
-    font-weight: 700;
+    font-weight: bold;
 }
 
-/* =============================================
-   17. PROGRESS / ACHIEVEMENTS
-   ============================================= */
+/* Progress Stats */
 .progress-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.25rem;
-    margin-bottom: 2rem;
+    gap: 20px;
+    margin-bottom: 30px;
 }
 
 .progress-card {
     background: var(--bg-secondary);
-    padding: 1.25rem;
-    border-radius: var(--radius-md);
+    padding: 20px;
+    border-radius: 10px;
     text-align: center;
     display: flex;
     align-items: center;
-    gap: 14px;
-    border: 1px solid var(--border-color);
-    transition: transform var(--transition-bounce);
+    gap: 15px;
 }
-
-.progress-card:hover { transform: translateY(-3px); }
 
 .progress-icon {
     width: 50px;
@@ -1317,721 +1112,193 @@ section h2 {
     align-items: center;
     justify-content: center;
     color: var(--text-inverted);
-    font-size: 1.4rem;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    font-size: 1.5rem;
 }
 
 .progress-info h4 {
-    margin-bottom: 3px;
+    margin-bottom: 5px;
     color: var(--text-primary);
-    font-size: 0.9rem;
-    font-weight: 700;
+    font-size: 1rem;
 }
 
 .progress-number {
-    font-size: 1.8rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-accent);
 }
 
 .achievements h4 {
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     color: var(--text-primary);
-    font-weight: 700;
 }
 
 .achievement-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .achievement {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 14px 16px;
+    gap: 15px;
+    padding: 15px;
     background: var(--bg-secondary);
-    border-radius: var(--radius-md);
-    transition: all var(--transition-bounce);
+    border-radius: 10px;
+    transition: all 0.3s;
     color: var(--text-primary);
-    border: 1px solid var(--border-color);
 }
-
-.achievement:hover { transform: translateX(4px); }
 
 .achievement.unlocked {
     background: linear-gradient(135deg, var(--bg-accent-gradient-start), var(--bg-accent-gradient-end));
-    color: #333;
-    border-color: transparent;
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+    color: var(--button-primary-text);
 }
 
-.achievement.locked { opacity: 0.45; }
+.achievement.locked {
+    opacity: 0.5;
+}
 
 .achievement i {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     color: var(--bg-gradient-start);
 }
 
-.achievement.unlocked i { color: #333; }
+.achievement.unlocked i {
+    color: var(--button-primary-text);
+}
 
-/* =============================================
-   18. ANIMAÇÕES
-   ============================================= */
+/* Animações */
 @keyframes slideUp {
-    from { transform: translateY(30px) scale(0.95); opacity: 0; }
-    to   { transform: translateY(0) scale(1); opacity: 1; }
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes modalSlide {
-    from { transform: scale(0.9) translateY(20px); opacity: 0; }
-    to   { transform: scale(1) translateY(0); opacity: 1; }
-}
-
-/* =============================================
-   19. JOGOS — ESTILOS ESPECÍFICOS
-   ============================================= */
-
-/* Memory Tile */
-.memory-tile {
-    width: 64px;
-    height: 64px;
-    background: var(--bg-secondary);
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 1.3rem;
-    color: transparent;
-    transition: all var(--transition-bounce);
-    box-shadow: var(--shadow-sm);
-}
-
-.memory-tile:hover {
-    transform: scale(1.08);
-    border-color: var(--bg-gradient-start);
-    box-shadow: 0 4px 14px rgba(102, 126, 234, 0.25);
-}
-
-.memory-tile.revealed {
-    color: var(--text-primary);
-    background: linear-gradient(135deg, var(--bg-accent-gradient-start), var(--bg-accent-gradient-end));
-    border-color: var(--bg-accent-gradient-start);
-    transform: scale(1.05);
-}
-
-/* Word Search */
-.word-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 52px);
-    gap: 6px;
-    justify-content: center;
-    margin-bottom: 16px;
-}
-
-.word-cell {
-    width: 52px;
-    height: 52px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    text-align: center;
-    line-height: 52px;
-    font-weight: 700;
-    font-size: 17px;
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    transition: all var(--transition-bounce);
-    color: var(--text-primary);
-}
-
-.word-cell:hover {
-    background: rgba(102, 126, 234, 0.1);
-    border-color: var(--bg-gradient-start);
-    transform: scale(1.08);
-}
-
-.word-cell.selected {
-    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-    color: #fff;
-    border-color: transparent;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-    transform: scale(1.05);
-}
-
-#wordSearchFeedback {
-    font-weight: 700;
-    text-align: center;
-    padding: 10px;
-    font-size: 15px;
-    border-radius: var(--radius-sm);
-    min-height: 40px;
-    transition: all var(--transition-base);
-}
-
-#wordSearchFeedback.success {
-    color: var(--success-color);
-    background: rgba(56, 161, 105, 0.1);
-}
-
-#wordSearchFeedback.error {
-    color: var(--error-color);
-    background: rgba(229, 62, 62, 0.1);
-}
-
-/* Memory Sequence */
-.memory-sequence {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-.memory-sequence div {
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius-sm);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-    transition: transform var(--transition-base), opacity var(--transition-base);
-}
-
-.memory-feedback {
-    font-weight: 700;
-    text-align: center;
-    min-height: 28px;
-    border-radius: var(--radius-sm);
-    padding: 6px 12px;
-    transition: all var(--transition-base);
-}
-
-.memory-feedback.success {
-    color: var(--success-color);
-    background: rgba(56, 161, 105, 0.1);
-}
-
-.memory-feedback.error {
-    color: var(--error-color);
-    background: rgba(229, 62, 62, 0.1);
-}
-
-.memory-level {
-    color: var(--text-accent);
-    font-size: 1.1rem;
-    font-weight: 800;
-    margin-bottom: 12px;
-}
-
-.memory-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 20px;
-}
-
-.memory-color-btn {
-    width: 54px;
-    height: 54px;
-    border: 3px solid transparent;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: transform var(--transition-bounce), box-shadow var(--transition-base), border-color var(--transition-fast);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.memory-color-btn:hover {
-    transform: scale(1.18);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    border-color: rgba(255,255,255,0.5);
-}
-
-.memory-color-btn.red    { background: #e74c3c; }
-.memory-color-btn.green  { background: #27ae60; }
-.memory-color-btn.blue   { background: #2980b9; }
-.memory-color-btn.yellow { background: #f1c40f; }
-
-.memory-start-btn {
-    width: 60%;
-    max-width: 220px;
-    display: block;
-    margin: 15px auto 0;
-    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 11px;
-    font-family: 'Nunito', sans-serif;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all var(--transition-bounce);
-    box-shadow: 0 4px 14px rgba(102, 126, 234, 0.35);
-}
-
-.memory-start-btn:hover {
-    transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 10px 24px rgba(102, 126, 234, 0.45);
-}
-
-/* Sequence Modal */
-.sequence-modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(6px);
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-.sequence-modal .modal-content {
-    border-radius: var(--radius-xl);
-    max-width: 420px;
-    width: 90%;
-    padding: 0;
-    overflow: hidden;
-}
-
-.sequence-modal .modal-header {
-    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-}
-
-.sequence-modal .modal-header button {
-    background: rgba(255,255,255,0.15);
-    border: none;
-    color: white;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    font-size: 18px;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.sequence-modal .modal-header button:hover {
-    background: rgba(255,255,255,0.3);
-    transform: rotate(90deg);
-}
-
-.sequence-level {
-    font-weight: 800;
-    color: var(--text-accent);
-    margin-bottom: 12px;
-    font-size: 1.1rem;
-    text-align: center;
-}
-
-.sequence-question {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin-bottom: 20px;
-    text-align: center;
-    color: var(--text-primary);
-}
-
-.sequence-options {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.sequence-option-btn {
-    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-    border: none;
-    border-radius: var(--radius-sm);
-    color: white;
-    font-size: 1.1rem;
-    font-weight: 700;
-    font-family: 'Nunito', sans-serif;
-    padding: 10px 22px;
-    cursor: pointer;
-    transition: all var(--transition-bounce);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    min-width: 56px;
-}
-
-.sequence-option-btn:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.45);
-}
-
-.sequence-feedback {
-    font-weight: 700;
-    text-align: center;
-    min-height: 30px;
-    border-radius: var(--radius-sm);
-    padding: 6px 12px;
-    transition: all var(--transition-base);
-}
-
-.sequence-feedback.correct {
-    color: var(--success-color);
-    background: rgba(56, 161, 105, 0.1);
-}
-
-.sequence-feedback.wrong {
-    color: var(--error-color);
-    background: rgba(229, 62, 62, 0.1);
-}
-
-.sequence-modal .tool-btn {
-    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 12px 24px;
-    font-size: 1rem;
-    font-family: 'Nunito', sans-serif;
-    font-weight: 700;
-    cursor: pointer;
-    display: block;
-    margin: 0 auto;
-    transition: all var(--transition-bounce);
-    box-shadow: 0 4px 14px rgba(102, 126, 234, 0.35);
-}
-
-.sequence-modal .tool-btn:hover {
-    transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 10px 24px rgba(102, 126, 234, 0.45);
-}
-
-/* =============================================
-   20. ORGANIZE GAME
-   ============================================= */
-.task-list button {
-    display: block;
-    width: 100%;
-    text-align: left;
-    margin-bottom: 8px;
-    padding: 9px 14px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    cursor: grab;
-    font-family: 'Nunito', sans-serif;
-    font-weight: 600;
-    color: var(--text-primary);
-    transition: all var(--transition-bounce);
-}
-
-.task-list button:hover {
-    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-    color: white;
-    border-color: transparent;
-    transform: translateX(4px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-.priority-section {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-.drop-zone {
-    min-height: 110px;
-    padding: 12px;
-    border: 2px dashed var(--border-color);
-    border-radius: var(--radius-md);
-    background: var(--bg-secondary);
-    flex: 1 1 30%;
-    transition: border-color var(--transition-base), background var(--transition-base);
-}
-
-.drop-zone:hover, .drop-zone.drag-over {
-    border-color: var(--bg-gradient-start);
-    background: var(--accent-color-light);
-}
-
-.drop-zone h4 {
-    margin-bottom: 8px;
-    color: var(--text-highlight);
-    font-weight: 700;
-    font-size: 0.9rem;
-}
-
-.drop-zone ul li {
-    margin-bottom: 6px;
-    background: var(--bg-primary);
-    padding: 7px 12px;
-    border-radius: var(--radius-sm);
-    box-shadow: var(--shadow-sm);
-    font-size: 0.9rem;
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-}
-
-/* =============================================
-   21. MODAIS ESPECÍFICOS
-   ============================================= */
-.login-modal .modal-body label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 700;
-    color: var(--text-primary);
-    font-size: 0.9rem;
-}
-
-.login-modal .modal-body input {
-    width: 100%;
-    padding: 10px 14px;
-    margin-bottom: 14px;
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    font-family: 'Nunito', sans-serif;
-    background-color: var(--bg-secondary);
-    color: var(--text-primary);
-    transition: border-color var(--transition-base), box-shadow var(--transition-base);
-}
-
-.login-modal .modal-body input:focus {
-    outline: none;
-    border-color: var(--bg-gradient-start);
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
-}
-
-.login-modal .modal-body button {
-    width: 100%;
-    padding: 11px;
-    background: linear-gradient(135deg, #ec407a, #f06292);
-    border: none;
-    color: white;
-    font-weight: 700;
-    font-family: 'Nunito', sans-serif;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: all var(--transition-bounce);
-    box-shadow: 0 4px 14px rgba(236, 64, 122, 0.3);
-}
-
-.login-modal .modal-body button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(236, 64, 122, 0.45);
-}
-
-body.dark-mode .login-modal .modal-body button {
-    background: linear-gradient(135deg, #ff8a65, #ffab91);
-}
-
-.login-modal .modal-body button:disabled {
-    background: var(--border-color);
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-    color: var(--text-tertiary);
-}
-
-.login-modal .modal-body .login-info {
-    font-size: 12px;
-    margin-top: 10px;
-    color: var(--text-tertiary);
-}
-
-.toggle-auth-mode {
-    text-align: center;
-    margin-top: 14px;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-}
-
-.toggle-auth-mode a {
-    color: var(--text-accent);
-    text-decoration: none;
-    font-weight: 700;
-    transition: color var(--transition-fast);
-}
-
-.toggle-auth-mode a:hover { color: var(--bg-gradient-end); }
-
-/* Mood & Notes Modais */
-#moodModal button {
-    font-size: 1.5rem;
-    padding: 10px 15px;
-    border-radius: var(--radius-sm);
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: transform var(--transition-bounce), box-shadow var(--transition-base);
-    background: var(--bg-secondary);
-}
-
-#moodModal button:hover {
-    transform: scale(1.15) rotate(-5deg);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    background: var(--bg-accent-gradient-start);
-}
-
-#notesModal button {
-    padding: 9px 18px;
-    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-family: 'Nunito', sans-serif;
-    font-weight: 700;
-    cursor: pointer;
-    margin-bottom: 10px;
-    transition: all var(--transition-bounce);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-#notesModal button:hover {
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-}
-
-/* =============================================
-   22. THEME TOGGLE
-   ============================================= */
-.theme-toggle-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-inverted);
-    cursor: pointer;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    transition: all var(--transition-bounce);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.theme-toggle-icon:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: scale(1.1) rotate(20deg);
-}
-
-.theme-toggle-icon svg {
-    width: 20px;
-    height: 20px;
-}
-
-/* =============================================
-   23. NEUROGAME SECTION (imagens/texto alternado)
-   ============================================= */
-.neurogame-section {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-}
-
-.neurogame-row {
-    display: flex;
-    align-items: center;
-    gap: 3rem;
-    margin-bottom: 5rem;
-}
-
-.reverse { flex-direction: row-reverse; }
-
-.neurogame-image-left,
-.neurogame-image-right {
-    flex: 1;
-    min-width: 300px;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--shadow-lg);
-    transition: transform var(--transition-slow);
-}
-
-.neurogame-image-left img,
-.neurogame-image-right img {
-    width: 100%;
-    height: auto;
-    display: block;
-    transition: transform var(--transition-slow);
-}
-
-.neurogame-image-left:hover,
-.neurogame-image-right:hover {
-    transform: translateY(-6px);
-}
-
-.neurogame-image-left:hover img,
-.neurogame-image-right:hover img {
-    transform: scale(1.04);
-}
-
-.neurogame-text-right,
-.neurogame-text-left {
-    flex: 1;
-    padding: 1.5rem;
-}
-
-.neurogame-text-right h2,
-.neurogame-text-left h3 {
-    color: var(--text-primary);
-    font-weight: 800;
-    margin-bottom: 1.25rem;
-}
-
-.neurogame-text-right p {
-    margin-bottom: 1rem;
-    line-height: 1.75;
-    color: var(--text-secondary);
-}
-
-.neurogame-list {
-    list-style: none;
-    padding: 0;
-}
-
-.neurogame-list li {
-    padding: 0.8rem 0 0.8rem 2.5rem;
-    position: relative;
-    margin-bottom: 0.4rem;
-    font-size: 1.05rem;
-    color: var(--text-secondary);
-    border-bottom: 1px solid var(--border-color);
-    transition: color var(--transition-fast);
-}
-
-.neurogame-list li:last-child { border-bottom: none; }
-.neurogame-list li:hover { color: var(--text-accent); }
-
-.neurogame-list li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 1.1rem;
-    width: 1.5rem;
-    height: 2px;
-    background: linear-gradient(90deg, var(--bg-gradient-start), var(--bg-gradient-end));
-    border-radius: 2px;
-}
-
-/* =============================================
-   24. SCROLLBAR
-   ============================================= */
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .nav-menu {
+        display: none;
+    }
+    
+    .hamburger {
+        display: flex;
+    }
+    
+    .hero-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 2rem;
+    }
+    
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-buttons {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .brain-animation i {
+        font-size: 5rem;
+    }
+    
+    .about-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .chat-container {
+        width: calc(100vw - 20px);
+        height: calc(100vh - 40px);
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
+        border-radius: 15px;
+    }
+    
+    .neurobot-toggle {
+        bottom: 15px;
+        right: 15px;
+        width: 55px;
+        height: 55px;
+        font-size: 22px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10px;
+    }
+    
+    .kanban-board {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .tips-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .progress-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    
+    .games-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tools-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .progress-card {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* Scrollbar personalizada */
 .chat-messages::-webkit-scrollbar,
 .modal-content::-webkit-scrollbar {
-    width: 5px;
+    width: 6px;
 }
 
 .chat-messages::-webkit-scrollbar-track,
 .modal-content::-webkit-scrollbar-track {
-    background: transparent;
+    background: var(--bg-tertiary);
 }
 
 .chat-messages::-webkit-scrollbar-thumb,
@@ -2042,76 +1309,641 @@ body.dark-mode .login-modal .modal-body button {
 
 .chat-messages::-webkit-scrollbar-thumb:hover,
 .modal-content::-webkit-scrollbar-thumb:hover {
-    background: var(--text-tertiary);
+    background: var(--text-secondary);
 }
 
-/* =============================================
-   25. RESPONSIVIDADE
-   ============================================= */
-@media (max-width: 768px) {
-    .nav-menu { display: none; }
-    .hamburger { display: flex; }
 
-    .hero-container {
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: 2rem;
-    }
-
-    .hero-content h1 { font-size: 2.5rem; }
-
-    .hero-buttons {
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    .brain-animation i { font-size: 5rem; }
-
-    .about-content {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-
-    .chat-container {
-        width: calc(100vw - 20px);
-        height: calc(100vh - 40px);
-        bottom: 10px;
-        right: 10px;
-        left: 10px;
-        border-radius: var(--radius-lg);
-    }
-
-    .neurobot-toggle {
-        bottom: 15px;
-        right: 15px;
-        width: 56px;
-        height: 56px;
-        font-size: 22px;
-    }
-
-    .modal-content { width: 95%; }
-    .kanban-board  { grid-template-columns: 1fr; gap: 12px; }
-    .tips-container, .progress-stats { grid-template-columns: 1fr; }
-
-    .neurogame-row,
-    .reverse {
-        flex-direction: column;
-        gap: 2rem;
-    }
-
-    .neurogame-image-left,
-    .neurogame-image-right {
-        width: 100%;
-        max-width: 500px;
-    }
+/* Modal Login */
+.login-modal {
+    max-width: 400px;
 }
 
-@media (max-width: 480px) {
-    .hero-content h1 { font-size: 2rem; }
-    .games-grid, .tools-grid { grid-template-columns: 1fr; }
+.login-modal .modal-body label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
 
-    .progress-card {
-        flex-direction: column;
-        text-align: center;
-    }
+.login-modal .modal-body input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.login-modal .modal-body button {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(135deg, #ec407a 0%, #f06292 100%); /* Mantido para destaque do login */
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+body.dark-mode .login-modal .modal-body button {
+    background: linear-gradient(135deg, #ff8a65 0%, #ffab91 100%); /* Cor para dark mode login button */
+    color: var(--text-inverted);
+}
+
+.login-modal .modal-body button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    color: #666;
+}
+
+body.dark-mode .login-modal .modal-body button:disabled {
+    background-color: #555;
+    color: #bbb;
+}
+
+
+.login-modal .modal-body .login-info {
+    font-size: 12px;
+    margin-top: 10px;
+    color: var(--text-tertiary);
+}
+
+.toggle-auth-mode {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.toggle-auth-mode a {
+    color: var(--text-accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.toggle-auth-mode a:hover {
+    text-decoration: underline;
+}
+
+/* Botão de Tema */
+.theme-toggle-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--text-inverted);
+    cursor: pointer;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    transition: background-color 0.3s;
+}
+
+.theme-toggle-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-toggle-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+#moodModal button {
+    font-size: 1.5rem;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+#moodModal button:hover {
+    transform: scale(1.1);
+    background: var(--bg-accent-gradient-start);
+    color: white;
+}
+#notesModal button {
+    padding: 8px 16px;
+    background: var(--bg-gradient-start);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+#notesModal button:hover {
+    background: var(--bg-gradient-end);
+    transform: scale(1.05);
+}
+/* ==== Estilo específico para o card de Acompanhamento ==== */
+.tool-card .tool-icon i.fa-chart-line {
+  font-size: 2.8rem;
+  color: var(--text-highlight);
+}
+
+.tool-card h3 {
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  margin: 0.8rem 0 0.4rem;
+}
+
+.tool-card p {
+  color: var(--text-tertiary);
+  font-size: 0.95rem;
+  margin-bottom: 1.2rem;
+}
+
+/* Força o link dentro do tool-card a parecer botão */
+.tool-card a.tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.6rem;
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  color: var(--text-inverted);
+  font-weight: 600;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.tool-card a.tool-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px var(--shadow-color-hover);
+}
+
+/* Garante que o card tenha altura mínima e centralize o conteúdo */
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 260px;
+}
+
+.highlight {
+  color: var(--text-highlight);
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  animation: glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 5px rgba(255, 217, 0, 0.864);
+  }
+  to {
+    text-shadow: 0 0 10px rgba(255, 217, 0, 0.866);
+  }
+}
+
+/* Organize Game Modal */
+.task-list button {
+  display: block;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: grab;
+  transition: 0.2s;
+}
+
+.task-list button:hover {
+  background: var(--bg-accent-gradient-start);
+  color: white;
+}
+
+.priority-section {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.drop-zone {
+  min-height: 100px;
+  padding: 10px;
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  flex: 1 1 30%;
+}
+
+.drop-zone h4 {
+  margin-bottom: 8px;
+  color: var(--text-highlight);
+}
+
+.drop-zone ul li {
+  margin-bottom: 5px;
+  background: var(--bg-primary);
+  padding: 6px 10px;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px var(--shadow-color);
+}
+
+#organizeGameModal .tool-btn {
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#organizeGameModal .tool-btn:hover {
+  transform: scale(1.05);
+}
+/* Organize Game Modal */
+
+
+
+.memory-tile {
+  width: 60px;
+  height: 60px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--button-secondary-hover-text);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: transparent;
+  transition: 0.2s;
+}
+
+.memory-tile.revealed {
+  color: var(--text-primary);
+  background: var(--bg-accent-gradient-start);
+}
+
+/* word Game */
+.word-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 50px);
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.word-cell {
+  width: 50px;
+  height: 50px;
+  background-color: #35404c;
+  text-align: center;
+  line-height: 50px;
+  font-weight: bold;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.word-cell:hover {
+  background-color: #cce5ff;
+  transform: scale(1.1);
+}
+
+.word-cell.selected {
+  background-color: #a3d9a5;
+  color: #fff;
+  box-shadow: 0 0 8px #76c893;
+}
+
+#wordSearchFeedback {
+  font-weight: bold;
+  text-align: center;
+  padding: 10px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+#wordSearchFeedback.success {
+  color: #2e7d32;
+}
+
+#wordSearchFeedback.error {
+  color: #c62828;
+}
+
+
+
+
+
+
+
+/* Área da sequência */
+.memory-sequence {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 20px;
+  transition: opacity 0.3s ease;
+}
+
+.memory-sequence div {
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  opacity: 1;
+  transition: transform 0.2s, opacity 0.3s;
+}
+
+/* Feedback visual */
+.memory-feedback {
+  font-weight: bold;
+  text-align: center;
+  min-height: 24px;
+  transition: all 0.4s ease;
+}
+
+.memory-feedback.success {
+  color: #2e7d32;
+  opacity: 1;
+}
+
+.memory-feedback.error {
+  color: #c62828;
+  opacity: 1;
+}
+
+/* Nível */
+.memory-level {
+  color: #007BFF;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Botões de cor */
+.memory-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.memory-color-btn {
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.memory-color-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+.memory-color-btn.red { background: #e74c3c; }
+.memory-color-btn.green { background: #27ae60; }
+.memory-color-btn.blue { background: #2980b9; }
+.memory-color-btn.yellow { background: #f1c40f; }
+
+/* Botão iniciar / próximo */
+.memory-start-btn {
+  margin-top: 15px;
+  width: 60%;
+  max-width: 220px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #007BFF;
+  color: white;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.memory-start-btn:hover {
+  background-color: #0056b3;
+}
+
+
+/* Apenas para o Modal do Jogo de Sequência Lógica */
+.sequence-modal {
+  display: none; /* Controlado via JS */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.sequence-modal .modal-content {
+  background: white;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 90%;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.sequence-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sequence-modal .modal-header h3 {
+  margin: 0;
+}
+
+.sequence-modal .modal-header button {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.sequence-level {
+  font-weight: bold;
+  color: #007bff;
+  margin-bottom: 15px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.sequence-question {
+  font-size: 22px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.sequence-options {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.sequence-option-btn {
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 18px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  min-width: 50px;
+}
+
+.sequence-option-btn:hover {
+  background-color: #0056b3;
+}
+
+.sequence-feedback {
+  font-weight: bold;
+  text-align: center;
+  min-height: 28px;
+}
+
+.sequence-feedback.correct {
+  color: #2e7d32;
+}
+
+.sequence-feedback.wrong {
+  color: #c62828;
+}
+
+.sequence-modal .tool-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+  transition: background-color 0.3s;
+}
+
+.sequence-modal .tool-btn:hover {
+  background-color: #1e7e34;
+}
+
+/* Estilos gerais */
+.neurogame-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.neurogame-row {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  margin-bottom: 4rem;
+}
+
+/* Layout alternado */
+.reverse {
+  flex-direction: row-reverse;
+}
+
+/* Estilos das imagens */
+.neurogame-image-left,
+.neurogame-image-right {
+  flex: 1;
+  min-width: 300px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.neurogame-image-left img,
+.neurogame-image-right img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.neurogame-image-left:hover img,
+.neurogame-image-right:hover img {
+  transform: scale(1.05);
+}
+
+/* Estilos do texto */
+.neurogame-text-right,
+.neurogame-text-left {
+  flex: 1;
+  padding: 1.5rem;
+}
+
+.neurogame-text-right h2,
+.neurogame-text-left h3 {
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.neurogame-text-right p {
+  margin-bottom: 1.2rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+/* Lista estilizada */
+.neurogame-list {
+  list-style: none;
+  padding: 0;
+}
+
+.neurogame-list li {
+  padding: 0.8rem 0;
+  padding-left: 2.5rem;
+  position: relative;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.neurogame-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 1.1rem;
+  width: 1.5rem;
+  height: 2px;
+  background-color: var(--bg-secondary);
+}
+
+/* Responsividade */
+@media (max-width: 900px) {
+  .neurogame-row,
+  .reverse {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .neurogame-image-left,
+  .neurogame-image-right {
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .neurogame-text-right,
+  .neurogame-text-left {
+    padding: 1rem 0;
+  }
 }
