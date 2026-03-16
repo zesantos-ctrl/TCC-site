@@ -1,1401 +1,1316 @@
-/* =============================================================
-   NeuroGame — script-improved.js
-   Melhorias: arquitetura modular, UX fluida, sem alert(),
-   animações de notificação, toast system, drag-and-drop robusto,
-   tema corrigido, validação em tempo real e código limpo.
-   ============================================================= */
-
-'use strict';
-
-// ─────────────────────────────────────────────
-// 1. UTILITÁRIOS
-// ─────────────────────────────────────────────
-
-const $ = (sel, ctx = document) => ctx.querySelector(sel);
-const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
-
-const storage = {
-    get: (key, fallback = null) => {
-        try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
-        catch { return fallback; }
+// Estado global do NeuroGame
+let neuroGameState = {
+    isNeuroBotOpen: false,
+    messages: [],
+    kanbanTasks: {
+        todo: JSON.parse(localStorage.getItem('neuroKanbanTodo')) || [],
+        doing: JSON.parse(localStorage.getItem('neuroKanbanDoing')) || [],
+        done: JSON.parse(localStorage.getItem('neuroKanbanDone')) || []
     },
-    set: (key, value) => {
-        try { localStorage.setItem(key, JSON.stringify(value)); }
-        catch (e) { console.warn('localStorage indisponível:', e); }
-    }
-};
-
-function formatTime(seconds) {
-    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
-    const s = String(seconds % 60).padStart(2, '0');
-    return `${m}:${s}`;
-}
-
-// ─────────────────────────────────────────────
-// 2. SISTEMA DE TOAST (substitui alert())
-// ─────────────────────────────────────────────
-
-const Toast = (() => {
-    let container = null;
-
-    function getContainer() {
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'toast-container';
-            Object.assign(container.style, {
-                position: 'fixed',
-                top: '24px',
-                right: '24px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-                zIndex: '99999',
-                pointerEvents: 'none'
-            });
-            document.body.appendChild(container);
-        }
-        return container;
-    }
-
-    const ICONS = {
-        success: '✅',
-        error: '❌',
-        info: 'ℹ️',
-        warning: '⚠️',
-        achievement: '🏆'
-    };
-
-    const COLORS = {
-        success: 'linear-gradient(135deg, #10b981, #059669)',
-        error: 'linear-gradient(135deg, #ef4444, #dc2626)',
-        info: 'linear-gradient(135deg, #6366f1, #4f46e5)',
-        warning: 'linear-gradient(135deg, #f59e0b, #d97706)',
-        achievement: 'linear-gradient(135deg, #fbbf24, #f59e0b)'
-    };
-
-    function show(message, type = 'info', duration = 3500) {
-        const c = getContainer();
-        const toast = document.createElement('div');
-
-        Object.assign(toast.style, {
-            background: COLORS[type] || COLORS.info,
-            color: '#fff',
-            padding: '14px 20px',
-            borderRadius: '14px',
-            boxShadow: '0 8px 28px rgba(0,0,0,0.25)',
-            fontSize: '14px',
-            fontFamily: "'Outfit', sans-serif",
-            fontWeight: '500',
-            maxWidth: '320px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            pointerEvents: 'auto',
-            opacity: '0',
-            transform: 'translateX(40px)',
-            transition: 'opacity 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s cubic-bezier(0.34,1.56,0.64,1)',
-            cursor: 'pointer'
-        });
-
-        toast.innerHTML = `<span style="font-size:1.2rem">${ICONS[type] || '•'}</span><span>${message}</span>`;
-        toast.addEventListener('click', () => dismiss(toast));
-        c.appendChild(toast);
-
-        // Forçar reflow para animar entrada
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                toast.style.opacity = '1';
-                toast.style.transform = 'translateX(0)';
-            });
-        });
-
-        const timer = setTimeout(() => dismiss(toast), duration);
-        toast._timer = timer;
-    }
-
-    function dismiss(toast) {
-        clearTimeout(toast._timer);
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(40px)';
-        setTimeout(() => toast.remove(), 320);
-    }
-
-    return { show };
-})();
-
-// ─────────────────────────────────────────────
-// 3. ESTADO GLOBAL
-// ─────────────────────────────────────────────
-
-const State = {
-    neuroBot: { isOpen: false, messages: [] },
-
-    kanban: {
-        todo:  storage.get('neuroKanbanTodo', []),
-        doing: storage.get('neuroKanbanDoing', []),
-        done:  storage.get('neuroKanbanDone', [])
-    },
-
-    progress: storage.get('neuroProgress', {
+    progress: JSON.parse(localStorage.getItem('neuroProgress')) || {
         gamesPlayed: 0,
         pomodorosCompleted: 0,
         tasksCompleted: 0,
         achievements: []
-    }),
-
-    pomodoro: {
+    },
+    pomodoroTimer: {
         minutes: 25,
         seconds: 0,
         isRunning: false,
-        _interval: null
+        interval: null
     },
+    authMode: 'login' // 'login' ou 'register'
+};
 
-    auth: { mode: 'login' }, // 'login' | 'register'
-
-    games: {
-        // Cor
-        targetColor: '',
-        colorScore: 0,
-        // Organizar
-        organizeTimerInterval: null,
-        organizeTimeElapsed: 0,
-        // Verdadeiro/Falso
-        currentTFIndex: 0,
-        tfScore: 0,
-        // Pares
-        firstTile: null,
-        secondTile: null,
-        attempts: 0,
-        // Caça-palavras
-        currentWord: '',
-        gridLetters: [],
-        selectedIndexes: [],
-        // Sequência
-        currentLevel: 0
+// Base de conhecimento específica para TDAH
+const neuroBotKnowledge = {
+    tdah: {
+        'o que é tdah': 'TDAH (Transtorno de Déficit de Atenção e Hiperatividade) é um transtorno neurobiológico que afeta a capacidade de concentração, controle de impulsos e níveis de atividade. É comum em crianças e adolescentes.',
+        'sintomas tdah': 'Os principais sintomas incluem: dificuldade de concentração, hiperatividade, impulsividade, desorganização, esquecimento e dificuldade para completar tarefas.',
+        'como lidar tdah': 'Estratégias eficazes incluem: rotinas estruturadas, técnicas de organização, exercícios físicos, técnica Pomodoro, jogos cognitivos e apoio profissional.',
+        'jogos tdah': 'Jogos cognitivos ajudam a desenvolver atenção, memória e funções executivas. Recomendo começar com o Jogo da Memória ou Foco Rápido!',
+        'pomodoro tdah': 'A técnica Pomodoro é excelente para TDAH: 25 minutos de foco + 5 minutos de pausa. Ajuda a manter a concentração sem sobrecarregar.',
+        'organização tdah': 'Use ferramentas visuais como Kanban, listas coloridas, lembretes e divida tarefas grandes em pequenas. A organização visual é fundamental!'
+    },
+    jogos: {
+        'jogo memória': 'O Jogo da Memória desenvolve memória visual e concentração. Ideal para treinar a atenção sustentada, uma habilidade importante para quem tem TDAH.',
+        'foco rápido': 'O Foco Rápido treina atenção seletiva e velocidade de processamento. Ajuda a melhorar a capacidade de filtrar distrações.',
+        'organize rotina': 'O jogo Organize a Rotina ensina planejamento e priorização de tarefas, habilidades executivas essenciais para o TDAH.',
+        'sequência lógica': 'Sequência Lógica desenvolve raciocínio sequencial e memória de trabalho, fundamentais para organização mental.'
+    },
+    ferramentas: {
+        'pomodoro': 'A técnica Pomodoro divide o trabalho em blocos de 25 minutos com pausas de 5 minutos. Perfeita para manter o foco sem se cansar!',
+        'kanban': 'O Kanban é um método visual de organização com colunas: Para Fazer, Fazendo e Feito. Ajuda a visualizar o progresso das tarefas.',
+        'dicas organização': 'Use cores, símbolos visuais, alarmes e lembretes. Divida tarefas grandes em pequenas e celebre cada conquista!'
     }
 };
 
-// ─────────────────────────────────────────────
-// 4. BASE DE CONHECIMENTO DO NEUROBOT
-// ─────────────────────────────────────────────
-
-const BOT_KNOWLEDGE = {
-    'o que é tdah': 'TDAH é um transtorno neurobiológico que afeta concentração, controle de impulsos e níveis de atividade. É comum em crianças, adolescentes e adultos.',
-    'sintomas tdah': 'Os principais sintomas são: dificuldade de concentração, hiperatividade, impulsividade, desorganização e esquecimento frequente.',
-    'como lidar tdah': 'Estratégias eficazes: rotinas estruturadas, técnica Pomodoro, jogos cognitivos, exercícios físicos e apoio profissional.',
-    'jogo memória': 'O Jogo da Memória desenvolve memória visual e atenção sustentada — habilidades essenciais para quem tem TDAH.',
-    'foco rápido': 'O Foco Rápido treina atenção seletiva e velocidade de processamento, ajudando a filtrar distrações.',
-    'pomodoro': 'A técnica Pomodoro divide o trabalho em blocos de 25 minutos com pausas de 5. Perfeita para manter o foco sem se sobrecarregar!',
-    'kanban': 'O Kanban é um método visual com colunas: Para Fazer, Fazendo e Feito. Ótimo para visualizar o progresso das suas tarefas.',
-    'organização': 'Use cores, símbolos visuais, alarmes e lembretes. Divida tarefas grandes em pequenas e celebre cada conquista!',
-    'sequência lógica': 'Sequência Lógica desenvolve raciocínio sequencial e memória de trabalho — fundamentos da organização mental.'
+// Respostas automáticas do NeuroBot
+const neuroBotResponses = {
+    'oi': 'Olá! Sou o NeuroBot, seu assistente especializado em TDAH! 🤖✨ Como posso ajudar você hoje?',
+    'olá': 'Oi! Estou aqui para ajudar com jogos, organização e dicas para TDAH. O que você gostaria de fazer?',
+    'ajuda': 'Posso ajudar você com: 🎮 Sugestões de jogos cognitivos, ⏰ Técnica Pomodoro, 📝 Organização de tarefas, 💡 Dicas para TDAH, 📊 Acompanhamento de progresso!',
+    'obrigado': 'De nada! Estou sempre aqui para apoiar você. Lembre-se: pequenos passos levam a grandes conquistas! 🌟',
+    'tchau': 'Até logo! Continue praticando e se organizando. Você está indo muito bem! 🚀'
 };
 
-const BOT_QUICK = {
-    'oi': 'Olá! Sou o NeuroBot, seu assistente para TDAH! 🤖✨ Como posso ajudar você hoje?',
-    'olá': 'Oi! Estou aqui para ajudar com jogos, organização e dicas para TDAH. O que você quer fazer?',
-    'ajuda': 'Posso ajudar com:\n🎮 Sugestão de jogos cognitivos\n⏰ Técnica Pomodoro\n📝 Organização de tarefas\n💡 Dicas para TDAH\n📊 Acompanhamento de progresso',
-    'obrigado': 'De nada! Lembre-se: pequenos passos levam a grandes conquistas! 🌟',
-    'obrigada': 'De nada! Estou sempre aqui. Você está indo muito bem! 🌟',
-    'tchau': 'Até logo! Continue praticando e se organizando. 🚀'
-};
-
-const BOT_FALLBACKS = [
-    'Para TDAH, recomendo técnicas visuais e dividir tarefas em pequenos passos. Posso ajudar com isso! 🎯',
-    'Que tal experimentar nossos jogos cognitivos ou a técnica Pomodoro? São ferramentas muito eficazes! 🧠',
-    'Para pessoas com TDAH, organização visual e rotinas estruturadas são fundamentais. Vamos trabalhar nisso! 📝',
-    'Que tal verificar suas conquistas ou organizar suas tarefas? Pequenos passos fazem a diferença! ✨'
-];
-
-// ─────────────────────────────────────────────
-// 5. NEUROBOT
-// ─────────────────────────────────────────────
-
-const NeuroBot = {
-    open() {
-        State.neuroBot.isOpen = true;
-        $('#neuroBotToggle').style.display = 'none';
-        $('#neuroBotContainer').style.display = 'flex';
-        $('#neuroBotBadge').style.display = 'none';
-        setTimeout(() => $('#neuroBotInput')?.focus(), 300);
-    },
-
-    close() {
-        State.neuroBot.isOpen = false;
-        $('#neuroBotContainer').style.display = 'none';
-        $('#neuroBotToggle').style.display = 'flex';
-    },
-
-    toggle() {
-        State.neuroBot.isOpen ? this.close() : this.open();
-    },
-
-    addMessage(content, sender) {
-        const container = $('#neuroBotMessages');
-        const wrap = document.createElement('div');
-        wrap.className = `message ${sender}-message`;
-
-        const avatar = document.createElement('div');
-        avatar.className = 'message-avatar';
-        avatar.innerHTML = sender === 'bot'
-            ? '<i class="fas fa-robot"></i>'
-            : '<i class="fas fa-user"></i>';
-
-        const bubble = document.createElement('div');
-        bubble.className = 'message-content';
-        // Suporte a quebras de linha no texto
-        bubble.innerHTML = `<p>${content.replace(/\n/g, '<br>')}</p>`;
-
-        wrap.appendChild(avatar);
-        wrap.appendChild(bubble);
-        container.appendChild(wrap);
-        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
-
-        State.neuroBot.messages.push({ content, sender, timestamp: new Date() });
-    },
-
-    send() {
-        const input = $('#neuroBotInput');
-        const message = input.value.trim();
-        if (!message) return;
-
-        this.addMessage(message, 'user');
-        input.value = '';
-
-        // Simula "digitando..."
-        setTimeout(() => {
-            const response = this._process(message);
-            this.addMessage(response, 'bot');
-        }, 500);
-    },
-
-    sendQuick(text) {
-        this.addMessage(text, 'user');
-        setTimeout(() => {
-            this.addMessage(this._processQuick(text), 'bot');
-        }, 500);
-    },
-
-    _process(message) {
-        const lower = message.toLowerCase();
-
-        // Respostas rápidas
-        for (const [key, resp] of Object.entries(BOT_QUICK)) {
-            if (lower.includes(key)) return resp;
-        }
-
-        // Base de conhecimento
-        for (const [key, resp] of Object.entries(BOT_KNOWLEDGE)) {
-            if (lower.includes(key) || key.split(' ').some(w => lower.includes(w))) return resp;
-        }
-
-        // Comandos de ação
-        if (lower.includes('jogo') || lower.includes('jogar'))
-            return '🎮 Recomendo começar com o Jogo da Memória — ótimo para treinar concentração! Vá para a seção Jogos.';
-
-        if (lower.includes('pomodoro') || lower.includes('foco')) {
-            Pomodoro.start();
-            return '⏰ Pomodoro iniciado! 25 minutos de foco total. Você consegue! 💪';
-        }
-
-        if (lower.includes('tarefa') || lower.includes('organizar')) {
-            Modal.open('kanbanModal');
-            Kanban.render();
-            return '📋 Abrindo seu organizador de tarefas! Use o Kanban para visualizar seu progresso.';
-        }
-
-        if (lower.includes('progresso') || lower.includes('conquista')) {
-            Modal.open('progressModal');
-            Progress.updateDisplay();
-            return '📊 Aqui está seu progresso! Continue assim! 🌟';
-        }
-
-        return BOT_FALLBACKS[Math.floor(Math.random() * BOT_FALLBACKS.length)];
-    },
-
-    _processQuick(action) {
-        const gameNames = ['Jogo da Memória', 'Foco Rápido', 'Organize a Rotina', 'Sequência Lógica'];
-        switch (action) {
-            case 'Sugerir jogo':
-                return `🎮 Recomendo o "${gameNames[Math.floor(Math.random() * gameNames.length)]}"! Vá para a seção Jogos e divirta-se!`;
-            case 'Iniciar Pomodoro':
-                Pomodoro.start();
-                return '⏰ Pomodoro iniciado! Elimine distrações e foque na sua tarefa. 💪';
-            case 'Dicas TDAH':
-                Modal.open('tipsModal');
-                return '💡 Abrindo dicas para TDAH! Organização visual e pausas regulares são suas melhores amigas!';
-            default:
-                return 'Como posso ajudar? Estou aqui para apoiar seu desenvolvimento cognitivo! 🌟';
-        }
-    },
-
-    updateBadge() {
-        const badge = $('#neuroBotBadge');
-        if (!badge) return;
-        const pending = State.kanban.todo.length + State.kanban.doing.length;
-        badge.textContent = pending;
-        badge.style.display = pending > 0 ? 'flex' : 'none';
-    }
-};
-
-// ─────────────────────────────────────────────
-// 6. POMODORO
-// ─────────────────────────────────────────────
-
-const Pomodoro = {
-    start() {
-        if (State.pomodoro.isRunning) return;
-        State.pomodoro.isRunning = true;
-        State.pomodoro._interval = setInterval(() => this._tick(), 1000);
-        this._render();
-    },
-
-    pause() {
-        State.pomodoro.isRunning = false;
-        clearInterval(State.pomodoro._interval);
-        this._render();
-    },
-
-    reset() {
-        State.pomodoro.isRunning = false;
-        clearInterval(State.pomodoro._interval);
-        State.pomodoro.minutes = 25;
-        State.pomodoro.seconds = 0;
-        this._render();
-    },
-
-    _tick() {
-        const p = State.pomodoro;
-        if (p.seconds > 0) {
-            p.seconds--;
-        } else if (p.minutes > 0) {
-            p.minutes--;
-            p.seconds = 59;
-        } else {
-            this._complete();
-            return;
-        }
-        this._render();
-    },
-
-    _complete() {
-        this.reset();
-        State.progress.pomodorosCompleted++;
-        Progress.save();
-        Achievements.check();
-        Toast.show('🎉 Pomodoro completo! Parabéns! Faça uma pausa de 5 minutos.', 'success', 5000);
-    },
-
-    _render() {
-        const p = State.pomodoro;
-        const display = $('.timer-display');
-        if (display) {
-            display.textContent = `${String(p.minutes).padStart(2,'0')}:${String(p.seconds).padStart(2,'0')}`;
-        }
-    }
-};
-
-// ─────────────────────────────────────────────
-// 7. KANBAN
-// ─────────────────────────────────────────────
-
-const Kanban = {
-    addTask(column) {
-        const input = $('#newTaskInput');
-        const text = input?.value.trim();
-        if (!text) return;
-
-        State.kanban[column].push({ id: Date.now(), text, createdAt: new Date().toISOString() });
-        this._saveColumn(column);
-        input.value = '';
-        this.render();
-        NeuroBot.updateBadge();
-    },
-
-    deleteTask(column, id) {
-        State.kanban[column] = State.kanban[column].filter(t => t.id !== id);
-        this._saveColumn(column);
-        this.render();
-        NeuroBot.updateBadge();
-    },
-
-    moveTask(id, from, to) {
-        const idx = State.kanban[from].findIndex(t => t.id == id);
-        if (idx === -1) return;
-        const [task] = State.kanban[from].splice(idx, 1);
-        State.kanban[to].push(task);
-        this._saveColumn(from);
-        this._saveColumn(to);
-
-        if (to === 'done') {
-            State.progress.tasksCompleted++;
-            Progress.save();
-            Achievements.check();
-            Toast.show('✅ Tarefa concluída! Parabéns!', 'success');
-        }
-
-        this.render();
-        NeuroBot.updateBadge();
-    },
-
-    render() {
-        ['todo', 'doing', 'done'].forEach(col => {
-            const container = $(`#${col}Tasks`);
-            if (!container) return;
-
-            // Remove tasks existentes mas preserva o input de "todo"
-            $$('.kanban-task', container).forEach(el => el.remove());
-
-            State.kanban[col].forEach(task => {
-                const div = document.createElement('div');
-                div.className = 'kanban-task';
-                div.draggable = true;
-                div.dataset.taskId = task.id;
-                div.dataset.column = col;
-
-                div.innerHTML = `
-                    <span>${task.text}</span>
-                    <button class="kanban-delete-btn" title="Remover tarefa"
-                        onclick="Kanban.deleteTask('${col}', ${task.id})"
-                        style="float:right;background:#ef4444;color:#fff;border:none;
-                               border-radius:50%;width:22px;height:22px;font-size:13px;
-                               cursor:pointer;display:inline-flex;align-items:center;
-                               justify-content:center;transition:background .2s;">×</button>
-                `;
-
-                div.addEventListener('dragstart', DnD.start.bind(DnD));
-                container.appendChild(div);
-            });
-
-            // Zona de drop
-            container.addEventListener('dragover', DnD.over.bind(DnD));
-            container.addEventListener('drop', DnD.drop.bind(DnD));
-        });
-    },
-
-    _saveColumn(col) {
-        const key = `neuroKanban${col.charAt(0).toUpperCase() + col.slice(1)}`;
-        storage.set(key, State.kanban[col]);
-    }
-};
-
-// ─────────────────────────────────────────────
-// 8. DRAG AND DROP
-// ─────────────────────────────────────────────
-
-const DnD = {
-    _dragged: null,
-
-    start(e) {
-        this._dragged = e.currentTarget;
-        e.dataTransfer.effectAllowed = 'move';
-        // Feedback visual suave
-        requestAnimationFrame(() => {
-            if (this._dragged) this._dragged.style.opacity = '0.5';
-        });
-    },
-
-    over(e) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        e.currentTarget.style.background = 'var(--accent-color-light)';
-    },
-
-    drop(e) {
-        e.preventDefault();
-        e.currentTarget.style.background = '';
-
-        if (!this._dragged) return;
-        this._dragged.style.opacity = '1';
-
-        const from = this._dragged.dataset.column;
-        const id = this._dragged.dataset.taskId;
-
-        const colMap = { todoTasks: 'todo', doingTasks: 'doing', doneTasks: 'done' };
-        const to = colMap[e.currentTarget.id];
-
-        if (to && from !== to) Kanban.moveTask(id, from, to);
-
-        this._dragged = null;
-    }
-};
-
-// ─────────────────────────────────────────────
-// 9. MODAIS
-// ─────────────────────────────────────────────
-
-const Modal = {
-    open(id) {
-        const el = $(`#${id}`);
-        if (!el) return;
-        el.style.display = 'flex';
-        if (id === 'loginModal') Auth.setup();
-    },
-
-    close(id) {
-        const el = $(`#${id}`);
-        if (el) el.style.display = 'none';
-    }
-};
-
-// Fechar clicando no overlay
-window.addEventListener('click', e => {
-    $$('.modal').forEach(modal => {
-        if (e.target === modal) modal.style.display = 'none';
-    });
+// Inicialização do NeuroGame
+document.addEventListener('DOMContentLoaded', function() {
+    initializeNeuroGame();
+    updateProgressDisplay();
+    updateNeuroBotBadge();
+    applySavedTheme(); // Aplicar o tema salvo ao carregar
 });
 
-// ─────────────────────────────────────────────
-// 10. PROGRESSO E CONQUISTAS
-// ─────────────────────────────────────────────
+function initializeNeuroGame() {
+    // Event listeners para navegação
+    document.querySelector('.hamburger').addEventListener('click', toggleMobileMenu);
+    
+    // Event listeners para o NeuroBot
+    document.getElementById('neuroBotInput').addEventListener('keypress', handleNeuroBotKeyPress);
+    
+    // Carregar dados salvos
+    renderKanbanBoard();
+    updatePomodoroDisplay();
 
-const Progress = {
-    save() {
-        storage.set('neuroProgress', State.progress);
-    },
+    // Event listeners para o Modal de Login/Cadastro
+    document.getElementById('authEmail').addEventListener('input', validateLoginForm);
+    document.getElementById('authPassword').addEventListener('input', validateLoginForm);
+    document.getElementById('authName').addEventListener('input', validateLoginForm);
+    document.getElementById('authConfirmPassword').addEventListener('input', validateLoginForm);
+    document.getElementById('authSubmitButton').addEventListener('click', performAuth);
+    document.getElementById('toggleAuthLink').addEventListener('click', toggleAuthMode);
 
-    updateDisplay() {
-        const set = (id, val) => { const el = $(`#${id}`); if (el) el.textContent = val; };
-        set('gamesPlayed', State.progress.gamesPlayed);
-        set('pomodorosCompleted', State.progress.pomodorosCompleted);
-        set('tasksCompleted', State.progress.tasksCompleted);
-        Achievements.renderList();
-    }
-};
-
-const ACHIEVEMENT_DEFS = [
-    { id: 'first_game',     name: 'Primeiro Jogo',   desc: 'Jogue seu primeiro jogo',   icon: 'fas fa-medal',  cond: () => State.progress.gamesPlayed >= 1 },
-    { id: 'pomodoro_x3',    name: 'Sequência de 3',  desc: 'Complete 3 Pomodoros',       icon: 'fas fa-fire',   cond: () => State.progress.pomodorosCompleted >= 3 },
-    { id: 'task_master',    name: 'Organizador',     desc: 'Complete 10 tarefas',        icon: 'fas fa-star',   cond: () => State.progress.tasksCompleted >= 10 },
-    { id: 'game_addict',    name: 'Jogador Dedicado',desc: 'Jogue 5 jogos diferentes',   icon: 'fas fa-gamepad',cond: () => State.progress.gamesPlayed >= 5 }
-];
-
-const Achievements = {
-    check() {
-        ACHIEVEMENT_DEFS.forEach(a => {
-            if (a.cond() && !State.progress.achievements.includes(a.id)) {
-                State.progress.achievements.push(a.id);
-                Progress.save();
-                this._notify(a);
-                this.renderList();
-            }
-        });
-    },
-
-    _notify(achievement) {
-        Toast.show(`🏆 Conquista desbloqueada: <strong>${achievement.name}</strong>`, 'achievement', 5000);
-    },
-
-    renderList() {
-        const list = $('#achievementList');
-        if (!list) return;
-        list.innerHTML = '';
-
-        ACHIEVEMENT_DEFS.forEach(a => {
-            const unlocked = State.progress.achievements.includes(a.id);
-            const div = document.createElement('div');
-            div.className = `achievement ${unlocked ? 'unlocked' : 'locked'}`;
-            div.innerHTML = `<i class="${a.icon}"></i><span>${a.name} — ${a.desc}</span>`;
-            list.appendChild(div);
-        });
-    }
-};
-
-// ─────────────────────────────────────────────
-// 11. TEMA
-// ─────────────────────────────────────────────
-
-const Theme = {
-    apply(theme) {
-        document.body.classList.remove('dark-mode', 'light-mode');
-        document.body.classList.add(theme === 'light' ? 'light-mode' : 'dark-mode');
-        storage.set('siteTheme', theme);
-        this._updateIcon(theme);
-    },
-
-    toggle() {
-        const isDark = document.body.classList.contains('dark-mode');
-        this.apply(isDark ? 'light' : 'dark');
-    },
-
-    init() {
-        const saved = storage.get('siteTheme', 'dark');
-        this.apply(saved);
-    },
-
-    _updateIcon(theme) {
-        const moon = $('#theme-icon-moon');
-        const sun  = $('#theme-icon-sun');
-        if (!moon || !sun) return;
-        moon.style.display = theme === 'dark' ? 'block' : 'none';
-        sun.style.display  = theme === 'light' ? 'block' : 'none';
-    }
-};
-
-// ─────────────────────────────────────────────
-// 12. AUTENTICAÇÃO
-// ─────────────────────────────────────────────
-
-const Auth = {
-    setup() {
-        State.auth.mode = 'login';
-        this._updateUI();
-        this._validate();
-        ['authEmail', 'authPassword', 'authName', 'authConfirmPassword'].forEach(id => {
-            const el = $(`#${id}`);
-            if (el) el.value = '';
-        });
-        const msg = $('#authMessage');
-        if (msg) msg.textContent = '';
-    },
-
-    toggle(e) {
-        e.preventDefault();
-        State.auth.mode = State.auth.mode === 'login' ? 'register' : 'login';
-        this._updateUI();
-        this._validate();
-        const msg = $('#authMessage');
-        if (msg) msg.textContent = '';
-    },
-
-    _updateUI() {
-        const isLogin = State.auth.mode === 'login';
-        const show = (id, visible) => {
-            const el = $(`#${id}`);
-            if (el) el.style.display = visible ? 'block' : 'none';
-        };
-
-        const title = $('#authModalTitle');
-        if (title) title.textContent = isLogin ? '🔐 Login' : '📝 Cadastro';
-
-        show('authNameLabel', !isLogin);
-        show('authName', !isLogin);
-        show('authConfirmPasswordLabel', !isLogin);
-        show('authConfirmPassword', !isLogin);
-
-        const btn = $('#authSubmitButton');
-        if (btn) btn.textContent = isLogin ? 'Entrar' : 'Cadastrar';
-
-        const txt = $('#toggleAuthText');
-        const lnk = $('#toggleAuthLink');
-        if (txt) txt.textContent = isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?';
-        if (lnk) lnk.textContent = isLogin ? 'Cadastre-se' : 'Faça login';
-
-        // Ajustar required
-        const name = $('#authName');
-        const confirm = $('#authConfirmPassword');
-        if (name) isLogin ? name.removeAttribute('required') : name.setAttribute('required', '');
-        if (confirm) isLogin ? confirm.removeAttribute('required') : confirm.setAttribute('required', '');
-    },
-
-    _validate() {
-        const email = $('#authEmail')?.value.trim() || '';
-        const password = $('#authPassword')?.value.trim() || '';
-        const name = $('#authName')?.value.trim() || '';
-        const confirm = $('#authConfirmPassword')?.value.trim() || '';
-        const msg = $('#authMessage');
-        const btn = $('#authSubmitButton');
-
-        let valid = email.includes('@') && email.includes('.') && password.length >= 6;
-        if (msg) msg.textContent = '';
-
-        if (State.auth.mode === 'register') {
-            if (!name) valid = false;
-            if (password !== confirm) {
-                valid = false;
-                if (password && confirm && msg) {
-                    msg.textContent = 'As senhas não coincidem.';
-                    msg.style.color = 'var(--error-color)';
-                }
-            }
-        }
-
-        if (btn) btn.disabled = !valid;
-    },
-
-    perform() {
-        const email = $('#authEmail')?.value.trim();
-        const password = $('#authPassword')?.value.trim();
-        const name = $('#authName')?.value.trim();
-        const msg = $('#authMessage');
-        if (!msg) return;
-
-        if (State.auth.mode === 'login') {
-            const valid =
-                (email === 'adulto@teste.com' || email === 'crianca@teste.com') &&
-                password === 'senha123';
-
-            if (valid) {
-                msg.textContent = 'Login realizado com sucesso! Bem-vindo(a)!';
-                msg.style.color = 'var(--success-color)';
-                Toast.show('Bem-vindo(a) ao NeuroGame! 🎉', 'success');
-                setTimeout(() => Modal.close('loginModal'), 1400);
-            } else {
-                msg.textContent = 'Email ou senha incorretos.';
-                msg.style.color = 'var(--error-color)';
-            }
-        } else {
-            const taken = email === 'adulto@teste.com' || email === 'crianca@teste.com';
-            if (taken) {
-                msg.textContent = 'Este email já está em uso.';
-                msg.style.color = 'var(--error-color)';
-            } else {
-                msg.textContent = `Cadastro de ${name} realizado! Faça login para continuar.`;
-                msg.style.color = 'var(--success-color)';
-                setTimeout(() => {
-                    State.auth.mode = 'login';
-                    this._updateUI();
-                    const emailEl = $('#authEmail');
-                    if (emailEl) emailEl.value = email;
-                    const passEl = $('#authPassword');
-                    if (passEl) passEl.value = '';
-                    this._validate();
-                }, 1500);
-            }
-        }
-    }
-};
-
-// ─────────────────────────────────────────────
-// 13. HUMOR (MOOD TRACKER)
-// ─────────────────────────────────────────────
-
-const Mood = {
-    open() {
-        Modal.open('moodModal');
-        this.render();
-    },
-
-    save(mood) {
-        const today = new Date().toLocaleDateString('pt-BR');
-        let history = storage.get('moodHistory', []);
-        history = [`${today} — ${mood}`, ...history].slice(0, 7);
-        storage.set('moodHistory', history);
-        this.render();
-        Toast.show(`Humor "${mood}" registrado! 😊`, 'success');
-    },
-
-    render() {
-        const list = $('#moodHistory');
-        if (!list) return;
-        const history = storage.get('moodHistory', []);
-        list.innerHTML = history.length
-            ? history.map(e => `<li style="padding:6px 0;border-bottom:1px solid var(--border-color)">${e}</li>`).join('')
-            : '<li style="color:var(--text-tertiary)">Nenhum humor registrado ainda.</li>';
-    }
-};
-
-// ─────────────────────────────────────────────
-// 14. NOTAS RÁPIDAS
-// ─────────────────────────────────────────────
-
-const Notes = {
-    open() {
-        Modal.open('notesModal');
-        this.render();
-    },
-
-    save() {
-        const input = $('#newNote');
-        const text = input?.value.trim();
-        if (!text) return;
-        const notes = [text, ...storage.get('quickNotes', [])];
-        storage.set('quickNotes', notes);
-        if (input) input.value = '';
-        this.render();
-    },
-
-    delete(index) {
-        const notes = storage.get('quickNotes', []);
-        notes.splice(index, 1);
-        storage.set('quickNotes', notes);
-        this.render();
-    },
-
-    render() {
-        const list = $('#notesList');
-        if (!list) return;
-        const notes = storage.get('quickNotes', []);
-        list.innerHTML = notes.length
-            ? notes.map((n, i) => `
-                <li style="display:flex;justify-content:space-between;align-items:center;
-                           padding:8px 0;border-bottom:1px solid var(--border-color);gap:8px">
-                    <span>${n}</span>
-                    <button onclick="Notes.delete(${i})"
-                        style="background:#ef4444;color:#fff;border:none;border-radius:6px;
-                               padding:3px 8px;cursor:pointer;font-size:12px;flex-shrink:0;">×</button>
-                </li>`).join('')
-            : '<li style="color:var(--text-tertiary)">Nenhuma nota ainda.</li>';
-    }
-};
-
-// ─────────────────────────────────────────────
-// 15. JOGOS
-// ─────────────────────────────────────────────
-
-function _incrementGame() {
-    State.progress.gamesPlayed++;
-    Progress.save();
-    Achievements.check();
+    // Event listener para o botão de tema
+    document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
 }
 
-// ── Jogo: Atenção às Cores ──────────────────
-
-const ColorGame = {
-    open() {
-        Modal.open('colorGameModal');
-        this.start();
-    },
-
-    start() {
-        const colors = ['red', 'blue', 'green', 'yellow'];
-        State.games.targetColor = colors[Math.floor(Math.random() * colors.length)];
-        State.games.colorScore = 0;
-        const el = $('#targetColor');
-        const score = $('#colorGameScore');
-        if (el) el.textContent = `Clique na cor: ${State.games.targetColor.toUpperCase()}`;
-        if (score) score.textContent = 0;
-    },
-
-    check(selected) {
-        if (selected === State.games.targetColor) {
-            State.games.colorScore++;
-            const score = $('#colorGameScore');
-            if (score) score.textContent = State.games.colorScore;
-            _incrementGame();
-            this.start();
-        } else {
-            Toast.show('Ops! Cor errada. 😅 Tente de novo!', 'error', 2000);
-        }
-    }
-};
-
-// ── Jogo: Organizar a Rotina ─────────────────
-
-const OrganizeGame = {
-    open() {
-        Modal.open('organizeGameModal');
-        this.start();
-    },
-
-    start() {
-        const tasks = ['Estudar', 'Jogar', 'Lavar a louça', 'Fazer exercícios', 'Assistir TV', 'Ler um livro'];
-        const list = $('#taskListToDrag');
-        if (list) {
-            list.innerHTML = '';
-            tasks.forEach((task, i) => {
-                const btn = document.createElement('button');
-                btn.textContent = task;
-                btn.draggable = true;
-                btn.id = `org-task-${i}`;
-                btn.ondragstart = e => e.dataTransfer.setData('text/plain', btn.id);
-                list.appendChild(btn);
-            });
-        }
-
-        ['priorityHigh', 'priorityMedium', 'priorityLow'].forEach(id => {
-            const el = $(`#${id}`);
-            if (el) el.innerHTML = '';
-        });
-
-        const result = $('#organizeGameResult');
-        if (result) result.textContent = '';
-
-        this._startTimer();
-    },
-
-    allowDrop(e) { e.preventDefault(); },
-
-    drop(e, priority) {
-        e.preventDefault();
-        const id = e.dataTransfer.getData('text/plain');
-        const taskEl = $(`#${id}`);
-        if (!taskEl) return;
-
-        const map = { High: 'priorityHigh', Medium: 'priorityMedium', Low: 'priorityLow' };
-        const target = $(` #${map[priority]}`);
-        if (!target) return;
-
-        const li = document.createElement('li');
-        li.textContent = taskEl.textContent;
-        target.appendChild(li);
-        taskEl.remove();
-    },
-
-    finish() {
-        const total = $$('#priorityHigh li, #priorityMedium li, #priorityLow li').length;
-        const result = $('#organizeGameResult');
-        if (total < 6) {
-            if (result) result.textContent = '📌 Você ainda não organizou todas as tarefas!';
-        } else {
-            this._stopTimer();
-            const time = formatTime(State.games.organizeTimeElapsed);
-            if (result) result.textContent = `✅ Parabéns! Você organizou sua rotina em ${time}!`;
-            _incrementGame();
-            Toast.show(`🎉 Rotina organizada em ${time}!`, 'success', 4000);
-        }
-    },
-
-    _startTimer() {
-        clearInterval(State.games.organizeTimerInterval);
-        State.games.organizeTimeElapsed = 0;
-        const el = $('#organizeTimer');
-        if (el) el.textContent = '00:00';
-
-        State.games.organizeTimerInterval = setInterval(() => {
-            State.games.organizeTimeElapsed++;
-            if (el) el.textContent = formatTime(State.games.organizeTimeElapsed);
-        }, 1000);
-    },
-
-    _stopTimer() {
-        clearInterval(State.games.organizeTimerInterval);
-    }
-};
-
-// ── Jogo: Verdadeiro ou Falso ────────────────
-
-const TF_QUESTIONS = [
-    { q: 'Estudar com música sempre melhora o foco.',     correct: 'false', exp: 'Depende da pessoa — para alguns pode atrapalhar.' },
-    { q: 'Fazer pausas curtas pode aumentar a produtividade.', correct: 'true',  exp: 'Técnicas como Pomodoro incentivam pequenas pausas.' },
-    { q: 'Dormir pouco melhora o rendimento.',            correct: 'false', exp: 'Dormir mal reduz foco e memória.' },
-    { q: 'Organizar suas tarefas ajuda a reduzir o estresse.', correct: 'true', exp: 'Ter um plano reduz a ansiedade e aumenta a clareza.' }
-];
-
-const TrueFalseGame = {
-    open() {
-        Modal.open('trueFalseGameModal');
-        this.start();
-    },
-
-    start() {
-        State.games.currentTFIndex = 0;
-        State.games.tfScore = 0;
-        this._show();
-    },
-
-    answer(userAnswer) {
-        const q = TF_QUESTIONS[State.games.currentTFIndex];
-        const feedback = $('#trueFalseFeedback');
-        if (userAnswer === q.correct) {
-            State.games.tfScore++;
-            if (feedback) feedback.textContent = `✅ Correto! ${q.exp}`;
-        } else {
-            if (feedback) feedback.textContent = `❌ Errado! ${q.exp}`;
-        }
-        State.games.currentTFIndex++;
-        setTimeout(() => this._show(), 2000);
-    },
-
-    _show() {
-        const qEl = $('#trueFalseQuestion');
-        const fb = $('#trueFalseFeedback');
-        const sc = $('#trueFalseScore');
-
-        if (State.games.currentTFIndex >= TF_QUESTIONS.length) {
-            if (qEl) qEl.textContent = 'Fim do jogo!';
-            if (fb) fb.textContent = `Você acertou ${State.games.tfScore} de ${TF_QUESTIONS.length} perguntas!`;
-            _incrementGame();
-            return;
-        }
-
-        const q = TF_QUESTIONS[State.games.currentTFIndex];
-        if (qEl) qEl.textContent = q.q;
-        if (fb) fb.textContent = '';
-        if (sc) sc.textContent = `Pergunta ${State.games.currentTFIndex + 1} de ${TF_QUESTIONS.length}`;
-    }
-};
-
-// ── Jogo: Pares de Memória ───────────────────
-
-const MemoryPairs = {
-    board: [],
-    first: null,
-    second: null,
-    attempts: 0,
-
-    open() {
-        Modal.open('memoryPairsGameModal');
-        this.start();
-    },
-
-    start() {
-        this.board = [];
-        this.first = null;
-        this.second = null;
-        this.attempts = 0;
-
-        const container = $('#memoryPairsBoard');
-        const fb = $('#memoryPairsFeedback');
-        if (container) container.innerHTML = '';
-        if (fb) fb.textContent = '';
-
-        const values = [1, 1, 2, 2, 3, 3, 4, 4].sort(() => Math.random() - 0.5);
-        values.forEach((val, i) => {
-            const tile = document.createElement('div');
-            tile.className = 'memory-tile';
-            tile.dataset.value = val;
-            tile.dataset.index = i;
-            tile.addEventListener('click', () => this._reveal(tile));
-            container?.appendChild(tile);
-            this.board.push(tile);
-        });
-    },
-
-    _reveal(tile) {
-        if (tile.classList.contains('revealed') || this.second) return;
-
-        tile.classList.add('revealed');
-        tile.textContent = tile.dataset.value;
-
-        if (!this.first) {
-            this.first = tile;
-            return;
-        }
-
-        this.second = tile;
-        this.attempts++;
-
-        if (this.first.dataset.value === this.second.dataset.value) {
-            this.first = null;
-            this.second = null;
-
-            const allRevealed = this.board.every(t => t.classList.contains('revealed'));
-            if (allRevealed) {
-                const fb = $('#memoryPairsFeedback');
-                if (fb) fb.textContent = `✅ Parabéns! Todos os pares em ${this.attempts} tentativas!`;
-                _incrementGame();
-                Toast.show(`🧠 Jogo da Memória concluído em ${this.attempts} tentativas!`, 'success', 4000);
-            }
-        } else {
-            setTimeout(() => {
-                [this.first, this.second].forEach(t => {
-                    if (t) { t.classList.remove('revealed'); t.textContent = ''; }
-                });
-                this.first = null;
-                this.second = null;
-            }, 800);
-        }
-    }
-};
-
-// ── Jogo: Caça-Palavras ──────────────────────
-
-const WORD_LIST = ['FOCO', 'ATENÇÃO', 'ORGANIZAÇÃO', 'MEMÓRIA', 'DISCIPLINA',
-                   'PLANEJAMENTO', 'CONCENTRAÇÃO', 'TEMPO', 'PRODUTIVIDADE', 'OBJETIVO'];
-
-const WordSearch = {
-    open() {
-        Modal.open('wordSearchModal');
-        this.start();
-    },
-
-    start() {
-        const g = State.games;
-        g.gridLetters = [];
-        g.selectedIndexes = [];
-        g.currentWord = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
-
-        const grid = $('#wordGrid');
-        const fb = $('#wordSearchFeedback');
-        if (grid) grid.innerHTML = '';
-        if (fb) { fb.className = 'word-search-feedback'; fb.textContent = `Encontre: ${g.currentWord}`; }
-
-        const ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const TOTAL = 36;
-
-        for (let i = 0; i < TOTAL; i++)
-            g.gridLetters.push(ALPHA[Math.floor(Math.random() * ALPHA.length)]);
-
-        const maxStart = TOTAL - g.currentWord.length;
-        const start = Math.floor(Math.random() * maxStart);
-        for (let i = 0; i < g.currentWord.length; i++)
-            g.gridLetters[start + i] = g.currentWord[i];
-
-        g.gridLetters.forEach((letter, idx) => {
-            const cell = document.createElement('div');
-            cell.className = 'word-cell';
-            cell.textContent = letter;
-            cell.addEventListener('click', () => this._select(idx));
-            grid?.appendChild(cell);
-        });
-    },
-
-    _select(index) {
-        const g = State.games;
-        if (g.selectedIndexes.includes(index)) return;
-
-        g.selectedIndexes.push(index);
-        const cells = $$('.word-cell');
-        if (cells[index]) cells[index].classList.add('selected');
-
-        if (g.selectedIndexes.length !== g.currentWord.length) return;
-
-        const formed = g.selectedIndexes.map(i => g.gridLetters[i]).join('');
-        const fb = $('#wordSearchFeedback');
-
-        if (formed === g.currentWord) {
-            if (fb) { fb.className = 'word-search-feedback success'; fb.textContent = `✅ Encontrou "${g.currentWord}"!`; }
-            _incrementGame();
-            Toast.show(`🔤 Palavra "${g.currentWord}" encontrada!`, 'success');
-        } else {
-            if (fb) { fb.className = 'word-search-feedback error'; fb.textContent = `❌ Formou "${formed}". Tente novamente!`; }
-        }
-
-        setTimeout(() => this.start(), 2000);
-    }
-};
-
-// ── Jogo: Sequência Numérica ─────────────────
-
-const SEQUENCES = [
-    { seq: [2, 4, 6, '?'],   answer: 8  },
-    { seq: [1, 3, 5, '?'],   answer: 7  },
-    { seq: [5, 10, 15, '?'], answer: 20 },
-    { seq: [10, 9, 8, '?'],  answer: 7  },
-    { seq: [2, 6, 18, '?'],  answer: 54 },
-    { seq: [1, 4, 9, '?'],   answer: 16 }
-];
-
-const SequenceGame = {
-    open() {
-        Modal.open('sequenceGameModal');
-        State.games.currentLevel = 0;
-        this.start();
-    },
-
-    start() {
-        const fb = $('#sequenceFeedback');
-        if (fb) { fb.textContent = ''; fb.className = 'sequence-feedback'; }
-
-        if (State.games.currentLevel >= SEQUENCES.length) State.games.currentLevel = 0;
-
-        const level = State.games.currentLevel;
-        const levelEl = $('#sequenceLevel');
-        const qEl = $('#sequenceQuestion');
-        const optsEl = $('#sequenceOptions');
-
-        if (levelEl) levelEl.textContent = `Nível: ${level + 1}`;
-        if (qEl) qEl.textContent = SEQUENCES[level].seq.join(', ');
-
-        if (!optsEl) return;
-        optsEl.innerHTML = '';
-
-        const correct = SEQUENCES[level].answer;
-        const options = [correct];
-        while (options.length < 4) {
-            const offset = (Math.floor(Math.random() * 6) + 1) * (Math.random() > 0.5 ? 1 : -1);
-            const fake = correct + offset;
-            if (!options.includes(fake) && fake > 0) options.push(fake);
-        }
-        options.sort(() => Math.random() - 0.5);
-
-        options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = 'sequence-option-btn';
-            btn.textContent = opt;
-            btn.addEventListener('click', () => this._answer(opt));
-            optsEl.appendChild(btn);
-        });
-    },
-
-    _answer(selected) {
-        const fb = $('#sequenceFeedback');
-        const correct = SEQUENCES[State.games.currentLevel].answer;
-
-        if (selected === correct) {
-            if (fb) { fb.textContent = '✅ Correto!'; fb.className = 'sequence-feedback correct'; }
-            State.games.currentLevel++;
-            _incrementGame();
-            setTimeout(() => this.start(), 1500);
-        } else {
-            if (fb) { fb.textContent = `❌ Errado! A resposta era ${correct}.`; fb.className = 'sequence-feedback wrong'; }
-        }
-    }
-};
-
-// ─────────────────────────────────────────────
-// 16. FUNÇÃO GERAL openGame()
-// ─────────────────────────────────────────────
-
-function openGame(name) {
-    const map = {
-        organize:    () => OrganizeGame.open(),
-        trueFalse:   () => TrueFalseGame.open(),
-        memoryPairs: () => MemoryPairs.open(),
-        wordSearch:  () => WordSearch.open(),
-        sequence:    () => SequenceGame.open(),
-        color:       () => ColorGame.open()
-    };
-    if (map[name]) map[name]();
-    else Toast.show('Jogo em desenvolvimento! Em breve. 🚧', 'info');
-}
-
-// ─────────────────────────────────────────────
-// 17. NAVEGAÇÃO
-// ─────────────────────────────────────────────
-
-function scrollToSection(id) {
-    const el = $(`#${id}`);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
+// Funções de navegação
+function scrollToSection(sectionId) {
+    document.getElementById(sectionId).scrollIntoView({
+        behavior: 'smooth'
+    });
 }
 
 function toggleMobileMenu() {
-    $('.nav-menu')?.classList.toggle('active');
+    const navMenu = document.querySelector('.nav-menu');
+    navMenu.classList.toggle('active');
 }
 
-// ─────────────────────────────────────────────
-// 18. FUNÇÕES GLOBAIS (chamadas via HTML)
-//     Mantidas para compatibilidade com o HTML
-// ─────────────────────────────────────────────
+// Funções do NeuroBot
+function openNeuroBot() {
+    neuroGameState.isNeuroBotOpen = true;
+    document.getElementById('neuroBotToggle').style.display = 'none';
+    document.getElementById('neuroBotContainer').style.display = 'flex';
+    document.getElementById('neuroBotBadge').style.display = 'none';
+    
+    setTimeout(() => {
+        document.getElementById('neuroBotInput').focus();
+    }, 300);
+}
 
-// NeuroBot
-const openNeuroBot  = () => NeuroBot.open();
-const closeNeuroBot = () => NeuroBot.close();
-const toggleNeuroBot= () => NeuroBot.toggle();
-const sendNeuroBotMessage = () => NeuroBot.send();
-const sendQuickMessage    = t => NeuroBot.sendQuick(t);
+function closeNeuroBot() {
+    neuroGameState.isNeuroBotOpen = false;
+    document.getElementById('neuroBotContainer').style.display = 'none';
+    document.getElementById('neuroBotToggle').style.display = 'flex';
+}
 
-// Pomodoro
-const startPomodoro = () => Pomodoro.start();
-const pausePomodoro = () => Pomodoro.pause();
-const resetPomodoro = () => Pomodoro.reset();
+function toggleNeuroBot() {
+    if (neuroGameState.isNeuroBotOpen) {
+        closeNeuroBot();
+    } else {
+        openNeuroBot();
+    }
+}
 
-// Kanban
-const openKanban = () => { Modal.open('kanbanModal'); Kanban.render(); };
-const addKanbanTask = col => Kanban.addTask(col);
+function handleNeuroBotKeyPress(event) {
+    if (event.key === 'Enter') {
+        sendNeuroBotMessage();
+    }
+}
 
-// Modais
-const openModal  = id => Modal.open(id);
-const closeModal = id => Modal.close(id);
-const openTips   = () => Modal.open('tipsModal');
-const openProgress = () => { Modal.open('progressModal'); Progress.updateDisplay(); };
+function sendNeuroBotMessage() {
+    const input = document.getElementById('neuroBotInput');
+    const message = input.value.trim();
+    
+    if (message === '') return;
+    
+    addNeuroBotMessage(message, 'user');
+    input.value = '';
+    
+    setTimeout(() => {
+        const response = processNeuroBotMessage(message);
+        addNeuroBotMessage(response, 'bot');
+    }, 500);
+}
 
-// Tema
-const toggleTheme = () => Theme.toggle();
+function sendQuickMessage(message) {
+    addNeuroBotMessage(message, 'user');
+    
+    setTimeout(() => {
+        const response = processQuickAction(message);
+        addNeuroBotMessage(response, 'bot');
+    }, 500);
+}
 
-// Auth
-const toggleAuthMode = e => Auth.toggle(e);
-const validateLoginForm = () => Auth._validate();
-const performAuth = () => Auth.perform();
-
-// Humor / Notas
-const openMoodTracker = () => Mood.open();
-const saveMood = mood => Mood.save(mood);
-const openNotes = () => Notes.open();
-const saveNote  = () => Notes.save();
-const deleteNote = i => Notes.delete(i);
-
-// Color Game
-const openColorGame = () => ColorGame.open();
-const checkColor    = c  => ColorGame.check(c);
-const startColorGame= () => ColorGame.start();
-
-// Organize Game
-const allowDrop = e => e.preventDefault();
-const drop = (e, p) => OrganizeGame.drop(e, p);
-const finishOrganizeGame = () => OrganizeGame.finish();
-
-// TrueFalse
-const answerTrueFalse = ans => TrueFalseGame.answer(ans);
-
-// Sequence
-const selectOption = opt => SequenceGame._answer(opt);
-
-// ─────────────────────────────────────────────
-// 19. INICIALIZAÇÃO
-// ─────────────────────────────────────────────
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Tema
-    Theme.init();
-
-    // Navegação mobile
-    $('.hamburger')?.addEventListener('click', toggleMobileMenu);
-
-    // NeuroBot input
-    $('#neuroBotInput')?.addEventListener('keypress', e => {
-        if (e.key === 'Enter') NeuroBot.send();
+function addNeuroBotMessage(content, sender) {
+    const messagesContainer = document.getElementById('neuroBotMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}-message`;
+    
+    const avatarDiv = document.createElement('div');
+    avatarDiv.className = 'message-avatar';
+    avatarDiv.innerHTML = sender === 'bot' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    contentDiv.innerHTML = `<p>${content}</p>`;
+    
+    messageDiv.appendChild(avatarDiv);
+    messageDiv.appendChild(contentDiv);
+    messagesContainer.appendChild(messageDiv);
+    
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    
+    neuroGameState.messages.push({
+        content: content,
+        sender: sender,
+        timestamp: new Date()
     });
+}
 
-    // Auth inputs — validação em tempo real
-    ['authEmail', 'authPassword', 'authName', 'authConfirmPassword'].forEach(id => {
-        $(`#${id}`)?.addEventListener('input', () => Auth._validate());
-    });
-    $('#authSubmitButton')?.addEventListener('click', () => Auth.perform());
-    $('#toggleAuthLink')?.addEventListener('click', e => Auth.toggle(e));
-    $('#theme-toggle-btn')?.addEventListener('click', () => Theme.toggle());
+function processNeuroBotMessage(message) {
+    const lowerMessage = message.toLowerCase();
+    
+    // Verificar respostas automáticas
+    for (const [key, response] of Object.entries(neuroBotResponses)) {
+        if (lowerMessage.includes(key)) {
+            return response;
+        }
+    }
+    
+    // Buscar na base de conhecimento
+    const knowledgeResponse = searchNeuroBotKnowledge(lowerMessage); 
+    if (knowledgeResponse) {
+        return knowledgeResponse;
+    }
+    
+    // Comandos específicos
+    if (lowerMessage.includes('jogo') || lowerMessage.includes('jogar')) {
+        return 'Que tal experimentar nossos jogos cognitivos? 🎮 Recomendo começar com o Jogo da Memória - é ótimo para treinar concentração! Clique em "Jogos" no menu acima.';
+    }
+    
+    if (lowerMessage.includes('pomodoro') || lowerMessage.includes('foco')) {
+        startPomodoro();
+        return '⏰ Iniciando seu Pomodoro! 25 minutos de foco total. Você consegue! 💪';
+    }
+    
+    if (lowerMessage.includes('tarefa') || lowerMessage.includes('organizar')) {
+        openKanban();
+        return '📋 Abrindo seu organizador de tarefas! Use o método Kanban para visualizar seu progresso.';
+    }
+    
+    if (lowerMessage.includes('progresso') || lowerMessage.includes('conquista')) {
+        openProgress();
+        return '📊 Aqui está seu progresso! Continue assim, você está indo muito bem! 🌟';
+    }
+    
+    // Resposta padrão inteligente
+    return generateSmartNeuroBotResponse(message);
+}
 
-    // Kanban
-    Kanban.render();
-
-    // Pomodoro display inicial
-    Pomodoro._render();
-
-    // Badge do bot
-    NeuroBot.updateBadge();
-
-    // Animações de entrada para cards (Intersection Observer)
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-                observer.unobserve(entry.target);
+function searchNeuroBotKnowledge(message) {
+    for (const [category, items] of Object.entries(neuroBotKnowledge)) {
+        for (const [key, value] of Object.entries(items)) {
+            if (message.includes(key) || key.split(' ').some(word => message.includes(word))) {
+                return value;
             }
+        }
+    }
+    return null;
+}
+
+function generateSmartNeuroBotResponse(message) {
+    const responses = [
+        'Interessante! Para TDAH, recomendo usar técnicas visuais e dividir tarefas em pequenos passos. Posso ajudar você com isso! 🎯',
+        'Ótima pergunta! Que tal experimentar nossos jogos cognitivos ou a técnica Pomodoro? São ferramentas muito eficazes para TDAH! 🧠',
+        'Entendo sua dúvida! Para pessoas com TDAH, a organização visual e rotinas estruturadas são fundamentais. Vamos trabalhar nisso juntos! 📝',
+        'Vou anotar isso! Enquanto isso, que tal verificar suas conquistas ou organizar suas tarefas? Pequenos passos fazem a diferença! ✨'
+    ];
+    
+    return responses[Math.floor(Math.random() * responses.length)];
+}
+
+function processQuickAction(action) {
+    switch (action) {
+        case 'Sugerir jogo':
+            const games = ['Jogo da Memória', 'Foco Rápido', 'Organize a Rotina', 'Sequência Lógica'];
+            const randomGame = games[Math.floor(Math.random() * games.length)];
+            return `🎮 Recomendo o "${randomGame}"! É perfeito para treinar suas habilidades cognitivas. Vá para a seção Jogos e divirta-se!`;
+        
+        case 'Iniciar Pomodoro':
+            startPomodoro();
+            return '⏰ Pomodoro iniciado! 25 minutos de foco total. Elimine distrações e concentre-se na sua tarefa. Você consegue! 💪';
+        
+        case 'Dicas TDAH':
+            openTips();
+            return '💡 Abrindo dicas especializadas para TDAH! Lembre-se: organização visual, rotinas estruturadas e pausas regulares são suas melhores amigas!';
+        
+        default:
+            return 'Como posso ajudar você com isso? Estou aqui para apoiar seu desenvolvimento cognitivo! 🌟';
+    }
+}
+
+// Funções dos jogos
+function openGame(gameType) {
+    neuroGameState.progress.gamesPlayed++;
+    updateProgress();
+    
+    switch (gameType) {
+        case 'memory':
+            alert('🧠 Jogo da Memória em desenvolvimento! Em breve você poderá treinar sua memória visual aqui.');
+            break;
+        case 'focus':
+            alert('🎯 Foco Rápido em desenvolvimento! Em breve você poderá treinar sua atenção aqui.');
+            break;
+        case 'organize':
+            alert('📋 Organize a Rotina em desenvolvimento! Em breve você poderá praticar organização aqui.');
+            break;
+        case 'sequence':
+            alert('🔢 Sequência Lógica em desenvolvimento! Em breve você poderá treinar raciocínio lógico aqui.');
+            break;
+    }
+    
+    checkAchievements();
+}
+
+// Funções do Pomodoro
+function startPomodoro() {
+    if (neuroGameState.pomodoroTimer.isRunning) return;
+    
+    neuroGameState.pomodoroTimer.isRunning = true;
+    neuroGameState.pomodoroTimer.interval = setInterval(updatePomodoroTimer, 1000);
+    
+    updatePomodoroDisplay();
+}
+
+function pausePomodoro() {
+    neuroGameState.pomodoroTimer.isRunning = false;
+    clearInterval(neuroGameState.pomodoroTimer.interval);
+    updatePomodoroDisplay();
+}
+
+function resetPomodoro() {
+    neuroGameState.pomodoroTimer.isRunning = false;
+    clearInterval(neuroGameState.pomodoroTimer.interval);
+    neuroGameState.pomodoroTimer.minutes = 25;
+    neuroGameState.pomodoroTimer.seconds = 0;
+    updatePomodoroDisplay();
+}
+
+function updatePomodoroTimer() {
+    if (neuroGameState.pomodoroTimer.seconds > 0) {
+        neuroGameState.pomodoroTimer.seconds--;
+    } else if (neuroGameState.pomodoroTimer.minutes > 0) {
+        neuroGameState.pomodoroTimer.minutes--;
+        neuroGameState.pomodoroTimer.seconds = 59;
+    } else {
+        // Pomodoro completo
+        neuroGameState.pomodoroTimer.isRunning = false;
+        clearInterval(neuroGameState.pomodoroTimer.interval);
+        neuroGameState.progress.pomodorosCompleted++;
+        updateProgress();
+        checkAchievements();
+        
+        alert('🎉 Pomodoro completo! Parabéns! Faça uma pausa de 5 minutos.');
+        resetPomodoro();
+        return;
+    }
+    
+    updatePomodoroDisplay();
+}
+
+function updatePomodoroDisplay() {
+    const display = document.querySelector('.timer-display');
+    const minutes = String(neuroGameState.pomodoroTimer.minutes).padStart(2, '0');
+    const seconds = String(neuroGameState.pomodoroTimer.seconds).padStart(2, '0');
+    display.textContent = `${minutes}:${seconds}`;
+}
+
+// Funções do Kanban
+function openKanban() {
+    openModal('kanbanModal');
+    renderKanbanBoard();
+}
+
+function addKanbanTask(column) {
+    const input = document.getElementById('newTaskInput');
+    const text = input.value.trim();
+    
+    if (text === '') return;
+    
+    const task = {
+        id: Date.now(),
+        text: text,
+        createdAt: new Date()
+    };
+    
+    neuroGameState.kanbanTasks[column].push(task);
+    localStorage.setItem(`neuroKanban${column.charAt(0).toUpperCase() + column.slice(1)}`, 
+                         JSON.stringify(neuroGameState.kanbanTasks[column]));
+    
+    input.value = '';
+    renderKanbanBoard();
+    updateNeuroBotBadge();
+}
+
+function renderKanbanBoard() {
+    const columns = ['todo', 'doing', 'done'];
+    
+    columns.forEach(column => {
+        const container = document.getElementById(`${column}Tasks`);
+        const tasks = neuroGameState.kanbanTasks[column];
+        
+        // Limpar container (exceto input para todo)
+        if (column === 'todo') {
+            const taskElements = container.querySelectorAll('.kanban-task');
+            taskElements.forEach(el => el.remove());
+        } else {
+            container.innerHTML = '';
+        }
+        
+        tasks.forEach(task => {
+            const taskDiv = document.createElement('div');
+            taskDiv.className = 'kanban-task';
+            taskDiv.draggable = true;
+            taskDiv.dataset.taskId = task.id;
+            taskDiv.dataset.column = column;
+            
+            taskDiv.innerHTML = `
+                <div>${task.text}</div>
+                <button onclick="deleteKanbanTask('${column}', ${task.id})" style="float: right; background: #ef4444; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;">×</button>
+            `;
+            
+            // Event listeners para drag and drop
+            taskDiv.addEventListener('dragstart', handleDragStart);
+            taskDiv.addEventListener('dragover', handleDragOver);
+            taskDiv.addEventListener('drop', handleDrop);
+            
+            container.appendChild(taskDiv);
         });
-    }, { threshold: 0.12 });
-
-    $$('.game-card, .tool-card, .stat-card').forEach((card, i) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(24px)';
-        card.style.transition = `opacity 0.5s ease ${i * 0.07}s, transform 0.5s ease ${i * 0.07}s`;
-        observer.observe(card);
     });
+}
 
-    // Estilos extras injetados
-    injectStyles();
+function deleteKanbanTask(column, taskId) {
+    neuroGameState.kanbanTasks[column] = neuroGameState.kanbanTasks[column].filter(task => task.id !== taskId);
+    localStorage.setItem(`neuroKanban${column.charAt(0).toUpperCase() + column.slice(1)}`, 
+                         JSON.stringify(neuroGameState.kanbanTasks[column]));
+    renderKanbanBoard();
+    updateNeuroBotBadge();
+}
+
+function moveKanbanTask(taskId, fromColumn, toColumn) {
+    const taskIndex = neuroGameState.kanbanTasks[fromColumn].findIndex(task => task.id == taskId);
+    if (taskIndex === -1) return;
+    
+    const task = neuroGameState.kanbanTasks[fromColumn].splice(taskIndex, 1)[0];
+    neuroGameState.kanbanTasks[toColumn].push(task);
+    
+    // Salvar no localStorage
+    localStorage.setItem(`neuroKanban${fromColumn.charAt(0).toUpperCase() + fromColumn.slice(1)}`, 
+                         JSON.stringify(neuroGameState.kanbanTasks[fromColumn]));
+    localStorage.setItem(`neuroKanban${toColumn.charAt(0).toUpperCase() + toColumn.slice(1)}`, 
+                         JSON.stringify(neuroGameState.kanbanTasks[toColumn]));
+    
+    // Se moveu para "done", incrementar contador
+    if (toColumn === 'done') {
+        neuroGameState.progress.tasksCompleted++;
+        updateProgress();
+        checkAchievements();
+    }
+    
+    renderKanbanBoard();
+    updateNeuroBotBadge();
+}
+
+// Drag and Drop handlers
+let draggedElement = null;
+
+function handleDragStart(e) {
+    draggedElement = e.target;
+    e.dataTransfer.effectAllowed = 'move';
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    
+    if (!draggedElement) return;
+    
+    const dropTarget = e.target.closest('.kanban-tasks');
+    if (!dropTarget) return;
+    
+    const fromColumn = draggedElement.dataset.column;
+    const taskId = draggedElement.dataset.taskId;
+    
+    let toColumn;
+    if (dropTarget.id === 'todoTasks') toColumn = 'todo';
+    else if (dropTarget.id === 'doingTasks') toColumn = 'doing';
+    else if (dropTarget.id === 'doneTasks') toColumn = 'done';
+    
+    if (fromColumn !== toColumn) {
+        moveKanbanTask(taskId, fromColumn, toColumn);
+    }
+    
+    draggedElement = null;
+}
+
+// Funções de modais
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = 'flex';
+    if (modalId === 'loginModal') {
+        setupLoginModal();
+    }
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+function openTips() {
+    openModal('tipsModal');
+}
+
+function openProgress() {
+    openModal('progressModal');
+    updateProgressDisplay();
+}
+
+// Funções de progresso e conquistas
+function updateProgress() {
+    localStorage.setItem('neuroProgress', JSON.stringify(neuroGameState.progress));
+}
+
+function updateProgressDisplay() {
+    document.getElementById('gamesPlayed').textContent = neuroGameState.progress.gamesPlayed;
+    document.getElementById('pomodorosCompleted').textContent = neuroGameState.progress.pomodorosCompleted;
+    document.getElementById('tasksCompleted').textContent = neuroGameState.progress.tasksCompleted;
+    
+    updateAchievementsDisplay();
+}
+
+function checkAchievements() {
+    const achievements = [
+        {
+            id: 'first_game',
+            name: 'Primeiro Jogo',
+            description: 'Jogue seu primeiro jogo',
+            condition: () => neuroGameState.progress.gamesPlayed >= 1,
+            icon: 'fas fa-medal'
+        },
+        {
+            id: 'pomodoro_streak',
+            name: 'Sequência de 3',
+            description: 'Complete 3 Pomodoros seguidos',
+            condition: () => neuroGameState.progress.pomodorosCompleted >= 3,
+            icon: 'fas fa-fire'
+        },
+        {
+            id: 'task_master',
+            name: 'Organizador',
+            description: 'Complete 10 tarefas',
+            condition: () => neuroGameState.progress.tasksCompleted >= 10,
+            icon: 'fas fa-star'
+        }
+    ];
+    
+    achievements.forEach(achievement => {
+        if (achievement.condition() && !neuroGameState.progress.achievements.includes(achievement.id)) {
+            neuroGameState.progress.achievements.push(achievement.id);
+            updateProgress();
+            showAchievementNotification(achievement);
+        }
+    });
+    
+    updateAchievementsDisplay();
+}
+
+function updateAchievementsDisplay() {
+    const achievementList = document.getElementById('achievementList');
+    const achievements = [
+        { id: 'first_game', name: 'Primeiro Jogo', description: 'Jogue seu primeiro jogo', icon: 'fas fa-medal' },
+        { id: 'pomodoro_streak', name: 'Sequência de 3', description: 'Complete 3 Pomodoros seguidos', icon: 'fas fa-fire' },
+        { id: 'task_master', name: 'Organizador', description: 'Complete 10 tarefas', icon: 'fas fa-star' }
+    ];
+    
+    achievementList.innerHTML = '';
+    
+    achievements.forEach(achievement => {
+        const isUnlocked = neuroGameState.progress.achievements.includes(achievement.id);
+        const achievementDiv = document.createElement('div');
+        achievementDiv.className = `achievement ${isUnlocked ? 'unlocked' : 'locked'}`;
+        
+        achievementDiv.innerHTML = `
+            <i class="${achievement.icon}"></i>
+            <span>${achievement.name} (${achievement.description})</span>
+        `;
+        
+        achievementList.appendChild(achievementDiv);
+    });
+}
+
+function showAchievementNotification(achievement) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+        color: #333;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        z-index: 10000;
+        font-family: 'Poppins', sans-serif;
+        font-size: 14px;
+        max-width: 300px;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="${achievement.icon}" style="font-size: 1.5rem;"></i>
+            <div>
+                <div style="font-weight: 600;">🏆 Conquista Desbloqueada!</div>
+                <div>${achievement.name}</div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 4000);
+}
+
+function updateNeuroBotBadge() {
+    const badge = document.getElementById('neuroBotBadge');
+    const pendingTasks = neuroGameState.kanbanTasks.todo.length + neuroGameState.kanbanTasks.doing.length;
+    
+    if (pendingTasks > 0) {
+        badge.textContent = pendingTasks;
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+// Fechar modais clicando fora
+window.addEventListener('click', function(event) {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
 });
 
-// ─────────────────────────────────────────────
-// 20. ESTILOS INJETADOS (nav mobile + notifs)
-// ─────────────────────────────────────────────
-
-function injectStyles() {
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to   { transform: translateX(0);    opacity: 1; }
+// Adicionar estilos para animações de notificação
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    .nav-menu.active {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+        padding: 1rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    @media (max-width: 768px) {
+        .nav-menu {
+            display: none;
         }
-        @keyframes slideOutRight {
-            from { transform: translateX(0);    opacity: 1; }
-            to   { transform: translateX(100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+
+// Funções de Tema (Claro/Escuro)
+function toggleTheme() {
+    const body = document.body;
+    const themeIconMoon = document.getElementById('theme-icon-moon');
+    const themeIconSun = document.getElementById('theme-icon-sun');
+
+    if (body.classList.contains('light-mode')) {
+        body.classList.remove('light-mode');
+        body.classList.add('dark-mode');
+        localStorage.setItem('siteTheme', 'dark');
+        themeIconMoon.style.display = 'block';
+        themeIconSun.style.display = 'none';
+    } else {
+        body.classList.remove('dark-mode');
+        body.classList.add('light-mode');
+        localStorage.setItem('siteTheme', 'light');
+        themeIconMoon.style.display = 'none';
+        themeIconSun.style.display = 'block';
+    }
+}
+
+function applySavedTheme() {
+    const savedTheme = localStorage.getItem('siteTheme');
+    const body = document.body;
+    const themeIconMoon = document.getElementById('theme-icon-moon');
+    const themeIconSun = document.getElementById('theme-icon-sun');
+
+    if (savedTheme === 'light') {
+        body.classList.add('light-mode');
+        themeIconMoon.style.display = 'none';
+        themeIconSun.style.display = 'block';
+    } else {
+        // Padrão para dark-mode se não houver tema salvo ou se for "dark"
+        body.classList.add('dark-mode');
+        themeIconMoon.style.display = 'block';
+        themeIconSun.style.display = 'none';
+    }
+}
+
+// Funções de Login/Cadastro
+function setupLoginModal() {
+    neuroGameState.authMode = 'login';
+    updateAuthModalUI();
+    validateLoginForm();
+    document.getElementById('authEmail').value = '';
+    document.getElementById('authPassword').value = '';
+    document.getElementById('authName').value = '';
+    document.getElementById('authConfirmPassword').value = '';
+    document.getElementById('authMessage').textContent = '';
+}
+
+function toggleAuthMode(event) {
+    event.preventDefault();
+    neuroGameState.authMode = neuroGameState.authMode === 'login' ? 'register' : 'login';
+    updateAuthModalUI();
+    validateLoginForm(); // Revalidar ao mudar o modo
+    document.getElementById('authMessage').textContent = ''; // Limpar mensagens de status
+}
+
+function updateAuthModalUI() {
+    const title = document.getElementById('authModalTitle');
+    const nameLabel = document.getElementById('authNameLabel');
+    const nameInput = document.getElementById('authName');
+    const confirmPasswordLabel = document.getElementById('authConfirmPasswordLabel');
+    const confirmPasswordInput = document.getElementById('authConfirmPassword');
+    const submitButton = document.getElementById('authSubmitButton');
+    const toggleAuthText = document.getElementById('toggleAuthText');
+    const toggleAuthLink = document.getElementById('toggleAuthLink');
+
+    if (neuroGameState.authMode === 'login') {
+        title.textContent = '🔐 Login';
+        nameLabel.style.display = 'none';
+        nameInput.style.display = 'none';
+        nameInput.removeAttribute('required');
+        confirmPasswordLabel.style.display = 'none';
+        confirmPasswordInput.style.display = 'none';
+        confirmPasswordInput.removeAttribute('required');
+        submitButton.textContent = 'Entrar';
+        toggleAuthText.textContent = 'Não tem uma conta?';
+        toggleAuthLink.textContent = 'Cadastre-se';
+    } else {
+        title.textContent = '📝 Cadastro';
+        nameLabel.style.display = 'block';
+        nameInput.style.display = 'block';
+        nameInput.setAttribute('required', 'required');
+        confirmPasswordLabel.style.display = 'block';
+        confirmPasswordInput.style.display = 'block';
+        confirmPasswordInput.setAttribute('required', 'required');
+        submitButton.textContent = 'Cadastrar';
+        toggleAuthText.textContent = 'Já tem uma conta?';
+        toggleAuthLink.textContent = 'Faça login';
+    }
+}
+
+function validateLoginForm() {
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value.trim();
+    const name = document.getElementById('authName').value.trim();
+    const confirmPassword = document.getElementById('authConfirmPassword').value.trim();
+    const submitButton = document.getElementById('authSubmitButton');
+    const authMessage = document.getElementById('authMessage');
+
+    let isValid = true;
+    authMessage.textContent = ''; // Limpar mensagens de erro anteriores
+
+    if (email === '' || !email.includes('@') || !email.includes('.')) {
+        isValid = false;
+    }
+    if (password === '' || password.length < 6) {
+        isValid = false;
+    }
+
+    if (neuroGameState.authMode === 'register') {
+        if (name === '') {
+            isValid = false;
+        }
+        if (confirmPassword === '' || password !== confirmPassword) {
+            isValid = false;
+            if (password !== confirmPassword && password !== '' && confirmPassword !== '') {
+                 authMessage.textContent = 'As senhas não coincidem.';
+                 authMessage.style.color = 'red';
+            }
+        }
+    }
+
+    submitButton.disabled = !isValid;
+}
+
+function performAuth() {
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value.trim();
+    const name = document.getElementById('authName').value.trim();
+    const authMessage = document.getElementById('authMessage');
+
+    // Simulação de autenticação
+    if (neuroGameState.authMode === 'login') {
+        if ((email === 'adulto@teste.com' || email === 'crianca@teste.com') && password === 'senha123') {
+            authMessage.textContent = 'Login realizado com sucesso! Bem-vindo(a)!';
+            authMessage.style.color = 'green';
+            // Em um ambiente real, você redirecionaria o usuário ou fecharia o modal
+            setTimeout(() => closeModal('loginModal'), 1500);
+        } else {
+            authMessage.textContent = 'Email ou senha incorretos.';
+            authMessage.style.color = 'red';
+        }
+    } else { // Register mode
+        // Simulação de registro
+        if (email === 'adulto@teste.com' || email === 'crianca@teste.com') {
+            authMessage.textContent = 'Este email já está em uso.';
+            authMessage.style.color = 'red';
+        } else {
+            authMessage.textContent = `Cadastro de ${name} realizado com sucesso! Faça login para continuar.`;
+            authMessage.style.color = 'green';
+            // Após o registro, pode-se automaticamente mudar para o modo de login
+            setTimeout(() => {
+                neuroGameState.authMode = 'login';
+                updateAuthModalUI();
+                document.getElementById('authEmail').value = email; // Preencher email para login
+                document.getElementById('authPassword').value = '';
+                validateLoginForm();
+            }, 1500);
+        }
+    }
+}
+
+function openMoodTracker() {
+    openModal('moodModal');
+    renderMoodHistory();
+}
+
+function saveMood(mood) {
+    const today = new Date().toLocaleDateString();
+    const moodEntry = `${today} - ${mood}`;
+
+    let moodHistory = JSON.parse(localStorage.getItem('moodHistory')) || [];
+    moodHistory.unshift(moodEntry);
+    if (moodHistory.length > 7) moodHistory.pop(); // Limitar a 7 dias
+
+    localStorage.setItem('moodHistory', JSON.stringify(moodHistory));
+    renderMoodHistory();
+    alert('Humor registrado com sucesso! 😄');
+}
+
+function renderMoodHistory() {
+    const moodHistory = JSON.parse(localStorage.getItem('moodHistory')) || [];
+    const list = document.getElementById('moodHistory');
+    list.innerHTML = '';
+
+    moodHistory.forEach(entry => {
+        const li = document.createElement('li');
+        li.textContent = entry;
+        list.appendChild(li);
+    });
+}
+function openNotes() {
+    openModal('notesModal');
+    renderNotes();
+}
+
+function saveNote() {
+    const noteText = document.getElementById('newNote').value.trim();
+    if (noteText === '') return;
+
+    let notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+    notes.unshift(noteText);
+    localStorage.setItem('quickNotes', JSON.stringify(notes));
+
+    document.getElementById('newNote').value = '';
+    renderNotes();
+}
+
+function renderNotes() {
+    const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+    const list = document.getElementById('notesList');
+    list.innerHTML = '';
+
+    notes.forEach((note, index) => {
+        const li = document.createElement('li');
+        li.style.marginBottom = '8px';
+        li.innerHTML = `
+            ${note}
+            <button style="margin-left:10px; color:white; background:red; border:none; border-radius:4px; padding:2px 6px; cursor:pointer;"
+                onclick="deleteNote(${index})">X</button>
+        `;
+        list.appendChild(li);
+    });
+}
+
+function deleteNote(index) {
+    let notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+    notes.splice(index, 1);
+    localStorage.setItem('quickNotes', JSON.stringify(notes));
+    renderNotes();
+}
+// Ao atualizar progresso, adicione um timestamp e salve no histórico:
+function logProgressHistory() {
+  const today = new Date().toISOString().split('T')[0]; // “2025-06-22”
+  const history = JSON.parse(localStorage.getItem('progressHistory')) || {};
+  history[today] = {
+    tasks: savedState.tasksCompleted,
+    pomodoros: savedState.pomodorosCompleted,
+    games: savedState.gamesPlayed
+  };
+  localStorage.setItem('progressHistory', JSON.stringify(history));
+}
+let targetColor = '';
+let colorGameScore = 0;
+
+function openColorGame() {
+    openModal('colorGameModal');
+    startColorGame();
+}
+
+function startColorGame() {
+    const colors = ['red', 'blue', 'green', 'yellow'];
+    targetColor = colors[Math.floor(Math.random() * colors.length)];
+    document.getElementById('targetColor').textContent = `Clique na cor: ${targetColor.toUpperCase()}`;
+    colorGameScore = 0;
+    document.getElementById('colorGameScore').textContent = colorGameScore;
+}
+
+function checkColor(selectedColor) {
+    if (selectedColor === targetColor) {
+        colorGameScore++;
+        document.getElementById('colorGameScore').textContent = colorGameScore;
+
+        // Se quiser, atualizar progresso:
+        if (typeof neuroGameState !== 'undefined') {
+            neuroGameState.progress.gamesPlayed++;
+            updateProgress();
+            checkAchievements();
         }
 
-        .nav-menu.active {
-            display: flex !important;
-            flex-direction: column;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-            padding: 1rem 1.5rem;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            gap: 1rem;
-            z-index: 999;
+        startColorGame(); // Próxima rodada
+    } else {
+        alert('Ops! Cor errada. 😅 Tente de novo!');
+    }
+}
+//fim do jogo da atenção às cores
+
+/// Variáveis do jogo de organizar a rotina
+let organizeTimerInterval;
+let organizeTimeElapsed = 0;
+
+// Variáveis do jogo de verdadeiro ou falso
+const trueFalseQuestions = [
+    { question: "Estudar com música sempre melhora o foco.", correct: "false", explanation: "Depende da pessoa. Para alguns, pode atrapalhar." },
+    { question: "Fazer pausas curtas pode aumentar a produtividade.", correct: "true", explanation: "Técnicas como Pomodoro incentivam pequenas pausas." },
+    { question: "Dormir pouco melhora o rendimento.", correct: "false", explanation: "Dormir mal reduz foco e memória." },
+    { question: "Organizar suas tarefas ajuda a reduzir o estresse.", correct: "true", explanation: "Ter um plano reduz a ansiedade e aumenta a clareza." }
+];
+let currentTFIndex = 0;
+let trueFalseScore = 0;
+
+// Variáveis do jogo de pares de memória
+let memoryPairsBoard = [];
+let firstTile = null;
+let secondTile = null;
+let attempts = 0;
+
+// Variáveis do jogo de caça-palavras
+const wordList = [
+  "FOCO",
+  "ATENÇÃO",
+  "ORGANIZAÇÃO",
+  "MEMÓRIA",
+  "DISCIPLINA",
+  "PLANEJAMENTO",
+  "CONCENTRAÇÃO",
+  "TEMPO",
+  "PRODUTIVIDADE",
+  "OBJETIVO"
+];
+let currentWord = "";
+let gridLetters = [];
+let selectedIndexes = [];
+
+// Variáveis do jogo de sequência numérica
+const sequences = [
+  { sequence: [2, 4, 6, null], answer: 8 },
+  { sequence: [1, 3, 5, null], answer: 7 },
+  { sequence: [5, 10, 15, null], answer: 20 },
+  { sequence: [10, 9, 8, null], answer: 7 },
+  { sequence: [2, 6, 18, null], answer: 54 },
+  { sequence: [1, 4, 9, null], answer: 16 },
+];
+let currentLevel = 0;
+
+// Função geral para abrir os jogos
+function openGame(gameName) {
+    if (gameName === 'organize') {
+        openModal('organizeGameModal');
+        startOrganizeDragGame();
+    } else if (gameName === 'trueFalse') {
+        openModal('trueFalseGameModal');
+        startTrueFalseGame();
+    } else if (gameName === 'memoryPairs') {
+        openModal('memoryPairsGameModal');
+        startMemoryPairsGame();
+    } else if (gameName === 'wordSearch') {
+        openModal('wordSearchModal');
+        startWordSearch();
+    } else if (gameName === 'sequence') {
+        openModal('sequenceGameModal');
+        startSequenceGame();
+    }
+}
+
+// ------------------ Jogo: Organizar a Rotina ------------------
+
+function startOrganizeDragGame() {
+    const tasks = ["Estudar", "Jogar", "Lavar a louça", "Fazer exercícios", "Assistir TV", "Ler um livro"];
+    const taskList = document.getElementById('taskListToDrag');
+    taskList.innerHTML = '';
+
+    tasks.forEach((task, index) => {
+        const btn = document.createElement('button');
+        btn.textContent = task;
+        btn.setAttribute('draggable', true);
+        btn.id = 'task-' + index;
+        btn.ondragstart = (event) => {
+            event.dataTransfer.setData('text/plain', btn.id);
+        };
+        taskList.appendChild(btn);
+    });
+
+    document.getElementById('priorityHigh').innerHTML = '';
+    document.getElementById('priorityMedium').innerHTML = '';
+    document.getElementById('priorityLow').innerHTML = '';
+    document.getElementById('organizeGameResult').innerText = '';
+
+    startOrganizeTimer();
+}
+
+function allowDrop(event) {
+    event.preventDefault();
+}
+
+function drop(event, priority) {
+    event.preventDefault();
+    const taskId = event.dataTransfer.getData('text/plain');
+    const taskElement = document.getElementById(taskId);
+
+    const targetList = document.getElementById(
+        priority === 'High' ? 'priorityHigh' :
+        priority === 'Medium' ? 'priorityMedium' :
+        'priorityLow'
+    );
+
+    const li = document.createElement('li');
+    li.textContent = taskElement.textContent;
+    targetList.appendChild(li);
+
+    taskElement.remove();
+}
+
+// Cronômetro
+function startOrganizeTimer() {
+    organizeTimeElapsed = 0;
+    document.getElementById('organizeTimer').textContent = formatTime(organizeTimeElapsed);
+
+    organizeTimerInterval = setInterval(() => {
+        organizeTimeElapsed++;
+        document.getElementById('organizeTimer').textContent = formatTime(organizeTimeElapsed);
+    }, 1000);
+}
+
+function stopOrganizeTimer() {
+    clearInterval(organizeTimerInterval);
+}
+
+function formatTime(seconds) {
+    const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const secs = String(seconds % 60).padStart(2, '0');
+    return `${mins}:${secs}`;
+}
+
+function finishOrganizeGame() {
+    const totalTasks = document.querySelectorAll('#priorityHigh li, #priorityMedium li, #priorityLow li').length;
+    if (totalTasks < 6) {
+        document.getElementById('organizeGameResult').innerText = "📌 Você ainda não organizou todas as tarefas!";
+    } else {
+        stopOrganizeTimer();
+        document.getElementById('organizeGameResult').innerText = `✅ Parabéns! Você organizou sua rotina em ${formatTime(organizeTimeElapsed)}!`;
+
+        if (typeof neuroGameState !== 'undefined') {
+            neuroGameState.progress.gamesPlayed++;
+            updateProgress();
+            checkAchievements();
+        }
+    }
+}
+
+// ------------------ Jogo: Verdadeiro ou Falso ------------------
+
+function startTrueFalseGame() {
+    currentTFIndex = 0;
+    trueFalseScore = 0;
+    showNextTFQuestion();
+}
+
+function showNextTFQuestion() {
+    if (currentTFIndex >= trueFalseQuestions.length) {
+        document.getElementById('trueFalseQuestion').innerText = "Fim do jogo!";
+        document.getElementById('trueFalseFeedback').innerText = `Você acertou ${trueFalseScore} de ${trueFalseQuestions.length} perguntas!`;
+        if (typeof neuroGameState !== 'undefined') {
+            neuroGameState.progress.gamesPlayed++;
+            updateProgress();
+            checkAchievements();
+        }
+        return;
+    }
+
+    const q = trueFalseQuestions[currentTFIndex];
+    document.getElementById('trueFalseQuestion').innerText = q.question;
+    document.getElementById('trueFalseFeedback').innerText = '';
+    document.getElementById('trueFalseScore').innerText = `Pergunta ${currentTFIndex + 1} de ${trueFalseQuestions.length}`;
+}
+
+function answerTrueFalse(userAnswer) {
+    const q = trueFalseQuestions[currentTFIndex];
+    if (userAnswer === q.correct) {
+        trueFalseScore++;
+        document.getElementById('trueFalseFeedback').innerText = `✅ Correto! ${q.explanation}`;
+    } else {
+        document.getElementById('trueFalseFeedback').innerText = `❌ Errado! ${q.explanation}`;
+    }
+    currentTFIndex++;
+    setTimeout(showNextTFQuestion, 2000);
+}
+
+// ------------------ Jogo: Pares de Memória ------------------
+
+function startMemoryPairsGame() {
+    memoryPairsBoard = [];
+    firstTile = null;
+    secondTile = null;
+    attempts = 0;
+    document.getElementById('memoryPairsFeedback').innerText = '';
+    const board = document.getElementById('memoryPairsBoard');
+    board.innerHTML = '';
+
+    const values = [1, 1, 2, 2, 3, 3, 4, 4];
+    values.sort(() => Math.random() - 0.5);
+
+    values.forEach((value, index) => {
+        const tile = document.createElement('div');
+        tile.classList.add('memory-tile');
+        tile.dataset.value = value;
+        tile.dataset.index = index;
+        tile.onclick = () => revealTile(tile);
+        board.appendChild(tile);
+        memoryPairsBoard.push(tile);
+    });
+}
+
+function revealTile(tile) {
+    if (tile.classList.contains('revealed') || secondTile) return;
+
+    tile.classList.add('revealed');
+    tile.innerText = tile.dataset.value;
+
+    if (!firstTile) {
+        firstTile = tile;
+    } else {
+        secondTile = tile;
+        attempts++;
+
+        if (firstTile.dataset.value === secondTile.dataset.value) {
+            firstTile = null;
+            secondTile = null;
+
+            if (document.querySelectorAll('.memory-tile.revealed').length === memoryPairsBoard.length) {
+                document.getElementById('memoryPairsFeedback').innerText = `✅ Parabéns! Você encontrou todos os pares em ${attempts} tentativas!`;
+                if (typeof neuroGameState !== 'undefined') {
+                    neuroGameState.progress.gamesPlayed++;
+                    updateProgress();
+                    checkAchievements();
+                }
+            }
+        } else {
+            setTimeout(() => {
+                firstTile.classList.remove('revealed');
+                secondTile.classList.remove('revealed');
+                firstTile.innerText = '';
+                secondTile.innerText = '';
+                firstTile = null;
+                secondTile = null;
+            }, 800);
+        }
+    }
+}
+
+// ------------------ Jogo: Caça-Palavras ------------------
+
+function startWordSearch() {
+    const grid = document.getElementById('wordGrid');
+    grid.innerHTML = '';
+    gridLetters = [];
+    selectedIndexes = [];
+
+    currentWord = wordList[Math.floor(Math.random() * wordList.length)];
+    document.getElementById('wordSearchFeedback').innerText = `Clique nas letras da palavra: ${currentWord}`;
+
+    const possibleLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const totalCells = 36; // Grid 6x6
+
+    // Preenche o grid com letras aleatórias
+    for (let i = 0; i < totalCells; i++) {
+        let letter = possibleLetters.charAt(Math.floor(Math.random() * possibleLetters.length));
+        gridLetters.push(letter);
+    }
+
+    // Insere a palavra na linha horizontal em uma posição aleatória
+    const maxStartPos = totalCells - currentWord.length;
+    const startPosition = Math.floor(Math.random() * maxStartPos);
+
+    for (let i = 0; i < currentWord.length; i++) {
+        gridLetters[startPosition + i] = currentWord.charAt(i);
+    }
+
+    // Renderiza o grid
+    gridLetters.forEach((letter, index) => {
+        const cell = document.createElement('div');
+        cell.classList.add('word-cell');
+        cell.innerText = letter;
+        cell.onclick = () => selectLetter(index);
+        grid.appendChild(cell);
+    });
+}
+
+function selectLetter(index) {
+    selectedIndexes.push(index);
+    const cell = document.getElementsByClassName('word-cell')[index];
+    cell.classList.add('selected');
+
+    if (selectedIndexes.length === currentWord.length) {
+        let formedWord = selectedIndexes.map(i => gridLetters[i]).join('');
+        const feedback = document.getElementById('wordSearchFeedback');
+        feedback.classList.remove('success', 'error');
+
+        if (formedWord === currentWord) {
+            feedback.innerText = `✅ Parabéns! Você encontrou a palavra "${currentWord}"!`;
+            feedback.classList.add('success');
+
+            if (typeof neuroGameState !== 'undefined') {
+                neuroGameState.progress.gamesPlayed++;
+                updateProgress();
+                checkAchievements();
+            }
+        } else {
+            feedback.innerText = `❌ Você formou "${formedWord}". Tente novamente!`;
+            feedback.classList.add('error');
         }
 
-        .kanban-task:active { cursor: grabbing; }
+        setTimeout(() => startWordSearch(), 2000);
+    }
+}
 
-        .kanban-tasks.drag-over {
-            background: var(--accent-color-light) !important;
+// ------------------ Jogo: Sequências Numéricas ------------------
+
+function startSequenceGame() {
+    const feedback = document.getElementById('sequenceFeedback');
+    feedback.innerText = '';
+    feedback.className = 'sequence-feedback';
+
+    if (currentLevel >= sequences.length) {
+        currentLevel = 0;
+    }
+
+    const level = currentLevel + 1;
+    document.getElementById('sequenceLevel').innerText = `Nível: ${level}`;
+
+    const currentSequence = sequences[currentLevel];
+    const sequenceDisplay = currentSequence.sequence.map(n => (n === null ? '...' : n)).join(', ');
+    document.getElementById('sequenceQuestion').innerText = sequenceDisplay;
+
+    const optionsDiv = document.getElementById('sequenceOptions');
+    optionsDiv.innerHTML = '';
+
+    const correctAnswer = currentSequence.answer;
+    let options = [correctAnswer];
+
+    while (options.length < 4) {
+        const randomOffset = Math.floor(Math.random() * 6) + 1;
+        const addOrSub = Math.random() > 0.5 ? 1 : -1;
+        const fakeOption = correctAnswer + addOrSub * randomOffset;
+        if (!options.includes(fakeOption) && fakeOption > 0) {
+            options.push(fakeOption);
         }
+    }
 
-        .word-search-feedback { font-weight: 700; text-align: center; padding: 10px; font-size: 15px; transition: all .3s; }
-        .word-search-feedback.success { color: var(--success-color); }
-        .word-search-feedback.error   { color: var(--error-color); }
-    `;
-    document.head.appendChild(style);
+    options.sort(() => Math.random() - 0.5);
+
+    options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.classList.add('sequence-option-btn');
+        btn.innerText = option;
+        btn.onclick = () => selectOption(option);
+        optionsDiv.appendChild(btn);
+    });
+}
+
+function selectOption(selected) {
+    const currentSequence = sequences[currentLevel];
+    const feedback = document.getElementById('sequenceFeedback');
+
+    if (selected === currentSequence.answer) {
+        feedback.innerText = '✅ Correto!';
+        feedback.className = 'sequence-feedback correct';
+        currentLevel++;
+        setTimeout(() => {
+            startSequenceGame();
+        }, 1500);
+    } else {
+        feedback.innerText = `❌ Errado! A resposta correta era ${currentSequence.answer}.`;
+        feedback.className = 'sequence-feedback wrong';
+        // currentLevel = 0; // Se quiser reiniciar ao errar, descomente
+    }
 }
