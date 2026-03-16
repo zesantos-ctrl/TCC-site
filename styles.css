@@ -362,71 +362,80 @@ section h2 {
     margin-bottom: 3rem;
 }
 
-/* Games Section */
-.games-section {
-    background: var(--bg-secondary);
-}
-
+/* ── Game Cards ───────────────────────────────────── */
 .games-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-    margin-top: 3rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 1.5rem;
 }
 
 .game-card {
-    background: var(--bg-primary);
-    padding: 2rem;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px var(--shadow-color);
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    border: 3px solid transparent;
+  background: var(--bg-primary);
+  padding: 1.8rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: .8rem;
 }
-
-.game-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px var(--shadow-color-hover);
-    border-color: var(--bg-gradient-start);
+.game-card-glow {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+  opacity: 0;
+  z-index: 0;
+  transition: opacity var(--transition);
 }
+.game-card > * { position: relative; z-index: 1; }
+.game-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); }
+.game-card:hover .game-card-glow { opacity: .08; }
+.game-card:hover { border-color: var(--grad-start); }
 
 .game-icon {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1.5rem;
-    color: var(--text-inverted);
-    font-size: 2rem;
+  width: 64px; height: 64px;
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  font-size: 1.6rem;
+  box-shadow: var(--shadow-sm);
 }
 
-.game-card h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-}
+.game-card h3 { font-size: 1.2rem; font-weight: 800; color: var(--text-primary); }
+.game-card p  { font-size: .9rem; color: var(--text-tertiary); flex: 1; }
 
-.game-card p {
-    color: var(--text-tertiary);
-    margin-bottom: 1.5rem;
+.game-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: .5rem;
 }
+.game-stats { display: flex; gap: 1rem; font-size: .8rem; color: var(--text-tertiary); }
+.game-stats span { display: flex; align-items: center; gap: 4px; }
+.difficulty.easy   { color: #16a34a; font-weight: 700; }
+.difficulty.medium { color: #d97706; font-weight: 700; }
+.difficulty.hard   { color: #dc2626; font-weight: 700; }
 
-.game-stats {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    color: var(--text-primary);
+.play-btn {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: .9rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
+.play-btn:hover { transform: scale(1.15); box-shadow: var(--shadow-md); }
 
-.game-stats span {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
 
 /* Tools Section */
 .tools-grid {
@@ -980,71 +989,84 @@ section h2 {
     padding: 20px;
 }
 
-/* Kanban Board */
+/* Kanban */
 .kanban-board {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    min-height: 400px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  min-height: 360px;
 }
-
 .kanban-column {
-    background: var(--bg-secondary);
-    border-radius: 10px;
-    padding: 15px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  border: 2px solid var(--border-color);
 }
-
 .kanban-column h4 {
-    text-align: center;
-    margin-bottom: 15px;
-    color: var(--text-primary);
-    font-size: 1.1rem;
+  text-align: center;
+  font-size: .95rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 2px dashed var(--border-color);
 }
-
-.kanban-tasks {
-    min-height: 300px;
-}
-
-.task-input {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
+.kanban-tasks { min-height: 200px; }
+.task-input { display: flex; gap: 8px; }
 .task-input input {
-    flex: 1;
-    padding: 8px 12px;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 14px;
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
+  flex: 1;
+  padding: 9px 14px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: .9rem;
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--transition);
 }
-
+.task-input input:focus { border-color: var(--grad-start); }
 .task-input button {
-    background: var(--bg-gradient-start);
-    border: none;
-    color: var(--text-inverted);
-    padding: 8px 12px;
-    border-radius: 8px;
-    cursor: pointer;
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+  border: none; color: #fff;
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  white-space: nowrap;
 }
-
 .kanban-task {
-    background: var(--bg-primary);
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 8px var(--shadow-color);
-    cursor: move;
-    transition: all 0.3s;
-    color: var(--text-primary);
+  background: var(--bg-primary);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  box-shadow: var(--shadow-sm);
+  cursor: grab;
+  transition: all var(--transition);
+  color: var(--text-primary);
+  font-size: .9rem;
+  border-left: 3px solid var(--grad-start);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
-
-.kanban-task:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px var(--shadow-color-hover);
+.kanban-task:active { cursor: grabbing; }
+.kanban-task:hover { transform: translateX(3px); box-shadow: var(--shadow-md); }
+.kanban-task-del {
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 50%;
+  width: 20px; height: 20px;
+  font-size: .7rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--transition);
 }
+.kanban-task-del:hover { background: #dc2626; color: #fff; }
 
 /* Tips Container */
 .tips-container {
