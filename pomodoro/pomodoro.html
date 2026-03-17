@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pomodoro & Kanban - NeuroGame</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="pomodoro.css" />
+</head>
+
+<body>
+
+  <header class="header">
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="logo">
+          <i class="fas fa-brain"></i>
+          <span>NeuroGame</span>
+        </div>
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="../index.html#home">Início</a></li>
+          <li><a href="../index.html#games">Jogos</a></li>
+          <li><a href="../index.html#tools">Ferramentas</a></li>
+          <li><a href="../index.html#about">Sobre TDAH</a></li>
+          <li><a href="../calender/calender.html">Calendário</a></li>
+          <li><a href="../contato/contato.html">Contato</a></li>
+          <li><a href="#" onclick="openModal('loginModal'); return false;">Login</a></li>
+        </ul>
+        <div class="hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ── LAYOUT CENTRALIZADO ── -->
+  <main class="pomo-center">
+
+    <div class="section-label">CRONÔMETRO</div>
+    <h2 class="section-title">Pomodoro</h2>
+
+    <div class="pomo-card">
+
+      <!-- Anel de progresso SVG -->
+      <div class="ring-wrapper">
+        <svg class="progress-ring" viewBox="0 0 200 200">
+          <circle class="ring-bg" cx="100" cy="100" r="88" />
+          <circle class="ring-fill" id="ringFill" cx="100" cy="100" r="88" />
+        </svg>
+        <div class="ring-inner">
+          <div class="timer-display" id="pomodoroDisplay">25:00</div>
+          <div class="timer-phase" id="pomodoroPhase">FOCO 🎯</div>
+        </div>
+      </div>
+
+      <!-- Controles -->
+      <div class="timer-controls">
+        <button class="timer-btn" onclick="startPomodoro()" title="Iniciar">
+          <i class="fas fa-play"></i>
+        </button>
+        <button class="timer-btn" onclick="pausePomodoro()" title="Pausar">
+          <i class="fas fa-pause"></i>
+        </button>
+        <button class="timer-btn" onclick="resetPomodoro()" title="Resetar">
+          <i class="fas fa-stop"></i>
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="pomo-stats">
+        <div class="stat-pill">
+          <span class="stat-num" id="pomodoroCount">0</span>
+          <span class="stat-lbl">Pomodoros</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-num" id="focusMinutes">0</span>
+          <span class="stat-lbl">min de foco</span>
+        </div>
+      </div>
+
+      <!-- ── PLAYER YOUTUBE ── -->
+      <div class="yt-panel">
+        <div class="yt-header">
+          <i class="fab fa-youtube yt-icon"></i>
+          <span class="yt-title">Música para foco</span>
+          <span class="yt-now" id="ytNowLabel">—</span>
+        </div>
+
+        <!-- Campo de busca por link -->
+        <div class="yt-search-row">
+          <input type="text" id="ytLinkInput" class="yt-search-input"
+            placeholder="Cole um link do YouTube ou Spotify..." />
+          <button class="yt-search-btn" onclick="loadYoutubeLink()" title="Carregar">
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <!-- Grade de playlists curadas -->
+        <div class="yt-playlists">
+          <button class="yt-pl-btn" data-id="9kzE8isXlQY" data-type="video"
+            data-label="Lo-fi Beat">🎵<span>Lo-fi</span></button>
+          <button class="yt-pl-btn" data-id="PLMIbmfP_9vb8BCxRoraJW0a4hNPpFKjMT" data-type="playlist"
+            data-label="Deep Focus">🧠<span>Deep Focus</span></button>
+          <button class="yt-pl-btn" data-id="PLWef0GV4A1b3L_i1t5ljrgbnJi1wqlkfZ" data-type="playlist"
+            data-label="Chuva">🌧️<span>Chuva</span></button>
+          <button class="yt-pl-btn" data-id="PLUtVEP2ICaqZ2P5DU0GKKEe8OVIgRiaxV" data-type="playlist"
+            data-label="Jazz Café">☕<span>Jazz</span></button>
+          <button class="yt-pl-btn" data-id="PLFs4vir_WsTwEd-nJgVJCZPNL3W87FJ5n" data-type="playlist"
+            data-label="Natureza">🌿<span>Natureza</span></button>
+          <button class="yt-pl-btn" data-id="PLhRjE2yGhrSVeB8wYbJYfz1oCAE2I2s35" data-type="playlist"
+            data-label="Clássico">🎻<span>Clássico</span></button>
+        </div>
+
+        <!-- Player -->
+        <div class="yt-player-wrap" id="ytPlayerWrap">
+          <iframe id="ytIframe" src=""
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen frameborder="0">
+          </iframe>
+          <button class="yt-close-btn" onclick="stopYoutube()" title="Fechar player">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <!-- Aviso Spotify -->
+        <div class="yt-spotify-tip" id="ytSpotifyTip" style="display:none">
+          <i class="fab fa-spotify"></i>
+          <span>O Spotify não permite embed direto. <a href="" id="spotifyLink" target="_blank" rel="noopener">Abrir no
+              Spotify ↗</a></span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+  </main>
+
+  <!-- ════════════════════════════════════
+       FABs — canto inferior esquerdo
+       (Kanban) e inferior direito (Wallpaper)
+       ════════════════════════════════════ -->
+
+  <!-- ── KANBAN POPUP — esquerdo ── -->
+  <div class="kb-popup" id="kbPopup">
+    <button class="kb-fab" id="kbFab" title="Tarefas">
+      <i class="fas fa-tasks"></i>
+      <span class="kb-badge" id="kbBadge">0</span>
+    </button>
+    <div class="kb-drawer" id="kbDrawer">
+      <div class="kb-drawer-header">
+        <span class="kb-drawer-title"><i class="fas fa-tasks"></i> Kanban</span>
+        <button class="kb-drawer-close" id="kbClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="kb-add-row">
+        <input type="text" id="kbPopupInput" placeholder="Nova tarefa..." />
+        <button onclick="addKanbanTaskPopup()"><i class="fas fa-plus"></i></button>
+      </div>
+      <div class="kb-cols">
+        <div class="kb-col" id="kbp-col-todo" ondragover="onDragOver(event)" ondrop="onDrop(event, 'todo')">
+          <div class="kb-col-header"><span class="col-dot dot-todo"></span>A Fazer <span class="col-count"
+              id="kbp-count-todo">0</span></div>
+          <div class="col-cards" id="kbp-cards-todo"></div>
+        </div>
+        <div class="kb-col" id="kbp-col-doing" ondragover="onDragOver(event)" ondrop="onDrop(event, 'doing')">
+          <div class="kb-col-header"><span class="col-dot dot-doing"></span>Em Progresso <span class="col-count"
+              id="kbp-count-doing">0</span></div>
+          <div class="col-cards" id="kbp-cards-doing"></div>
+        </div>
+        <div class="kb-col" id="kbp-col-done" ondragover="onDragOver(event)" ondrop="onDrop(event, 'done')">
+          <div class="kb-col-header"><span class="col-dot dot-done"></span>Concluído <span class="col-count"
+              id="kbp-count-done">0</span></div>
+          <div class="col-cards" id="kbp-cards-done"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── WALLPAPER POPUP — direito ── -->
+  <div class="wp-panel" id="wpPanel">
+    <button class="wp-toggle" id="wpToggle" title="Wallpaper">
+      <i class="fas fa-image"></i>
+    </button>
+    <div class="wp-drawer" id="wpDrawer">
+      <p class="wp-label">WALLPAPER</p>
+      <div class="wp-presets">
+        <button class="wp-preset" data-bg="linear-gradient(135deg,#0d0f18 0%,#131620 100%)" title="Padrão">
+          <span class="preset-swatch" style="background:linear-gradient(135deg,#0d0f18,#131620)"></span>
+        </button>
+        <button class="wp-preset" data-bg="linear-gradient(135deg,#0f2027,#203a43,#2c5364)" title="Oceano">
+          <span class="preset-swatch" style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364)"></span>
+        </button>
+        <button class="wp-preset" data-bg="linear-gradient(135deg,#1a0533,#2d1b69,#11998e)" title="Aurora">
+          <span class="preset-swatch" style="background:linear-gradient(135deg,#1a0533,#2d1b69,#11998e)"></span>
+        </button>
+        <button class="wp-preset" data-bg="linear-gradient(135deg,#0a0a0a,#1a1a2e,#16213e)" title="Noite">
+          <span class="preset-swatch" style="background:linear-gradient(135deg,#0a0a0a,#1a1a2e,#16213e)"></span>
+        </button>
+        <button class="wp-preset" data-bg="linear-gradient(135deg,#2d0036,#6a0572,#ab0099)" title="Roxo">
+          <span class="preset-swatch" style="background:linear-gradient(135deg,#2d0036,#6a0572,#ab0099)"></span>
+        </button>
+        <button class="wp-preset" data-bg="linear-gradient(135deg,#001a00,#003300,#004d00)" title="Floresta">
+          <span class="preset-swatch" style="background:linear-gradient(135deg,#001a00,#003300,#004d00)"></span>
+        </button>
+      </div>
+      <label class="wp-upload-btn" for="bgInput">
+        <i class="fas fa-upload"></i> Enviar imagem
+      </label>
+      <input type="file" id="bgInput" accept="image/*" hidden />
+      <button class="wp-clear" id="wpClear">
+        <i class="fas fa-trash"></i> Remover wallpaper
+      </button>
+      <div class="wp-opacity-row">
+        <span class="wp-opacity-lbl">Escurecimento</span>
+        <input type="range" id="overlayOpacity" min="0" max="90" value="50" />
+        <span class="wp-opacity-val" id="overlayVal">50%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wp-overlay" id="wpOverlay"></div>
+
+  <script src="pomodoro..js"></script>
+  <script src="../theme/theme.js"></script>
+</body>
+
+</html>

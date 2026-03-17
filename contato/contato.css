@@ -1,111 +1,452 @@
-/* Formulário de Contato */
-#contato {
-    padding: 4rem 0;
+/* ====================================================
+   CONTATO — contato.css
+   Extensão do style.css principal do NeuroGame
+   ==================================================== */
+
+/* ── Hero da página ───────────────────────────────── */
+.contato-hero {
+    background: linear-gradient(135deg, var(--grad-start) 0%, var(--grad-end) 100%);
+    padding: 7rem 0 3.5rem;
+    position: relative;
+    overflow: hidden;
+    color: #fff;
 }
 
-#contato h2 {
+.contato-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 80% 50%, rgba(251, 191, 36, .12) 0%, transparent 55%),
+        radial-gradient(ellipse at 15% 80%, rgba(139, 92, 246, .18) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.contato-hero-inner {
+    position: relative;
+    z-index: 1;
     text-align: center;
-    font-size: 2rem;
-    margin-bottom: 1rem;
 }
 
-#contato p {
-    text-align: center;
-    margin-bottom: 2rem;
+.contato-hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 900;
+    letter-spacing: -1px;
+    margin: .6rem 0 .8rem;
+    color: #fff;
 }
 
-#contato form {
-    max-width: 600px;
+.hero-sub {
+    font-size: 1.1rem;
+    opacity: .88;
+    max-width: 500px;
     margin: 0 auto;
+}
+
+/* ── Layout principal ─────────────────────────────── */
+.contato-main {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 2rem;
+    padding-top: 3rem;
+    padding-bottom: 4rem;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .contato-main {
+        grid-template-columns: 1fr;
+    }
+
+    .contato-info-col {
+        order: -1;
+    }
+}
+
+/* ── Card box (container reutilizável) ────────────── */
+.cbox {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.8rem;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.5rem;
+    transition: box-shadow var(--transition);
+}
+
+.cbox:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.cbox-header {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.4rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px dashed var(--border-color);
+}
+
+.cbox-header i {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: .95rem;
+    flex-shrink: 0;
+}
+
+.cbox-header h2 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* ── Formulário ───────────────────────────────────── */
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 1rem;
 }
 
-#contato input,
-#contato textarea {
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
+@media (max-width: 560px) {
+    .form-row-2 {
+        grid-template-columns: 1fr;
+    }
 }
 
-#contato textarea {
-    resize: vertical;
-    min-height: 120px;
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 1.1rem;
 }
 
-#contato button {
-    padding: 12px;
-    background: #667eea;
-    color: white;
-    border: none;
-    border-radius: 8px;
+.form-group label {
+    font-size: .85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.form-group label i {
+    color: var(--grad-start);
+    font-size: .8rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 11px 14px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: .95rem;
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    width: 100%;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--grad-start);
+    box-shadow: 0 0 0 3px rgba(91, 110, 245, .12);
+}
+
+.form-group input.invalid,
+.form-group select.invalid,
+.form-group textarea.invalid {
+    border-color: #dc2626;
+}
+
+.form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
     cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s;
 }
 
-#contato button:hover {
-    background: #5a67d8;
+.form-group textarea {
+    resize: vertical;
+    min-height: 130px;
 }
 
-body.dark-mode #contato input,
-body.dark-mode #contato textarea {
-    background: #2c2c2c;
-    color: white;
-    border: 1px solid #555;
+.char-row {
+    font-size: .75rem;
+    color: var(--text-tertiary);
+    text-align: right;
+    margin-top: 3px;
+    font-family: 'Space Mono', monospace;
 }
 
-body.dark-mode #contato button {
-    background: #fdd835;
-    color: #333;
+.ferr {
+    font-size: .78rem;
+    color: #dc2626;
+    font-weight: 700;
+    min-height: 16px;
 }
 
-.contato-card {
-    margin-top: 2rem;
-    padding: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: var(--card-bg, #f9f9f9);
+/* ── Botão enviar ─────────────────────────────────── */
+.btn-submit {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+    border: none;
+    border-radius: var(--radius-sm);
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all var(--transition);
+    margin-top: .5rem;
+    position: relative;
+    overflow: hidden;
 }
 
-.contato-card h3 {
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
+.btn-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(91, 110, 245, .35);
 }
 
-.contato-itens .item {
-    margin-bottom: 0.5rem;
+.btn-submit:disabled {
+    opacity: .65;
+    cursor: not-allowed;
+    transform: none;
 }
 
-.contato-itens .item a {
-    color: #0077b5; /* Cor padrão LinkedIn, mas pode mudar se quiser */
+.btn-submit.sending i {
+    animation: spinIcon .8s linear infinite;
+}
+
+@keyframes spinIcon {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ── Status do formulário ─────────────────────────── */
+.form-status {
+    margin-top: 1rem;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    font-size: .9rem;
+    font-weight: 700;
+    text-align: center;
+    display: none;
+}
+
+.form-status.success {
+    display: block;
+    background: #dcfce7;
+    color: #16a34a;
+    border: 2px solid #bbf7d0;
+}
+
+.form-status.error {
+    display: block;
+    background: #fee2e2;
+    color: #dc2626;
+    border: 2px solid #fecaca;
+}
+
+/* ── Canais de contato ────────────────────────────── */
+.canais-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: .9rem;
+}
+
+.canais-list li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition);
+}
+
+.canais-list li:hover {
+    border-color: var(--grad-start);
+    transform: translateX(4px);
+    box-shadow: var(--shadow-sm);
+}
+
+.canal-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.canal-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.canal-info span {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+}
+
+.canal-info a {
+    font-size: .92rem;
+    font-weight: 700;
+    color: var(--text-accent);
     text-decoration: none;
+    transition: color var(--transition);
 }
 
-.contato-itens .item a:hover {
+.canal-info a:hover {
+    color: var(--grad-end);
     text-decoration: underline;
 }
 
-.nav-menu {
-    position: relative;
-    right: 550px;
+/* ── Horário ──────────────────────────────────────── */
+.horario-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }
 
-.dark-mode label {
-    
-    color: white;
+.horario-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .7rem 0;
+    border-bottom: 1px dashed var(--border-color);
+    font-size: .93rem;
+    color: var(--text-primary);
 }
 
-
-.dark-mode #contato p {
-    color: white;
-    text-align: center;
-    margin-bottom: 2rem;
+.horario-list li:last-child {
+    border-bottom: none;
 }
 
-.footer {
-    display: flex ;
-    justify-content: center;
+.horario-list li span {
+    color: var(--text-tertiary);
+}
+
+.horario-list li strong {
+    background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+}
+
+.horario-obs {
+    margin-top: 1rem;
+    font-size: .82rem;
+    color: var(--text-tertiary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.horario-obs i {
+    color: var(--grad-start);
+}
+
+/* ── FAQ ──────────────────────────────────────────── */
+.faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.faq-item {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    transition: border-color var(--transition);
+}
+
+.faq-item[open] {
+    border-color: var(--grad-start);
+}
+
+.faq-item summary {
+    padding: .9rem 1rem;
+    font-size: .92rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    transition: background var(--transition);
+}
+
+.faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.faq-item summary::after {
+    content: '+';
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--grad-start);
+    transition: transform var(--transition);
+    flex-shrink: 0;
+}
+
+.faq-item[open] summary::after {
+    transform: rotate(45deg);
+}
+
+.faq-item summary:hover {
+    background: var(--bg-tertiary);
+}
+
+.faq-item p {
+    padding: .2rem 1rem 1rem;
+    font-size: .88rem;
+    color: var(--text-tertiary);
+    line-height: 1.6;
+    border-top: 1px dashed var(--border-color);
+    margin: 0;
+}
+
+/* ── Link ativo no menu ───────────────────────────── */
+.nav-active {
+    color: var(--text-highlight) !important;
+    font-weight: 900 !important;
 }

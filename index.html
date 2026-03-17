@@ -27,9 +27,21 @@
                     <li><a href="#games">Jogos</a></li>
                     <li><a href="#tools">Ferramentas</a></li>
                     <li><a href="#about">Sobre TDAH</a></li>
+                    <li><a href="./pomodoro/pomodoro.html">Pomodoro</a></li>
                     <li><a href="./calender/calender.html">Calendário</a></li>
                     <li><a href="./contato/contato.html">Contato</a></li>
-                    <li><a href="#" onclick="openModal('loginModal'); return false;">Login</a></li>
+                    <!-- Link de login (visível quando deslogado) -->
+                    <li id="navLoginLink"><a href="#" onclick="openModal('loginModal'); return false;">Login</a></li>
+                    <!-- Saudação (visível quando logado) -->
+                    <li id="navUserGreet" style="display:none">
+                        <div class="nav-user">
+                            <span class="nav-avatar" id="navUserAvatar">U</span>
+                            <span id="navUserName">Usuário</span>
+                            <button class="nav-logout-btn" onclick="logoutUser()" title="Sair">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        </div>
+                    </li>
                 </ul>
                 <button class="theme-toggle-icon" id="theme-toggle-btn" aria-label="Alternar tema">
                     <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
@@ -174,6 +186,20 @@
                     </div>
                 </div>
 
+                <div class="game-card" onclick="openGame('diffGame')">
+                    <div class="game-card-glow"></div>
+                    <div class="game-icon"><i class="fas fa-eye"></i></div>
+                    <h3>Encontre as Diferenças</h3>
+                    <p>Compare dois painéis e encontre o que mudou — 3 níveis progressivos</p>
+                    <div class="game-footer">
+                        <div class="game-stats">
+                            <span><i class="fas fa-clock"></i> 2-5 min</span>
+                            <span class="difficulty medium"><i class="fas fa-star"></i> Médio</span>
+                        </div>
+                        <button class="play-btn"><i class="fas fa-play"></i></button>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
@@ -186,33 +212,17 @@
                 <h2>Ferramentas de Apoio</h2>
                 <p class="section-subtitle">Recursos para melhorar sua organização e foco</p>
             </div>
+
             <div class="tools-grid">
 
+                <!-- Pomodoro + Kanban — página dedicada -->
                 <div class="tool-card">
                     <div class="tool-icon"><i class="fas fa-clock"></i></div>
-                    <h3>Cronômetro Pomodoro</h3>
-                    <p>Técnica de gestão de tempo para melhorar o foco</p>
-                    <div class="pomodoro-timer">
-                        <div class="timer-display" id="pomodoroDisplay">25:00</div>
-                        <div class="timer-phase" id="pomodoroPhase">Foco</div>
-                        <div class="timer-controls">
-                            <button class="timer-btn" onclick="startPomodoro()" title="Iniciar"><i
-                                    class="fas fa-play"></i></button>
-                            <button class="timer-btn" onclick="pausePomodoro()" title="Pausar"><i
-                                    class="fas fa-pause"></i></button>
-                            <button class="timer-btn" onclick="resetPomodoro()" title="Resetar"><i
-                                    class="fas fa-stop"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-icon"><i class="fas fa-tasks"></i></div>
-                    <h3>Organizador de Tarefas</h3>
-                    <p>Kanban visual para organizar suas atividades</p>
-                    <button class="tool-btn" onclick="openKanban()">
-                        <i class="fas fa-external-link-alt"></i> Abrir Kanban
-                    </button>
+                    <h3>Pomodoro &amp; Kanban</h3>
+                    <p>Técnica de foco com cronômetro e quadro de tarefas visual na mesma tela</p>
+                    <a href="./pomodoro/pomodoro.html" class="tool-btn">
+                        <i class="fas fa-external-link-alt"></i> Abrir Ferramenta
+                    </a>
                 </div>
 
                 <div class="tool-card">
@@ -249,6 +259,15 @@
                     <button class="tool-btn" onclick="openNotes()">
                         <i class="fas fa-pen"></i> Abrir Notas
                     </button>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <h3>Calendário de Tarefas</h3>
+                    <p>Organize seus compromissos e tarefas por dia</p>
+                    <a href="./calender/calender.html" class="tool-btn">
+                        <i class="fas fa-external-link-alt"></i> Abrir Calendário
+                    </a>
                 </div>
 
             </div>
@@ -343,11 +362,14 @@
                         <li><a href="#games">Jogos</a></li>
                         <li><a href="#tools">Ferramentas</a></li>
                         <li><a href="#about">Sobre TDAH</a></li>
+                        <li><a href="./pomodoro/pomodoro.html">Pomodoro &amp; Kanban</a></li>
+                        <li><a href="./calender/calender.html">Calendário</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h4>Contato</h4>
-                    <p><i class="fas fa-envelope"></i> contato@brightmind.com</p>
+                    <p><i class="fas fa-envelope"></i> <a href="/cdn-cgi/l/email-protection" class="__cf_email__"
+                            data-cfemail="bdded2d3c9dcc9d2fddfcfd4dad5c9d0d4d3d993ded2d0">[email&#160;protected]</a></p>
                     <p><i class="fas fa-phone"></i> (11) 9999-9999</p>
                 </div>
             </div>
@@ -357,89 +379,9 @@
         </div>
     </footer>
 
-    <!-- NEUROBOT -->
-    <div class="chat-container" id="neuroBotContainer">
-        <div class="chat-header">
-            <div class="bot-avatar"><i class="fas fa-robot"></i></div>
-            <div class="bot-info">
-                <h3>NeuroBot</h3>
-                <span class="status online">Online</span>
-            </div>
-            <div class="chat-actions">
-                <button class="minimize-btn" onclick="toggleNeuroBot()" title="Minimizar"><i
-                        class="fas fa-minus"></i></button>
-                <button class="close-btn" onclick="closeNeuroBot()" title="Fechar"><i class="fas fa-times"></i></button>
-            </div>
-        </div>
-        <div class="chat-messages" id="neuroBotMessages">
-            <div class="message bot-message">
-                <div class="message-avatar"><i class="fas fa-robot"></i></div>
-                <div class="message-content">
-                    <p>Olá! Sou o NeuroBot, seu assistente para TDAH! 🧠✨</p>
-                    <p>Posso ajudar você com:</p>
-                    <ul>
-                        <li>🎮 Sugestões de jogos cognitivos</li>
-                        <li>⏰ Técnica Pomodoro</li>
-                        <li>📝 Organização de tarefas</li>
-                        <li>💡 Dicas para TDAH</li>
-                        <li>📊 Acompanhamento de progresso</li>
-                    </ul>
-                    <p>Como posso ajudar você hoje?</p>
-                </div>
-            </div>
-        </div>
-        <div class="quick-actions">
-            <button class="quick-btn" onclick="sendQuickMessage('Sugerir jogo')"><i class="fas fa-gamepad"></i>
-                Jogo</button>
-            <button class="quick-btn" onclick="sendQuickMessage('Iniciar Pomodoro')"><i class="fas fa-clock"></i>
-                Pomodoro</button>
-            <button class="quick-btn" onclick="sendQuickMessage('Dicas TDAH')"><i class="fas fa-lightbulb"></i>
-                Dicas</button>
-        </div>
-        <div class="chat-input">
-            <div class="input-container">
-                <input type="text" id="neuroBotInput" placeholder="Digite sua mensagem..." />
-                <button class="send-btn" onclick="sendNeuroBotMessage()"><i class="fas fa-paper-plane"></i></button>
-            </div>
-        </div>
-    </div>
-    <div class="neurobot-toggle" id="neuroBotToggle" onclick="openNeuroBot()" title="Abrir NeuroBot">
-        <i class="fas fa-robot"></i>
-        <span class="notification-badge" id="neuroBotBadge">1</span>
-    </div>
+
 
     <!-- ===================== MODAIS ===================== -->
-
-    <!-- KANBAN -->
-    <div class="modal" id="kanbanModal">
-        <div class="modal-content kanban-modal">
-            <div class="modal-header">
-                <h3>📋 Organizador de Tarefas — Kanban</h3>
-                <button class="close-modal" onclick="closeModal('kanbanModal')"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body">
-                <div class="task-input" style="margin-bottom:1.5rem;">
-                    <input type="text" placeholder="Nova tarefa..." id="newTaskInput"
-                        onkeypress="if(event.key==='Enter') addKanbanTask('todo')" />
-                    <button onclick="addKanbanTask('todo')"><i class="fas fa-plus"></i> Adicionar</button>
-                </div>
-                <div class="kanban-board">
-                    <div class="kanban-column">
-                        <h4>📝 Para Fazer</h4>
-                        <div class="kanban-tasks" id="todoTasks"></div>
-                    </div>
-                    <div class="kanban-column">
-                        <h4>⏳ Fazendo</h4>
-                        <div class="kanban-tasks" id="doingTasks"></div>
-                    </div>
-                    <div class="kanban-column">
-                        <h4>✅ Feito</h4>
-                        <div class="kanban-tasks" id="doneTasks"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- DICAS -->
     <div class="modal" id="tipsModal">
@@ -521,6 +463,13 @@
                             <div class="progress-number" id="tasksCompleted">0</div>
                         </div>
                     </div>
+                    <div class="progress-card">
+                        <div class="progress-icon"><i class="fas fa-fire"></i></div>
+                        <div class="progress-info">
+                            <h4>Minutos de Foco</h4>
+                            <div class="progress-number" id="focusMinutesProgress">0</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="achievements">
                     <h4>🏆 Conquistas</h4>
@@ -563,8 +512,8 @@
                     </p>
                     <div class="login-hint">
                         <p>🧪 Contas de teste:</p>
-                        <code>adulto@teste.com / senha123</code><br>
-                        <code>crianca@teste.com / senha123</code>
+                        <code><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="127376677e667d5266776166773c717d7f">[email&#160;protected]</a> / senha123</code><br>
+                        <code><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="197a6b7078777a78596d7c6a6d7c377a7674">[email&#160;protected]</a> / senha123</code>
                     </div>
                 </div>
             </div>
@@ -686,22 +635,36 @@
     <div class="modal" id="trueFalseGameModal">
         <div class="modal-content game-modal">
             <div class="modal-header">
-                <h3>🧠 Desafio: Verdadeiro ou Falso</h3>
+                <h3>🧠 Verdadeiro ou Falso</h3>
                 <button class="close-modal" onclick="closeModal('trueFalseGameModal')"><i
                         class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <div class="tf-game-container">
+
+                    <!-- Bolinhas de progresso -->
                     <div class="tf-progress" id="tfProgress"></div>
+
+                    <!-- Timer bar -->
+                    <div class="tf-timer-wrap" id="tfTimerBar">
+                        <div class="tf-timer-fill" id="tfTimerFill"></div>
+                        <span class="tf-timer-count" id="tfTimerCount">12s</span>
+                    </div>
+
                     <div class="tf-question-card">
                         <p id="trueFalseQuestion">Carregando...</p>
                     </div>
+
                     <div class="tf-buttons">
                         <button class="tf-btn true-btn" onclick="answerTrueFalse('true')">✅ Verdadeiro</button>
                         <button class="tf-btn false-btn" onclick="answerTrueFalse('false')">❌ Falso</button>
                     </div>
+
                     <div class="tf-feedback" id="trueFalseFeedback"></div>
                     <p class="tf-score" id="trueFalseScore"></p>
+
+                    <button class="tool-btn" style="margin-top:.6rem" onclick="startTrueFalseGame()">🔄 Nova
+                        Rodada</button>
                 </div>
             </div>
         </div>
@@ -716,14 +679,19 @@
                         class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
+                <div style="text-align:center; margin-bottom:.6rem;">
+                    <span id="memoryLevel" style="font-size:.85rem; font-weight:800; color:var(--text-accent);">Nível 1
+                        — Fácil</span>
+                </div>
                 <div class="memory-pairs-stats">
                     <span>Tentativas: <strong id="memoryAttempts">0</strong></span>
-                    <span>Pares: <strong id="memoryFound">0</strong>/4</span>
+                    <span>Pares: <strong id="memoryFound">0</strong>/<strong id="memoryTotal">4</strong></span>
                     <span>Tempo: <strong id="memoryTime">0s</strong></span>
                 </div>
                 <div id="memoryPairsBoard" class="memory-pairs-board"></div>
                 <p id="memoryPairsFeedback" class="game-result"></p>
-                <button class="tool-btn" style="margin-top:1rem" onclick="startMemoryPairsGame()">🔄 Reiniciar</button>
+                <button class="tool-btn" style="margin-top:1rem" onclick="startMemoryPairsGame(true)">🔄 Reiniciar do
+                    Nível 1</button>
             </div>
         </div>
     </div>
@@ -737,10 +705,17 @@
                         class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
+                <div class="ws-stats">
+                    <span>Rodada <strong id="wsRound">0</strong></span>
+                    <span>Pontos <strong id="wsScore">0</strong></span>
+                </div>
                 <div class="word-search-hint" id="wordSearchHint">Encontre a palavra na grade</div>
+                <p style="font-size:.78rem; color:var(--text-tertiary); text-align:center; margin-bottom:.6rem;">
+                    Clique e arraste as letras em qualquer direção
+                </p>
                 <div id="wordGrid" class="word-grid"></div>
                 <p id="wordSearchFeedback" class="game-result"></p>
-                <button class="tool-btn" style="margin-top:1rem" onclick="startWordSearch()">🔄 Nova Palavra</button>
+                <button class="tool-btn" style="margin-top:.8rem" onclick="startWordSearch()">🔄 Nova Palavra</button>
             </div>
         </div>
     </div>
@@ -769,9 +744,52 @@
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- JOGO: ENCONTRE AS DIFERENÇAS -->
+    <div class="modal" id="diffGameModal">
+        <div class="modal-content diff-modal">
+            <div class="modal-header">
+                <h3>👁️ Encontre as Diferenças</h3>
+                <button class="close-modal" onclick="closeModal('diffGameModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="diff-header">
+                    <span id="diffLevel" style="font-weight:800; color:var(--text-accent); font-size:.9rem;">Nível 1 —
+                        Fácil</span>
+                    <div class="diff-stats">
+                        <span>⏱️ <strong id="diffTimer">60s</strong></span>
+                        <span>🔍 <strong id="diffFound">0</strong>/<strong id="diffTotal">3</strong></span>
+                    </div>
+                </div>
+                <p style="font-size:.82rem; color:var(--text-tertiary); text-align:center; margin-bottom:.8rem;">
+                    Clique nas células do <strong>Painel B</strong> que são diferentes do Painel A
+                </p>
+                <div class="diff-boards-wrapper">
+                    <div class="diff-panel">
+                        <div class="diff-panel-label">Painel A</div>
+                        <div class="diff-board" id="diffBoardA"></div>
+                    </div>
+                    <div class="diff-panel">
+                        <div class="diff-panel-label">Painel B</div>
+                        <div class="diff-board" id="diffBoardB"></div>
+                    </div>
+                </div>
+                <p id="diffFeedback" class="game-result" style="margin-top:.8rem;"></p>
+                <button class="tool-btn" style="margin-top:.6rem" onclick="diffLevel=0; startDiffGame()">🔄
+                    Reiniciar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHATLING AI AGENT -->
+    <script>
+        window.chtlConfig = { chatbotId: "9222712187" }
+    </script>
+    <script async data-id="9222712187" id="chtl-script" type="text/javascript"
+        src="https://chatling.ai/js/embed.js"></script>
     <script src="script.js"></script>
     <script src="./theme/theme.js"></script>
+    <link rel="stylesheet" href="./pomodoro/pomodoro-widget.css" />
+    <script src="./pomodoro/pomodoro-widget.js"></script>
 </body>
 
 </html>

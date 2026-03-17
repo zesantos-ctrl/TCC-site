@@ -1,61 +1,245 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Contato - NeuroGame</title>
-    <link rel="stylesheet" href="contato.css" />
-    <link rel="stylesheet" href="../styles.css" />
-  </head>
-  <body>
-    <header class="header">
-      <nav class="nav-container">
-        <div class="logo">NeuroGame</div>
-        <ul class="nav-menu">
-          <li><a href="../index.html">Home</a></li>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contato - NeuroGame</title>
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="contato.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="logo">
+          <i class="fas fa-brain"></i>
+          <span>NeuroGame</span>
+        </div>
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="../index.html#home">Início</a></li>
+          <li><a href="../index.html#games">Jogos</a></li>
+          <li><a href="../index.html#tools">Ferramentas</a></li>
+          <li><a href="../index.html#about">Sobre TDAH</a></li>
+          <li><a href="../pomodoro/pomodoro.html">Pomodoro</a></li>
+          <li><a href="../calender/calender.html">Calendário</a></li>
+          <li><a href="contato.html" class="nav-active">Contato</a></li>
         </ul>
-      </nav>
-    </header>
+        <div class="hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </nav>
+  </header>
 
-    <section id="contato" style="margin-top: 100px">
-      <div class="container">
-        <h2>📩 Fale com a gente</h2>
-        <p>Mande sugestões, críticas ou dúvidas:</p>
+  <!-- HERO -->
+  <section class="contato-hero">
+    <div class="container contato-hero-inner">
+      <span class="section-tag">✉️ Contato</span>
+      <h1>Fale com a gente</h1>
+      <p class="hero-sub">Sugestões, dúvidas ou parcerias — adoramos ouvir você!</p>
+    </div>
+  </section>
 
-        <form action="https://formsubmit.co/jvitinhosa@email.com" method="POST">
+  <!-- MAIN -->
+  <main class="contato-main container">
 
-          <label for="name">Nome:</label>
-     <input type="text" name="name" required>
-     <label for="email">Email:</label>
-     <input type="email" name="email" required>
-     <button type="submit">Send</button>
-</form>
-
-        <div class="contato-card">
-          <h3>📞 Outras formas de contato</h3>
-          <div class="contato-itens">
-            <div class="item">
-              <strong>Email:</strong> contato@neurogame.com
-            </div>
-            <div class="item"><strong>Telefone:</strong> (11) 99999-9999</div>
-            <div class="item">
-              <strong>Instagram:</strong>
-              <a href="https://www.instagram.com/seuperfil" target="_blank"
-                >@seuperfil</a
-              >
-            </div>
-          </div>
+    <!-- FORMULÁRIO -->
+    <div class="contato-form-col">
+      <div class="cbox">
+        <div class="cbox-header">
+          <i class="fas fa-paper-plane"></i>
+          <h2>Envie uma mensagem</h2>
         </div>
 
-        <p id="mensagemStatus"></p>
+        <form id="contatoForm" novalidate>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="ctNome"><i class="fas fa-user"></i> Nome completo</label>
+              <input type="text" id="ctNome" name="name" placeholder="Seu nome" autocomplete="name" />
+              <span class="ferr" id="errNome"></span>
+            </div>
+            <div class="form-group">
+              <label for="ctEmail"><i class="fas fa-envelope"></i> E-mail</label>
+              <input type="email" id="ctEmail" name="email" placeholder="seu@email.com" autocomplete="email" />
+              <span class="ferr" id="errEmail"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="ctAssunto"><i class="fas fa-tag"></i> Assunto</label>
+            <select id="ctAssunto" name="assunto">
+              <option value="" disabled selected>Selecione um assunto…</option>
+              <option value="sugestao">💡 Sugestão de melhoria</option>
+              <option value="bug">🐛 Reportar um problema</option>
+              <option value="parceria">🤝 Parceria / Colaboração</option>
+              <option value="duvida">❓ Dúvida geral</option>
+              <option value="tdah">🧠 Sobre TDAH</option>
+              <option value="outro">📌 Outro</option>
+            </select>
+            <span class="ferr" id="errAssunto"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="ctMensagem"><i class="fas fa-comment-alt"></i> Mensagem</label>
+            <textarea id="ctMensagem" name="message" placeholder="Escreva sua mensagem…" rows="5"></textarea>
+            <div class="char-row"><span id="charCount">0</span>/500 caracteres</div>
+            <span class="ferr" id="errMensagem"></span>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <i class="fas fa-paper-plane"></i>
+            <span id="submitLabel">Enviar mensagem</span>
+          </button>
+
+          <div class="form-status" id="formStatus"></div>
+        </form>
       </div>
-    </section>
+    </div>
 
-    <footer class="footer">
-      <p>&copy; 2025 NeuroGame - Todos os direitos reservados.</p>
-    </footer>
+    <!-- INFO -->
+    <div class="contato-info-col">
 
-    <script src="../script.js"></script>
-    <script src="../theme/theme.js"></script>
-  </body>
+      <!-- Canais -->
+      <div class="cbox">
+        <div class="cbox-header">
+          <i class="fas fa-address-book"></i>
+          <h2>Outros canais</h2>
+        </div>
+        <ul class="canais-list">
+          <li>
+            <div class="canal-icon" style="background:linear-gradient(135deg,#5b6ef5,#8b5cf6)">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="canal-info">
+              <span>E-mail</span>
+              <a href="mailto:contato@neurogame.com">contato@neurogame.com</a>
+            </div>
+          </li>
+          <li>
+            <div class="canal-icon" style="background:linear-gradient(135deg,#e1306c,#f77737)">
+              <i class="fab fa-instagram"></i>
+            </div>
+            <div class="canal-info">
+              <span>Instagram</span>
+              <a href="https://instagram.com/neurogame" target="_blank" rel="noopener">@neurogame</a>
+            </div>
+          </li>
+          <li>
+            <div class="canal-icon" style="background:linear-gradient(135deg,#0a66c2,#0e76a8)">
+              <i class="fab fa-linkedin"></i>
+            </div>
+            <div class="canal-info">
+              <span>LinkedIn</span>
+              <a href="https://linkedin.com/company/neurogame" target="_blank" rel="noopener">BrightMind Studios</a>
+            </div>
+          </li>
+          <li>
+            <div class="canal-icon" style="background:linear-gradient(135deg,#25d366,#128c7e)">
+              <i class="fab fa-whatsapp"></i>
+            </div>
+            <div class="canal-info">
+              <span>WhatsApp</span>
+              <a href="https://wa.me/5511999999999" target="_blank" rel="noopener">(11) 99999-9999</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Horário -->
+      <div class="cbox">
+        <div class="cbox-header">
+          <i class="fas fa-clock"></i>
+          <h2>Horário de atendimento</h2>
+        </div>
+        <ul class="horario-list">
+          <li><span>Segunda — Sexta</span><strong>9h às 18h</strong></li>
+          <li><span>Sábado</span><strong>9h às 13h</strong></li>
+          <li><span>Domingo</span><strong>Fechado</strong></li>
+        </ul>
+        <p class="horario-obs"><i class="fas fa-bolt"></i> Respondemos e-mails em até 24h úteis.</p>
+      </div>
+
+      <!-- FAQ -->
+      <div class="cbox">
+        <div class="cbox-header">
+          <i class="fas fa-question-circle"></i>
+          <h2>Perguntas frequentes</h2>
+        </div>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>O NeuroGame é gratuito?</summary>
+            <p>Sim! Todos os jogos e ferramentas são 100% gratuitos e acessíveis pelo navegador, sem precisar instalar
+              nada.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Preciso criar uma conta?</summary>
+            <p>Não é necessário. Seu progresso fica salvo automaticamente no dispositivo via localStorage.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Posso sugerir um novo jogo?</summary>
+            <p>Claro! Use o formulário ao lado selecionando "💡 Sugestão de melhoria" e descreva sua ideia.</p>
+          </details>
+          <details class="faq-item">
+            <summary>O NeuroGame substitui tratamento médico?</summary>
+            <p>Não. É uma ferramenta de apoio e estimulação cognitiva, não substitui diagnóstico ou tratamento
+              profissional.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Funciona no celular?</summary>
+            <p>Sim! O NeuroGame é totalmente responsivo e funciona bem em smartphones e tablets modernos.</p>
+          </details>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <div class="logo">
+            <i class="fas fa-brain"></i>
+            <span>NeuroGame</span>
+          </div>
+          <p>Desenvolvido por <strong>BrightMind Studios</strong></p>
+          <p>Apoio cognitivo para jovens com TDAH</p>
+        </div>
+        <div class="footer-section">
+          <h4>Links Úteis</h4>
+          <ul>
+            <li><a href="../index.html#games">Jogos</a></li>
+            <li><a href="../index.html#tools">Ferramentas</a></li>
+            <li><a href="../index.html#about">Sobre TDAH</a></li>
+            <li><a href="../pomodoro/pomodoro.html">Pomodoro &amp; Kanban</a></li>
+            <li><a href="../calender/calender.html">Calendário</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Contato</h4>
+          <p><i class="fas fa-envelope"></i> contato@neurogame.com</p>
+          <p><i class="fas fa-phone"></i> (11) 99999-9999</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 BrightMind Studios. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="contato.js"></script>
+ <script src="./theme/theme.js"></script>
+  <link rel="stylesheet" href="../pomodoro/pomodoro-widget.css" />
+  <script src="../pomodoro/pomodoro-widget.js"></script>
+</body>
+
 </html>

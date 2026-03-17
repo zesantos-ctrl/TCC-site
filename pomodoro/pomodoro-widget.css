@@ -1,0 +1,294 @@
+/* ================================================
+   POMODORO WIDGET FLUTUANTE
+   Inclua em todas as páginas que quiser o widget
+   ================================================ */
+
+/* ── Botão toggle (FAB) ── */
+.pw-fab {
+    position: fixed;
+    bottom: 28px;
+    left: 28px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #7c5cfc, #48cae4);
+    color: #fff;
+    font-size: 1.15rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 18px rgba(124, 92, 252, 0.55);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    z-index: 9000;
+    flex-shrink: 0;
+}
+
+.pw-fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 24px rgba(124, 92, 252, 0.75);
+}
+
+/* Mini-timer no botão quando rodando */
+.pw-fab-time {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.52rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 20px;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    pointer-events: none;
+    display: none;
+}
+
+.pw-fab-time.visible {
+    display: block;
+}
+
+/* Pulsação quando rodando */
+.pw-fab.running {
+    animation: pwPulse 2s ease-in-out infinite;
+}
+
+@keyframes pwPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 4px 18px rgba(124, 92, 252, 0.55);
+    }
+
+    50% {
+        box-shadow: 0 4px 28px rgba(124, 92, 252, 0.9), 0 0 0 6px rgba(124, 92, 252, 0.15);
+    }
+}
+
+/* ── Popup ── */
+.pw-popup {
+    position: fixed;
+    bottom: 90px;
+    left: 28px;
+    width: 280px;
+    background: #131620;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+    z-index: 8999;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.pw-popup.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+/* ── Header do popup ── */
+.pw-header {
+    background: linear-gradient(135deg, #7c5cfc, #48cae4);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pw-header-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.pw-header-title i {
+    font-size: 0.9rem;
+}
+
+.pw-phase {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.15);
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+/* ── Anel + timer ── */
+.pw-ring-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0 10px;
+    gap: 8px;
+}
+
+.pw-svg {
+    width: 110px;
+    height: 110px;
+    transform: rotate(-90deg);
+}
+
+.pw-ring-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.07);
+    stroke-width: 8;
+}
+
+.pw-ring-fill {
+    fill: none;
+    stroke: url(#pwGrad);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 302;
+    /* 2π × 48 */
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear, stroke 0.4s ease;
+}
+
+.pw-ring-inner {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.pw-ring-wrap {
+    position: relative;
+}
+
+.pw-ring-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(0deg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    gap: 2px;
+    /* contrarrotaciona o texto para ficar legível */
+    /* O SVG gira -90deg, então o centro precisa de +90deg */
+    transform: translate(-50%, -50%);
+}
+
+.pw-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #eef0f8;
+    letter-spacing: 1px;
+}
+
+.pw-label-text {
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #a78bfa;
+}
+
+/* ── Controles ── */
+.pw-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 0 14px;
+}
+
+.pw-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.06);
+    color: #eef0f8;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.pw-btn:hover {
+    background: rgba(124, 92, 252, 0.35);
+    transform: scale(1.1);
+}
+
+.pw-btn.primary {
+    background: linear-gradient(135deg, #7c5cfc, #48cae4);
+}
+
+.pw-btn.primary:hover {
+    transform: scale(1.12);
+}
+
+/* ── Stats mini ── */
+.pw-stats {
+    display: flex;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pw-stat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 0;
+    gap: 1px;
+}
+
+.pw-stat+.pw-stat {
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pw-stat-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #a78bfa;
+}
+
+.pw-stat-lbl {
+    font-size: 0.58rem;
+    color: #8891b4;
+    letter-spacing: 0.04em;
+}
+
+/* ── Link para página completa ── */
+.pw-fullpage {
+    display: flex;
+    justify-content: center;
+    padding: 6px 0 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pw-fullpage a {
+    font-size: 0.72rem;
+    color: #a78bfa;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.2s;
+}
+
+.pw-fullpage a:hover {
+    color: #fff;
+}

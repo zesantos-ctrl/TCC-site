@@ -1,292 +1,268 @@
-body {
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+/* ========================================
+   VARIÁVEIS GLOBAIS
+   ======================================== */
+:root {
+  --bg-primary: #0f1117;
+  --bg-secondary: #1a1d27;
+  --bg-gradient-start: #6c63ff;
+  --bg-gradient-end: #48cae4;
+  --text-primary: #e8eaf0;
+  --text-highlight: #6c63ff;
+  --text-inverted: #ffffff;
+  --border-color: #2e3147;
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --shadow-color-hover: rgba(108, 99, 255, 0.4);
+}
+
+/* ========================================
+   BASE
+   ======================================== */
+* {
+  box-sizing: border-box;
   margin: 0;
-  font-family: "Poppins", sans-serif;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
 }
 
+/* ========================================
+   CONTAINER DO CALENDÁRIO
+   ======================================== */
 .calendar-container {
-  max-width: 600px;
-  margin: 40px auto;
-  padding: 20px;
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  box-shadow: 0 4px 15px var(--shadow-color);
-}
-
-.calendar-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.calendar-nav h2 {
-  font-size: 1.8rem;
-  color: var(--text-highlight);
-  text-align: center;
-  flex-grow: 1;
-}
-
-.nav-btn {
-  padding: 8px 12px;
-  background: var(--bg-accent-gradient-start);
-  color: white;
-  border: none;
-  border-radius: 30px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.2s ease-in-out;
-}
-
-.nav-btn:hover {
-  background: var(--bg-accent-gradient-end);
-  transform: translateY(-2px);
-}
-
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
-}
-
-.day-header {
-  font-weight: 600;
-  color: var(--text-highlight);
-  text-align: center;
-  padding: 8px 0;
-}
-
-.calendar-day {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 12px 0;
-  min-height: 50px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.2s ease-in-out;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-}
-
-.calendar-day:hover {
-  background: var(--bg-accent-gradient-start);
-  color: var(--text-inverted);
-}
-
-.calendar-day.today {
-  background: var(--text-highlight);
-  color: white;
-  font-weight: bold;
-}
-
-.calendar-day.empty {
-  background: transparent;
-  box-shadow: none;
-  cursor: default;
-}
-
-.task-count-badge {
-  background: var(--text-highlight);
-  color: white;
-  border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 0.7rem;
-  margin-left: 5px;
-  display: inline-block;
-}
-
-/* Modal */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: var(--bg-secondary);
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 400px;
-  margin: auto;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal-body input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-}
-
-.modal-body ul li {
-  text-align: left;
-  background: var(--bg-secondary);
-  margin-bottom: 8px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  box-shadow: 0 2px 5px var(--shadow-color);
-}
-.calendar-container {
-  max-width: 900px;
+  max-width: 640px;
   margin: 80px auto;
-  padding: 0 20px;
-  text-align: center;
-  font-family: "Poppins", sans-serif;
-  color: var(--text-primary);
+  padding: 28px;
+  background: var(--bg-secondary);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px var(--shadow-color);
 }
 
+/* ========================================
+   NAVEGAÇÃO (MÊS / ANO)
+   ======================================== */
 .calendar-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .calendar-nav h2 {
-  font-size: 2rem;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: var(--text-highlight);
   flex-grow: 1;
   text-align: center;
+  letter-spacing: 0.02em;
 }
 
 .nav-btn {
-  padding: 8px 16px;
+  padding: 8px 18px;
   background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
   color: white;
   border: none;
   border-radius: 50px;
   cursor: pointer;
   font-weight: 600;
-  transition: 0.2s ease-in-out;
+  font-size: 0.9rem;
+  font-family: 'Poppins', sans-serif;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .nav-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px var(--shadow-color-hover);
+  box-shadow: 0 6px 18px var(--shadow-color-hover);
 }
 
+/* ========================================
+   GRID DO CALENDÁRIO
+   ======================================== */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
-  margin-top: 10px;
+  gap: 8px;
 }
 
 .day-header {
-  font-weight: bold;
-  background: transparent;
-  box-shadow: none;
-  cursor: default;
+  font-weight: 600;
+  font-size: 0.75rem;
   color: var(--text-highlight);
+  text-align: center;
+  padding: 6px 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
+/* ========================================
+   CÉLULAS DO CALENDÁRIO
+   ======================================== */
 .calendar-day {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 4px;
+  min-height: 52px;
   border-radius: 10px;
-  box-shadow: 0 4px 8px var(--shadow-color);
   cursor: pointer;
-  transition: 0.2s ease-in-out;
+  font-size: 0.88rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  border: 1px solid transparent;
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
 .calendar-day:hover {
-  background: var(--bg-accent-gradient-start);
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
   color: var(--text-inverted);
-  transform: translateY(-3px);
+  transform: translateY(-2px);
+  border-color: transparent;
 }
 
 .calendar-day.today {
   border: 2px solid var(--text-highlight);
-  box-shadow: 0 0 15px var(--text-highlight);
+  box-shadow: 0 0 14px rgba(108, 99, 255, 0.5);
+  font-weight: 700;
+  color: var(--text-highlight);
+  background: rgba(108, 99, 255, 0.1);
+}
+
+.calendar-day.today:hover {
+  color: white;
 }
 
 .calendar-day.empty {
   background: transparent;
+  border-color: transparent;
   box-shadow: none;
   cursor: default;
+  pointer-events: none;
 }
 
+/* ========================================
+   BADGE DE TAREFAS
+   ======================================== */
 .task-count-badge {
   background: var(--text-highlight);
   color: white;
   border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 0.7rem;
-  margin-left: 5px;
-  display: inline-block;
+  width: 18px;
+  height: 18px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
 }
 
-/* Modal seguindo o mesmo padrão */
-.modal {
+/* ========================================
+   MODAL
+   ======================================== */
+.modal-backdrop {
   display: none;
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
   justify-content: center;
   align-items: center;
+  z-index: 999;
+}
+
+.modal-backdrop.open {
+  display: flex;
 }
 
 .modal-content {
   background: var(--bg-secondary);
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 400px;
-  margin: auto;
-  box-shadow: 0 4px 15px var(--shadow-color);
+  padding: 24px;
+  border-radius: 14px;
+  width: 90%;
+  max-width: 380px;
+  box-shadow: 0 8px 32px var(--shadow-color);
+  border: 1px solid var(--border-color);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-highlight);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.4rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.modal-close:hover {
+  opacity: 1;
 }
 
 .modal-body input {
   width: 100%;
-  padding: 10px;
-  margin-top: 10px;
+  padding: 10px 14px;
+  margin-top: 8px;
   border-radius: 8px;
   border: 1px solid var(--border-color);
   background: var(--bg-primary);
   color: var(--text-primary);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.modal-body input:focus {
+  border-color: var(--text-highlight);
+}
+
+.modal-body ul {
+  list-style: none;
+  margin-top: 12px;
 }
 
 .modal-body ul li {
-  text-align: left;
-  background: var(--bg-secondary);
+  background: rgba(255, 255, 255, 0.05);
   margin-bottom: 8px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  box-shadow: 0 2px 5px var(--shadow-color);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  border-left: 3px solid var(--text-highlight);
 }
+
+/* ========================================
+   BOTÃO FERRAMENTA (tool-btn)
+   ======================================== */
 .tool-btn {
   display: inline-block;
-  margin-top: 20px;
-  padding: 10px 20px;
-  background: linear-gradient(
-    135deg,
-    var(--bg-gradient-start),
-    var(--bg-gradient-end)
-  );
+  margin-top: 24px;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
   color: white;
   border-radius: 50px;
   text-decoration: none;
   font-weight: 600;
-  transition: 0.2s ease;
+  font-size: 0.9rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .tool-btn:hover {

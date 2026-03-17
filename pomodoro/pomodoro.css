@@ -1,0 +1,1180 @@
+/* ========================================
+   VARIÁVEIS
+   ======================================== */
+:root {
+    --bg-page: #0d0f18;
+    --bg-card: #131620;
+    --bg-col: #0f1219;
+    --bg-task: #1a1e2e;
+    --grad-start: #7c5cfc;
+    --grad-end: #48cae4;
+    --accent: #7c5cfc;
+    --accent-break: #f472b6;
+    --text-primary: #eef0f8;
+    --text-secondary: #8891b4;
+    --text-accent: #a78bfa;
+    --border: rgba(255, 255, 255, 0.07);
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --transition: 0.2s ease;
+    --dot-todo: #64748b;
+    --dot-doing: #7c5cfc;
+    --dot-done: #34d399;
+}
+
+/* ========================================
+   RESET / BASE
+   ======================================== */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    min-height: 100vh;
+}
+
+/* ========================================
+   LAYOUT PRINCIPAL
+   ======================================== */
+
+
+@media (max-width: 800px) {}
+
+/* ========================================
+   RÓTULOS DE SEÇÃO
+   ======================================== */
+
+
+
+
+/* ========================================
+   LAYOUT CENTRALIZADO
+   ======================================== */
+.pomo-center {
+    max-width: 500px;
+    margin: 120px auto 80px;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.section-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.section-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.4rem;
+}
+
+@media (max-width: 600px) {
+    .pomo-center {
+        margin-top: 90px;
+        padding: 0 16px;
+    }
+}
+
+/* ========================================
+   CARD DO POMODORO
+   ======================================== */
+.pomo-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.4rem;
+    box-shadow: var(--shadow);
+    width: 100%;
+}
+
+/* ── Anel SVG ── */
+.ring-wrapper {
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+
+.progress-ring {
+    width: 200px;
+    height: 200px;
+    transform: rotate(-90deg);
+}
+
+.ring-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.06);
+    stroke-width: 10;
+}
+
+.ring-fill {
+    fill: none;
+    stroke: url(#ringGrad);
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-dasharray: 553;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear, stroke 0.4s ease;
+}
+
+.ring-inner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.timer-display {
+    font-family: 'Space Mono', monospace;
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 2px;
+    line-height: 1;
+}
+
+.timer-phase {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-accent);
+}
+
+/* ── Controles ── */
+.timer-controls {
+    display: flex;
+    gap: 0.9rem;
+}
+
+.timer-btn {
+    width: 46px;
+    height: 46px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+    color: #fff;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.timer-btn:hover {
+    transform: scale(1.12);
+    box-shadow: 0 0 18px rgba(124, 92, 252, 0.5);
+}
+
+/* ── Stats ── */
+.pomo-stats {
+    display: flex;
+    gap: 0.8rem;
+    width: 100%;
+}
+
+.stat-pill {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.stat-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-accent);
+}
+
+.stat-lbl {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+}
+
+/* ── Toast ── */
+.toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 10px 22px;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    box-shadow: var(--shadow);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    white-space: nowrap;
+    z-index: 999;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ========================================
+   KANBAN
+   ======================================== */
+.kanban-add {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 1.2rem;
+}
+
+.kanban-add input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color var(--transition);
+}
+
+.kanban-add input::placeholder {
+    color: var(--text-secondary);
+}
+
+.kanban-add input:focus {
+    border-color: var(--accent);
+}
+
+.kanban-add button {
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform var(--transition), box-shadow var(--transition);
+    flex-shrink: 0;
+}
+
+.kanban-add button:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 14px rgba(124, 92, 252, 0.4);
+}
+
+/* ── Board ── */
+.kanban-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+@media (max-width: 600px) {
+    .kanban-board {
+        grid-template-columns: 1fr;
+    }
+}
+
+.kanban-col {
+    background: var(--bg-col);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    min-height: 280px;
+    transition: border-color var(--transition);
+}
+
+.kanban-col.drag-over {
+    border-color: var(--accent);
+    background: rgba(124, 92, 252, 0.05);
+}
+
+.col-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 0.9rem;
+}
+
+.col-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.dot-todo {
+    background: var(--dot-todo);
+}
+
+.dot-doing {
+    background: var(--dot-doing);
+}
+
+.dot-done {
+    background: var(--dot-done);
+}
+
+.col-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    flex: 1;
+}
+
+.col-count {
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 20px;
+    padding: 1px 8px;
+    color: var(--text-secondary);
+}
+
+.col-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    min-height: 60px;
+}
+
+/* ── Cards de Tarefa ── */
+.task-card {
+    background: var(--bg-task);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    animation: cardIn 0.2s ease;
+}
+
+@keyframes cardIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.task-card:hover {
+    border-color: rgba(124, 92, 252, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.task-card.dragging {
+    opacity: 0.4;
+    cursor: grabbing;
+}
+
+.task-card.done-card .task-text {
+    text-decoration: line-through;
+    color: var(--text-secondary);
+}
+
+.task-text {
+    flex: 1;
+    line-height: 1.4;
+}
+
+.task-del {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: color var(--transition), background var(--transition);
+    flex-shrink: 0;
+}
+
+.task-del:hover {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.1);
+}
+
+/* ========================================
+   DARK MODE
+   ======================================== */
+body.dark-mode {
+    background: var(--bg-page);
+}
+
+/* ========================================
+   WALLPAPER — overlay + painel lateral
+   O background do body é controlado pelo JS
+   via <style id="wp-dynamic-style"> injetada
+   no <head>, garantindo prioridade máxima.
+   ======================================== */
+
+/* Overlay: visibilidade controlada 100% pelo JS */
+.wp-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    transition: background 0.3s ease;
+}
+
+/* header, main e painel ficam acima do overlay */
+.header,
+main,
+.wp-panel,
+.toast {
+    position: relative;
+    z-index: 1;
+}
+
+/* ── Painel flutuante ── */
+.wp-panel {
+    position: fixed;
+    bottom: 12px;
+    right: 12px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.wp-toggle {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(124, 92, 252, 0.5);
+    transition: transform var(--transition), box-shadow var(--transition);
+    flex-shrink: 0;
+}
+
+.wp-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 22px rgba(124, 92, 252, 0.7);
+}
+
+/* ── Gaveta / drawer ── */
+.wp-drawer {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.2rem;
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.wp-drawer.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+.wp-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* ── Presets de gradiente ── */
+.wp-presets {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+}
+
+.wp-preset {
+    background: none;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 2px;
+    cursor: pointer;
+    transition: border-color var(--transition), transform var(--transition);
+}
+
+.wp-preset:hover {
+    transform: scale(1.1);
+}
+
+.wp-preset.active {
+    border-color: var(--accent);
+}
+
+.preset-swatch {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 5px;
+}
+
+/* ── Botão upload ── */
+.wp-upload-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: border-color var(--transition), color var(--transition);
+}
+
+.wp-upload-btn:hover {
+    border-color: var(--accent);
+    color: var(--text-primary);
+}
+
+/* ── Botão limpar ── */
+.wp-clear {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+    transition: color var(--transition);
+    font-family: 'DM Sans', sans-serif;
+}
+
+.wp-clear:hover {
+    color: #f87171;
+}
+
+/* ── Slider de escurecimento ── */
+.wp-opacity-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wp-opacity-lbl {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.wp-opacity-row input[type="range"] {
+    flex: 1;
+    accent-color: var(--accent);
+    height: 4px;
+    cursor: pointer;
+}
+
+.wp-opacity-val {
+    font-size: 0.72rem;
+    color: var(--text-accent);
+    min-width: 30px;
+    text-align: right;
+    font-family: 'Space Mono', monospace;
+}
+
+@media (max-width: 500px) {
+    .wp-panel {
+        bottom: 16px;
+        right: 16px;
+    }
+
+    .wp-drawer {
+        width: 190px;
+    }
+}
+
+/* ========================================
+   MODO MÚSICA
+   ======================================== */
+.music-panel {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0.9rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.music-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.music-header i {
+    color: var(--text-accent);
+    font-size: 0.85rem;
+}
+
+.music-title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    flex: 1;
+}
+
+.music-vol-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.music-vol-icon {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+.music-vol-slider {
+    width: 70px;
+    accent-color: var(--accent);
+    height: 3px;
+    cursor: pointer;
+}
+
+.music-btns {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 5px;
+}
+
+.music-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 6px 2px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 1.1rem;
+    transition: all var(--transition);
+    color: var(--text-primary);
+}
+
+.music-btn span {
+    font-size: 0.55rem;
+    color: var(--text-secondary);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.music-btn:hover {
+    border-color: var(--accent);
+    background: rgba(124, 92, 252, 0.1);
+    transform: translateY(-2px);
+}
+
+.music-btn.active {
+    border-color: var(--accent);
+    background: rgba(124, 92, 252, 0.2);
+    box-shadow: 0 0 10px rgba(124, 92, 252, 0.3);
+}
+
+.music-btn.active span {
+    color: var(--text-accent);
+}
+
+/* ========================================
+   KANBAN POPUP — canto inferior esquerdo
+   ======================================== */
+.kb-popup {
+    position: fixed;
+    bottom: 28px;
+    left: 28px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+/* Botão FAB */
+.kb-fab {
+    position: relative;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(124, 92, 252, 0.5);
+    transition: transform var(--transition), box-shadow var(--transition);
+    flex-shrink: 0;
+}
+
+.kb-fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 22px rgba(124, 92, 252, 0.7);
+}
+
+.kb-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #f472b6;
+    color: white;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 0.6rem;
+    font-weight: 700;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+}
+
+.kb-badge.visible {
+    display: flex;
+}
+
+/* Gaveta do kanban */
+.kb-drawer {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    width: 420px;
+    max-height: 520px;
+    overflow-y: auto;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.kb-drawer.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+.kb-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.kb-drawer-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--text-accent);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.kb-drawer-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 2px 5px;
+    border-radius: 4px;
+    transition: color var(--transition);
+}
+
+.kb-drawer-close:hover {
+    color: var(--text-primary);
+}
+
+/* Input de nova tarefa no popup */
+.kb-add-row {
+    display: flex;
+    gap: 6px;
+}
+
+.kb-add-row input {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color var(--transition);
+}
+
+.kb-add-row input::placeholder {
+    color: var(--text-secondary);
+}
+
+.kb-add-row input:focus {
+    border-color: var(--accent);
+}
+
+.kb-add-row button {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+    color: #fff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform var(--transition);
+}
+
+.kb-add-row button:hover {
+    transform: scale(1.08);
+}
+
+/* Colunas do popup */
+.kb-cols {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.kb-col {
+    background: var(--bg-col);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0.7rem;
+    min-height: 120px;
+    transition: border-color var(--transition);
+}
+
+.kb-col.drag-over {
+    border-color: var(--accent);
+    background: rgba(124, 92, 252, 0.05);
+}
+
+.kb-col-header {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.6rem;
+}
+
+/* scrollbar da gaveta */
+.kb-drawer::-webkit-scrollbar {
+    width: 4px;
+}
+
+.kb-drawer::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.kb-drawer::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+@media (max-width: 500px) {
+    .kb-popup {
+        bottom: 16px;
+        left: 16px;
+    }
+
+    .kb-drawer {
+        width: calc(100vw - 32px);
+    }
+
+    .kb-cols {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   PLAYER YOUTUBE
+   ======================================== */
+.yt-panel {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0.9rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.yt-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.yt-icon {
+    color: #ff4444;
+    font-size: 1rem;
+}
+
+.yt-title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    flex: 1;
+}
+
+.yt-now {
+    font-size: 0.7rem;
+    color: var(--text-accent);
+    font-family: 'Space Mono', monospace;
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Grade de playlists */
+.yt-playlists {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 5px;
+}
+
+.yt-pl-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 6px 2px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 1.1rem;
+    transition: all var(--transition);
+    color: var(--text-primary);
+}
+
+.yt-pl-btn span {
+    font-size: 0.53rem;
+    color: var(--text-secondary);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.yt-pl-btn:hover {
+    border-color: #ff4444;
+    background: rgba(255, 68, 68, 0.08);
+    transform: translateY(-2px);
+}
+
+.yt-pl-btn.active {
+    border-color: #ff4444;
+    background: rgba(255, 68, 68, 0.15);
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.25);
+}
+
+.yt-pl-btn.active span {
+    color: #ff6666;
+}
+
+/* Wrap do iframe */
+.yt-player-wrap {
+    position: relative;
+    width: 100%;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    display: none;
+    /* aparece via JS quando playlist selecionada */
+    background: #000;
+}
+
+.yt-player-wrap.visible {
+    display: block;
+}
+
+.yt-player-wrap iframe {
+    width: 100%;
+    height: 160px;
+    display: block;
+    border: none;
+}
+
+.yt-close-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition);
+    z-index: 2;
+}
+
+.yt-close-btn:hover {
+    background: rgba(255, 68, 68, 0.8);
+}
+
+/* ── Campo de busca por link ── */
+.yt-search-row {
+    display: flex;
+    gap: 6px;
+}
+
+.yt-search-input {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    outline: none;
+    transition: border-color var(--transition);
+}
+
+.yt-search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.yt-search-input:focus {
+    border-color: #ff4444;
+}
+
+.yt-search-btn {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: #ff4444;
+    color: #fff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background var(--transition), transform var(--transition);
+}
+
+.yt-search-btn:hover {
+    background: #cc2222;
+    transform: scale(1.08);
+}
+
+/* ── Aviso Spotify ── */
+.yt-spotify-tip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(29, 185, 84, 0.1);
+    border: 1px solid rgba(29, 185, 84, 0.3);
+    border-radius: var(--radius-md);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+}
+
+.yt-spotify-tip i {
+    color: #1db954;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.yt-spotify-tip a {
+    color: #1db954;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.yt-spotify-tip a:hover {
+    text-decoration: underline;
+}

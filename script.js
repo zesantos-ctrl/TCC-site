@@ -1,45 +1,24 @@
 /* ====================================================
-   NEUROGAME — script.js  (versão melhorada)
+   NEUROGAME — script.js
    ==================================================== */
 
 // ── Estado Global ─────────────────────────────────────
 const state = {
     isNeuroBotOpen: false,
     authMode: 'login',
-    kanbanTasks: {
-        todo: JSON.parse(localStorage.getItem('neuroKanbanTodo')) || [],
-        doing: JSON.parse(localStorage.getItem('neuroKanbanDoing')) || [],
-        done: JSON.parse(localStorage.getItem('neuroKanbanDone')) || []
-    },
     progress: JSON.parse(localStorage.getItem('neuroProgress')) || {
         gamesPlayed: 0,
         pomodorosCompleted: 0,
         tasksCompleted: 0,
         achievements: []
-    },
-    pomodoro: {
-        minutes: 25,
-        seconds: 0,
-        isRunning: false,
-        isBreak: false,
-        interval: null
     }
 };
 
 // ── Inicialização ──────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     applySavedTheme();
-    renderKanbanBoard();
-    updatePomodoroDisplay();
     updateProgressDisplay();
-    updateNeuroBotBadge();
-
     document.getElementById('hamburger').addEventListener('click', toggleMobileMenu);
-    document.getElementById('neuroBotInput').addEventListener('keypress', e => {
-        if (e.key === 'Enter') sendNeuroBotMessage();
-    });
-
-    // Auth form listeners
     ['authEmail', 'authPassword', 'authName', 'authConfirmPassword'].forEach(id => {
         document.getElementById(id).addEventListener('input', validateAuthForm);
     });
@@ -48,6 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault(); toggleAuthMode();
     });
     document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
+
+    // Sessão + scroll spy
+    applySession();
+    initScrollSpy();
 });
 
 // ── Navegação ──────────────────────────────────────────
@@ -72,7 +55,6 @@ function closeModal(id) {
     if (el) el.style.display = 'none';
 }
 
-// Fechar clicando fora
 window.addEventListener('click', e => {
     document.querySelectorAll('.modal').forEach(m => {
         if (e.target === m) closeModal(m.id);
@@ -98,220 +80,33 @@ function applySavedTheme() {
 }
 
 // ── NeuroBot ───────────────────────────────────────────
-const botKB = {
-    'o que é tdah': 'TDAH é um transtorno neurobiológico que afeta concentração, controle de impulsos e atividade. É muito comum em crianças e adolescentes. 🧠',
-    'sintomas': 'Principais sintomas: dificuldade de concentração, hiperatividade, impulsividade, desorganização e esquecimento. Cada pessoa é única!',
-    'como lidar': 'Estratégias eficazes: rotinas, técnica Pomodoro, jogos cognitivos, organização visual e apoio profissional. 💪',
-    'jogo': 'Nossos jogos cognitivos ajudam a treinar atenção, memória e funções executivas. Abra a seção Jogos e escolha um! 🎮',
-    'pomodoro': 'A técnica Pomodoro divide o trabalho em blocos: 25 min de foco + 5 min de pausa. Ótimo para TDAH! ⏰',
-    'organização': 'Use o Kanban para visualizar suas tarefas. Divida tudo em pequenos passos e celebre cada conquista! 📋',
-    'dica': 'Dica de ouro: faça UMA tarefa por vez. Elimine distrações e use alarmes para não perder o tempo. 🎯',
-    'oi': 'Olá! 👋 Como posso ajudar você hoje?',
-    'olá': 'Oi! Estou aqui para te apoiar. O que você precisa? 😊',
-    'obrigado': 'De nada! Lembre-se: pequenos passos levam a grandes conquistas! 🌟',
-    'tchau': 'Até logo! Continue praticando. Você está indo muito bem! 🚀'
-};
 
-function openNeuroBot() {
-    state.isNeuroBotOpen = true;
-    document.getElementById('neuroBotToggle').style.display = 'none';
-    document.getElementById('neuroBotContainer').style.display = 'flex';
-    document.getElementById('neuroBotBadge').style.display = 'none';
-    setTimeout(() => document.getElementById('neuroBotInput').focus(), 300);
-}
-function closeNeuroBot() {
-    state.isNeuroBotOpen = false;
-    document.getElementById('neuroBotContainer').style.display = 'none';
-    document.getElementById('neuroBotToggle').style.display = 'flex';
-}
-function toggleNeuroBot() {
-    state.isNeuroBotOpen ? closeNeuroBot() : openNeuroBot();
-}
 
-function sendNeuroBotMessage() {
-    const input = document.getElementById('neuroBotInput');
-    const msg = input.value.trim();
-    if (!msg) return;
-    addBotMsg(msg, 'user');
-    input.value = '';
-    setTimeout(() => addBotMsg(processBotMsg(msg), 'bot'), 500);
-}
 
-function sendQuickMessage(msg) {
-    addBotMsg(msg, 'user');
-    setTimeout(() => addBotMsg(processQuick(msg), 'bot'), 500);
-}
 
-function addBotMsg(content, sender) {
-    const container = document.getElementById('neuroBotMessages');
-    const div = document.createElement('div');
-    div.className = `message ${sender}-message`;
-    div.innerHTML = `
-    <div class="message-avatar"><i class="fas fa-${sender === 'bot' ? 'robot' : 'user'}"></i></div>
-    <div class="message-content"><p>${content}</p></div>
-  `;
-    container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
-}
 
-function processBotMsg(msg) {
-    const lower = msg.toLowerCase();
-    for (const [key, val] of Object.entries(botKB)) {
-        if (lower.includes(key)) return val;
-    }
-    if (lower.includes('tarefa') || lower.includes('organizar')) { openKanban(); return '📋 Abrindo o Kanban para você!'; }
-    if (lower.includes('progresso') || lower.includes('conquista')) { openProgress(); return '📊 Aqui está seu progresso!'; }
-    const fallbacks = [
-        'Para TDAH, recomendo começar com pequenos passos e rotinas visuais. Posso ajudar com mais detalhes! 🎯',
-        'Quer tentar algum jogo cognitivo? São ótimos para treinar foco e memória! 🧠',
-        'Organização visual é fundamental. Que tal usar o Kanban para estruturar suas tarefas? 📝'
-    ];
-    return fallbacks[Math.floor(Math.random() * fallbacks.length)];
-}
 
-function processQuick(action) {
-    const map = {
-        'Sugerir jogo': () => {
-            const jogos = ['Jogo da Memória', 'Encontre a Palavra', 'Organize a Rotina', 'Sequência Lógica', 'Jogo de Atenção'];
-            return `🎮 Recomendo: "${jogos[Math.floor(Math.random() * jogos.length)]}"! Vai para a seção Jogos e divirta-se!`;
-        },
-        'Iniciar Pomodoro': () => { startPomodoro(); return '⏰ Pomodoro iniciado! 25 minutos de foco total. Você consegue! 💪'; },
-        'Dicas TDAH': () => { openTips(); return '💡 Abrindo dicas para TDAH!'; }
-    };
-    return (map[action] || (() => 'Como posso te ajudar? 🌟'))();
-}
 
-// ── Pomodoro ───────────────────────────────────────────
-function startPomodoro() {
-    if (state.pomodoro.isRunning) return;
-    state.pomodoro.isRunning = true;
-    state.pomodoro.interval = setInterval(tickPomodoro, 1000);
-    updatePomodoroDisplay();
-}
-function pausePomodoro() {
-    state.pomodoro.isRunning = false;
-    clearInterval(state.pomodoro.interval);
-    updatePomodoroDisplay();
-}
-function resetPomodoro() {
-    pausePomodoro();
-    state.pomodoro.minutes = 25;
-    state.pomodoro.seconds = 0;
-    state.pomodoro.isBreak = false;
-    updatePomodoroDisplay();
-}
-function tickPomodoro() {
-    const p = state.pomodoro;
-    if (p.seconds > 0) { p.seconds--; }
-    else if (p.minutes > 0) { p.minutes--; p.seconds = 59; }
-    else {
-        // Ciclo completo
-        p.isRunning = false;
-        clearInterval(p.interval);
-        if (!p.isBreak) {
-            state.progress.pomodorosCompleted++;
-            saveProgress();
-            checkAchievements();
-            p.isBreak = true;
-            p.minutes = 5; p.seconds = 0;
-            showToast('🎉 Pomodoro completo! Pausa de 5 minutos.');
-        } else {
-            p.isBreak = false;
-            p.minutes = 25; p.seconds = 0;
-            showToast('💪 Pausa encerrada! Pronto para focar?');
-        }
-    }
-    updatePomodoroDisplay();
-}
-function updatePomodoroDisplay() {
-    const p = state.pomodoro;
-    const m = String(p.minutes).padStart(2, '0');
-    const s = String(p.seconds).padStart(2, '0');
-    const display = document.getElementById('pomodoroDisplay');
-    const phase = document.getElementById('pomodoroPhase');
-    if (display) display.textContent = `${m}:${s}`;
-    if (phase) phase.textContent = p.isBreak ? 'Pausa ☕' : 'Foco 🎯';
-}
 
-// ── Kanban ─────────────────────────────────────────────
-function openKanban() { openModal('kanbanModal'); renderKanbanBoard(); }
 
-function addKanbanTask(col) {
-    const input = document.getElementById('newTaskInput');
-    const text = input.value.trim();
-    if (!text) return;
-    state.kanbanTasks[col].push({ id: Date.now(), text });
-    saveKanban(col);
-    input.value = '';
-    renderKanbanBoard();
-    updateNeuroBotBadge();
-}
 
-function deleteKanbanTask(col, id) {
-    state.kanbanTasks[col] = state.kanbanTasks[col].filter(t => t.id !== id);
-    saveKanban(col);
-    renderKanbanBoard();
-    updateNeuroBotBadge();
-}
+// ── Scroll Spy ─────────────────────────────────────────
+function initScrollSpy() {
+    const sections = ['home', 'games', 'tools', 'about'].map(id => document.getElementById(id)).filter(Boolean);
+    const links    = document.querySelectorAll('.nav-menu a[href^="#"]');
 
-function saveKanban(col) {
-    const key = `neuroKanban${col.charAt(0).toUpperCase() + col.slice(1)}`;
-    localStorage.setItem(key, JSON.stringify(state.kanbanTasks[col]));
-}
-
-function renderKanbanBoard() {
-    ['todo', 'doing', 'done'].forEach(col => {
-        const container = document.getElementById(`${col}Tasks`);
-        if (!container) return;
-        container.innerHTML = '';
-        state.kanbanTasks[col].forEach(task => {
-            const div = document.createElement('div');
-            div.className = 'kanban-task';
-            div.draggable = true;
-            div.dataset.taskId = task.id;
-            div.dataset.col = col;
-            div.innerHTML = `
-        <span>${task.text}</span>
-        <button class="kanban-task-del" onclick="deleteKanbanTask('${col}', ${task.id})" title="Remover">×</button>
-      `;
-            div.addEventListener('dragstart', e => {
-                e.dataTransfer.setData('taskId', task.id);
-                e.dataTransfer.setData('fromCol', col);
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const id = entry.target.id;
+            links.forEach(a => {
+                const isActive = a.getAttribute('href') === `#${id}`;
+                a.classList.toggle('nav-spy-active', isActive);
             });
-            container.appendChild(div);
         });
-        // Drop zone on the column container
-        container.addEventListener('dragover', e => e.preventDefault());
-        container.addEventListener('drop', e => {
-            e.preventDefault();
-            const taskId = parseInt(e.dataTransfer.getData('taskId'));
-            const fromCol = e.dataTransfer.getData('fromCol');
-            if (fromCol !== col) moveKanbanTask(taskId, fromCol, col);
-        });
-    });
-}
+    }, { threshold: 0.35, rootMargin: '-70px 0px -40% 0px' });
 
-function moveKanbanTask(id, from, to) {
-    const idx = state.kanbanTasks[from].findIndex(t => t.id === id);
-    if (idx === -1) return;
-    const [task] = state.kanbanTasks[from].splice(idx, 1);
-    state.kanbanTasks[to].push(task);
-    saveKanban(from); saveKanban(to);
-    if (to === 'done') {
-        state.progress.tasksCompleted++;
-        saveProgress();
-        checkAchievements();
-    }
-    renderKanbanBoard();
-    updateNeuroBotBadge();
-}
-
-function updateNeuroBotBadge() {
-    const pending = state.kanbanTasks.todo.length + state.kanbanTasks.doing.length;
-    const badge = document.getElementById('neuroBotBadge');
-    if (!badge) return;
-    badge.textContent = pending;
-    badge.style.display = pending > 0 ? 'flex' : 'none';
+    sections.forEach(s => observer.observe(s));
 }
 
 // ── Progresso ──────────────────────────────────────────
@@ -320,10 +115,39 @@ function saveProgress() {
 }
 
 function updateProgressDisplay() {
+    // Lê dados reais do pomodoro (publicados pelo pomodoro.js via ng_pw_state)
+    try {
+        const pw = JSON.parse(localStorage.getItem('ng_pw_state'));
+        if (pw && pw.everStarted) {
+            if (pw.pomodorosCompleted > state.progress.pomodorosCompleted) {
+                state.progress.pomodorosCompleted = pw.pomodorosCompleted;
+            }
+            if (pw.focusMinutes) {
+                state.progress.focusMinutes = pw.focusMinutes;
+            }
+        }
+    } catch {}
+
+    // Tarefas do kanban concluídas
+    try {
+        const kanban = JSON.parse(localStorage.getItem('ng_kanban'));
+        if (kanban && kanban.done) {
+            const done = kanban.done.length;
+            if (done > state.progress.tasksCompleted) {
+                state.progress.tasksCompleted = done;
+            }
+        }
+    } catch {}
+
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-    set('gamesPlayed', state.progress.gamesPlayed);
-    set('pomodorosCompleted', state.progress.pomodorosCompleted);
-    set('tasksCompleted', state.progress.tasksCompleted);
+    set('gamesPlayed',         state.progress.gamesPlayed);
+    set('pomodorosCompleted',  state.progress.pomodorosCompleted);
+    set('tasksCompleted',      state.progress.tasksCompleted);
+
+    // Linha de minutos de foco (se o elemento existir)
+    const focusEl = document.getElementById('focusMinutesProgress');
+    if (focusEl) focusEl.textContent = state.progress.focusMinutes || 0;
+
     renderAchievements();
 }
 
@@ -361,17 +185,17 @@ function renderAchievements() {
 function openTips() { openModal('tipsModal'); }
 function openProgress() { openModal('progressModal'); updateProgressDisplay(); }
 
-// ── Toast / Notificação ────────────────────────────────
+// ── Toast ──────────────────────────────────────────────
 function showToast(msg) {
     const el = document.createElement('div');
     el.style.cssText = `
-    position:fixed; top:20px; right:20px; z-index:99999;
-    background:linear-gradient(135deg,#fbbf24,#f59e0b);
-    color:#1e1b4b; padding:14px 20px; border-radius:12px;
-    box-shadow:0 8px 24px rgba(251,191,36,.4);
-    font-family:'Nunito',sans-serif; font-weight:800; font-size:.95rem;
-    max-width:300px; animation:slideInRight .3s ease-out;
-  `;
+        position:fixed; top:20px; right:20px; z-index:99999;
+        background:linear-gradient(135deg,#fbbf24,#f59e0b);
+        color:#1e1b4b; padding:14px 20px; border-radius:12px;
+        box-shadow:0 8px 24px rgba(251,191,36,.4);
+        font-family:'Nunito',sans-serif; font-weight:800; font-size:.95rem;
+        max-width:300px; animation:slideInRight .3s ease-out;
+    `;
     el.textContent = msg;
     document.body.appendChild(el);
     setTimeout(() => {
@@ -429,37 +253,93 @@ function validateAuthForm() {
             if (msg.textContent === 'As senhas não coincidem.') msg.textContent = '';
         }
     }
-
     btn.disabled = !valid;
 }
 
-function performAuth() {
-    const email = document.getElementById('authEmail').value.trim();
-    const password = document.getElementById('authPassword').value.trim();
-    const name = document.getElementById('authName').value.trim();
-    const msg = document.getElementById('authMessage');
+// ── Auth com localStorage ─────────────────────────────────
+const AUTH_KEY = 'ng_users';
+const SESSION_KEY = 'ng_session';
 
-    const testAccounts = ['adulto@teste.com', 'crianca@teste.com'];
+function getUsers() {
+    try { return JSON.parse(localStorage.getItem(AUTH_KEY)) || {}; } catch { return {}; }
+}
+function saveUsers(u) { localStorage.setItem(AUTH_KEY, JSON.stringify(u)); }
+
+function getSession() {
+    try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch { return null; }
+}
+function saveSession(user) { localStorage.setItem(SESSION_KEY, JSON.stringify(user)); }
+function clearSession() { localStorage.removeItem(SESSION_KEY); }
+
+function performAuth() {
+    const email    = document.getElementById('authEmail').value.trim().toLowerCase();
+    const password = document.getElementById('authPassword').value;
+    const name     = document.getElementById('authName').value.trim();
+    const msg      = document.getElementById('authMessage');
+    const users    = getUsers();
+
+    // Contas de teste pré-cadastradas
+    if (!users['adulto@teste.com']) {
+        users['adulto@teste.com'] = { name: 'Adulto Teste', password: 'senha123' };
+        users['crianca@teste.com'] = { name: 'Criança Teste', password: 'senha123' };
+        saveUsers(users);
+    }
 
     if (state.authMode === 'login') {
-        if (testAccounts.includes(email) && password === 'senha123') {
-            msg.textContent = '✅ Login realizado! Bem-vindo(a)!';
+        const user = users[email];
+        if (user && user.password === password) {
+            saveSession({ name: user.name, email });
+            msg.textContent = `✅ Bem-vindo(a), ${user.name}!`;
             msg.style.color = '#16a34a';
-            setTimeout(() => closeModal('loginModal'), 1500);
+            setTimeout(() => {
+                closeModal('loginModal');
+                applySession();
+            }, 1000);
         } else {
             msg.textContent = '❌ Email ou senha incorretos.';
             msg.style.color = '#dc2626';
         }
     } else {
-        if (testAccounts.includes(email)) {
-            msg.textContent = '❌ Este email já está em uso.';
+        if (users[email]) {
+            msg.textContent = '❌ Este email já está cadastrado.';
             msg.style.color = '#dc2626';
         } else {
-            msg.textContent = `✅ Cadastro de ${name} realizado! Faça o login.`;
+            users[email] = { name, password };
+            saveUsers(users);
+            saveSession({ name, email });
+            msg.textContent = `✅ Conta criada! Bem-vindo(a), ${name}!`;
             msg.style.color = '#16a34a';
-            setTimeout(() => { toggleAuthMode(); document.getElementById('authEmail').value = email; validateAuthForm(); }, 1500);
+            setTimeout(() => {
+                closeModal('loginModal');
+                applySession();
+            }, 1000);
         }
     }
+}
+
+// Aplica sessão na UI (header + modal)
+function applySession() {
+    const session = getSession();
+    const loginLink = document.getElementById('navLoginLink');
+    const userGreet = document.getElementById('navUserGreet');
+    const userNameEl = document.getElementById('navUserName');
+    const userAvatar = document.getElementById('navUserAvatar');
+
+    if (session) {
+        if (loginLink)  loginLink.style.display  = 'none';
+        if (userGreet)  userGreet.style.display   = 'flex';
+        if (userNameEl) userNameEl.textContent    = session.name.split(' ')[0];
+        if (userAvatar) userAvatar.textContent    = session.name.charAt(0).toUpperCase();
+    } else {
+        if (loginLink)  loginLink.style.display  = 'list-item';
+        if (userGreet)  userGreet.style.display   = 'none';
+    }
+}
+
+function logoutUser() {
+    clearSession();
+    applySession();
+    showToast('👋 Até logo! Sessão encerrada.');
 }
 
 // ── Mood Tracker ───────────────────────────────────────
@@ -511,10 +391,10 @@ function renderNotes() {
     const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
     list.innerHTML = notes.length
         ? notes.map((n, i) => `
-        <li>
-          <span>${n}</span>
-          <button class="note-del-btn" onclick="deleteNote(${i})">✕</button>
-        </li>`).join('')
+            <li>
+                <span>${n}</span>
+                <button class="note-del-btn" onclick="deleteNote(${i})">✕</button>
+            </li>`).join('')
         : '<li style="color:var(--text-tertiary);font-style:italic">Nenhuma nota ainda.</li>';
 }
 
@@ -522,17 +402,17 @@ function renderNotes() {
 function openGame(name) {
     const map = {
         memoryPairs: () => { openModal('memoryPairsGameModal'); startMemoryPairsGame(); },
-        wordSearch: () => { openModal('wordSearchModal'); startWordSearch(); },
-        organize: () => { openModal('organizeGameModal'); startOrganizeGame(); },
-        sequence: () => { openModal('sequenceGameModal'); startSequenceGame(); },
-        trueFalse: () => { openModal('trueFalseGameModal'); startTrueFalseGame(); }
+        wordSearch:  () => { openModal('wordSearchModal');      startWordSearch(); },
+        organize:    () => { openModal('organizeGameModal');    startOrganizeGame(); },
+        sequence:    () => { openModal('sequenceGameModal');    startSequenceGame(); },
+        trueFalse:   () => { openModal('trueFalseGameModal');   startTrueFalseGame(); },
+        diffGame:    () => openDiffGame(),
     };
     if (map[name]) map[name]();
 }
 
 function openColorGame() { openModal('colorGameModal'); startColorGame(); }
 
-// Registrar jogo jogado
 function registerGame() {
     state.progress.gamesPlayed++;
     saveProgress();
@@ -542,14 +422,14 @@ function registerGame() {
 // ── JOGO: Atenção — Cores ──────────────────────────────
 const COLOR_LIST = [
     { label: 'vermelho', hex: '#e74c3c' },
-    { label: 'azul', hex: '#3498db' },
-    { label: 'verde', hex: '#27ae60' },
-    { label: 'amarelo', hex: '#f1c40f' },
-    { label: 'roxo', hex: '#9b59b6' },
-    { label: 'laranja', hex: '#e67e22' }
+    { label: 'azul',     hex: '#3498db' },
+    { label: 'verde',    hex: '#27ae60' },
+    { label: 'amarelo',  hex: '#f1c40f' },
+    { label: 'roxo',     hex: '#9b59b6' },
+    { label: 'laranja',  hex: '#e67e22' }
 ];
 let colorTarget = '';
-let colorScore = 0;
+let colorScore  = 0;
 let colorRecord = parseInt(localStorage.getItem('colorRecord') || '0');
 
 function startColorGame() {
@@ -584,15 +464,15 @@ function checkColor(selected) {
 
 // ── JOGO: Organizar a Rotina ───────────────────────────
 let organizeInterval = null;
-let organizeElapsed = 0;
+let organizeElapsed  = 0;
 
 const ORGANIZE_TASKS = [
     { text: '📚 Estudar para a prova', priority: 'High' },
-    { text: '🏃 Fazer exercícios', priority: 'High' },
-    { text: '🍽️ Lavar a louça', priority: 'Medium' },
-    { text: '📖 Ler um livro', priority: 'Medium' },
-    { text: '🎮 Jogar videogame', priority: 'Low' },
-    { text: '📺 Assistir série', priority: 'Low' }
+    { text: '🏃 Fazer exercícios',      priority: 'High' },
+    { text: '🍽️ Lavar a louça',         priority: 'Medium' },
+    { text: '📖 Ler um livro',          priority: 'Medium' },
+    { text: '🎮 Jogar videogame',       priority: 'Low' },
+    { text: '📺 Assistir série',        priority: 'Low' }
 ];
 
 function startOrganizeGame() {
@@ -622,16 +502,14 @@ function startOrganizeGame() {
         container.appendChild(btn);
     });
 
-    // Drop zone listeners
     document.querySelectorAll('.drop-zone').forEach(zone => {
         zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
         zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
         zone.addEventListener('drop', e => {
             e.preventDefault();
             zone.classList.remove('drag-over');
-            const text = e.dataTransfer.getData('taskText');
+            const text  = e.dataTransfer.getData('taskText');
             const btnId = e.dataTransfer.getData('taskBtnId');
-            const colId = zone.querySelector('ul').id;
             const li = document.createElement('li');
             li.textContent = text;
             zone.querySelector('ul').appendChild(li);
@@ -649,7 +527,7 @@ function allowDrop(e) { e.preventDefault(); }
 
 function drop(e, priority) {
     e.preventDefault();
-    const text = e.dataTransfer.getData('taskText');
+    const text  = e.dataTransfer.getData('taskText');
     const btnId = e.dataTransfer.getData('taskBtnId');
     if (!text) return;
     const listId = { High: 'priorityHigh', Medium: 'priorityMedium', Low: 'priorityLow' }[priority];
@@ -669,15 +547,12 @@ function finishOrganizeGame() {
         return;
     }
     clearInterval(organizeInterval);
-
-    // Verificar acertos
     let correct = 0;
     ORGANIZE_TASKS.forEach(task => {
         const listId = { High: 'priorityHigh', Medium: 'priorityMedium', Low: 'priorityLow' }[task.priority];
         const items = [...document.querySelectorAll(`#${listId} li`)];
         if (items.some(li => li.textContent === task.text)) correct++;
     });
-
     const pct = Math.round((correct / ORGANIZE_TASKS.length) * 100);
     result.textContent = `✅ Concluído em ${fmtTime(organizeElapsed)}! Acertos: ${correct}/${ORGANIZE_TASKS.length} (${pct}%)`;
     result.style.color = pct >= 60 ? '#16a34a' : '#dc2626';
@@ -690,89 +565,218 @@ function fmtTime(s) {
 }
 
 // ── JOGO: Verdadeiro ou Falso ──────────────────────────
-const TF_QUESTIONS = [
-    { q: 'Estudar com música sempre melhora o foco.', a: false, exp: 'Depende do tipo de música e da pessoa!' },
-    { q: 'Fazer pausas curtas aumenta a produtividade.', a: true, exp: 'A técnica Pomodoro comprova isso.' },
-    { q: 'Dormir pouco melhora o rendimento.', a: false, exp: 'Dormir mal reduz foco, memória e humor.' },
-    { q: 'Organizar tarefas ajuda a reduzir o estresse.', a: true, exp: 'Ter um plano claro reduz ansiedade.' },
-    { q: 'Multitasking é mais eficiente que focar em 1 coisa.', a: false, exp: 'Multitasking reduz a qualidade de cada tarefa.' },
-    { q: 'Exercício físico melhora a concentração.', a: true, exp: 'Atividade física libera dopamina e melhora o foco.' },
-    { q: 'Listas de tarefas são inúteis para TDAH.', a: false, exp: 'Listas visuais são muito eficazes para TDAH!' },
-    { q: 'Celebrar pequenas conquistas é importante.', a: true, exp: 'Recompensas motivam a continuar.' }
+const TF_BANK = [
+    // TDAH e cognição
+    { q: 'TDAH é um transtorno exclusivo de crianças.',                         a: false, exp: 'TDAH persiste na vida adulta em até 60% dos casos.' },
+    { q: 'Exercício físico libera dopamina e melhora o foco.',                  a: true,  exp: 'Atividade física é uma das melhores intervenções naturais para TDAH.' },
+    { q: 'Pessoas com TDAH não conseguem se concentrar em nada.',               a: false, exp: 'Em atividades de alto interesse, o foco pode ser intenso (hiperfoco).' },
+    { q: 'Dormir pouco reduz memória, humor e concentração.',                   a: true,  exp: 'O sono é essencial para consolidar memórias e regular emoções.' },
+    { q: 'TDAH afeta apenas meninos.',                                          a: false, exp: 'Meninas também têm TDAH, mas com sintomas diferentes e subdiagnosticados.' },
+    { q: 'Medicação é o único tratamento eficaz para TDAH.',                    a: false, exp: 'Terapia, exercício, rotina e jogos cognitivos também são tratamentos válidos.' },
+    { q: 'Hiperfoco é uma característica comum no TDAH.',                       a: true,  exp: 'Hiperfoco é concentração intensa em assuntos de alto interesse.' },
+    // Produtividade e foco
+    { q: 'Fazer pausas curtas aumenta a produtividade.',                        a: true,  exp: 'A técnica Pomodoro comprova isso com ciclos de 25+5 min.' },
+    { q: 'Multitasking é mais eficiente que focar em uma tarefa.',              a: false, exp: 'Alternar tarefas reduz qualidade e aumenta o tempo total gasto.' },
+    { q: 'Estudar com música sempre melhora o foco.',                           a: false, exp: 'Depende do tipo de música e da pessoa — letras podem distrair.' },
+    { q: 'Escrever tarefas à mão melhora a memorização.',                       a: true,  exp: 'A escrita manual ativa mais áreas do cérebro do que digitar.' },
+    { q: 'Listas de tarefas são inúteis para pessoas com TDAH.',                a: false, exp: 'Listas visuais são uma das ferramentas mais eficazes para TDAH.' },
+    { q: 'Organizar o ambiente de estudo melhora a concentração.',              a: true,  exp: 'Ambientes desorganizados aumentam distração e ansiedade.' },
+    { q: 'Revisar o conteúdo logo após aprender aumenta a retenção.',           a: true,  exp: 'A curva do esquecimento de Ebbinghaus mostra que revisões precoces fixam mais.' },
+    { q: 'Procrastinar sempre indica preguiça.',                                a: false, exp: 'Procrastinação geralmente envolve regulação emocional e ansiedade, não preguiça.' },
+    // Saúde mental e bem-estar
+    { q: 'Celebrar pequenas conquistas motiva a continuar.',                    a: true,  exp: 'Recompensas ativam o sistema de dopamina e reforçam comportamentos positivos.' },
+    { q: 'Ansiedade e TDAH nunca ocorrem juntos.',                              a: false, exp: 'Ansiedade é uma das comorbidades mais comuns no TDAH.' },
+    { q: 'Respiração profunda pode reduzir o estresse rapidamente.',            a: true,  exp: 'Técnicas de respiração ativam o sistema nervoso parassimpático.' },
+    { q: 'Redes sociais não afetam a atenção de jovens com TDAH.',              a: false, exp: 'Notificações e rolagem infinita são especialmente prejudiciais para TDAH.' },
+    { q: 'Mindfulness pode ajudar a melhorar o foco em pessoas com TDAH.',      a: true,  exp: 'Estudos mostram redução de sintomas com prática regular de mindfulness.' },
+    // Organização e rotina
+    { q: 'Rotinas fixas ajudam pessoas com TDAH a se organizar.',               a: true,  exp: 'Previsibilidade reduz a carga cognitiva e facilita a execução.' },
+    { q: 'Usar alarmes e lembretes é sinal de fraqueza.',                       a: false, exp: 'Ferramentas externas de memória são estratégias inteligentes e recomendadas.' },
+    { q: 'Dividir tarefas grandes em etapas menores facilita a execução.',      a: true,  exp: 'Tarefas menores reduzem a paralisia por análise e o início é mais fácil.' },
+    { q: 'A técnica Pomodoro usa blocos de 25 minutos de foco.',                a: true,  exp: 'O ciclo padrão é 25 min de foco + 5 min de pausa.' },
+    { q: 'Priorizar tarefas é desnecessário se você tem boa memória.',          a: false, exp: 'Priorização é uma habilidade executiva essencial, independente da memória.' },
+    // Curiosidades do cérebro
+    { q: 'O cérebro humano usa apenas 10% de sua capacidade.',                  a: false, exp: 'Esse mito foi derrubado — usamos virtualmente todo o cérebro.' },
+    { q: 'Aprender coisas novas cria novas conexões neurais.',                  a: true,  exp: 'Neuroplasticidade permite ao cérebro se reorganizar ao longo da vida.' },
+    { q: 'Jogar games cognitivos pode melhorar memória de trabalho.',           a: true,  exp: 'Jogos que exigem atenção e memória fortalecem essas funções executivas.' },
+    { q: 'A memória funciona como uma gravação perfeita dos eventos.',          a: false, exp: 'A memória é reconstrutiva e pode ser influenciada por emoções e contexto.' },
+    { q: 'Emoções positivas facilitam o aprendizado e a memória.',              a: true,  exp: 'Emoções ativam a amígdala, que intensifica a consolidação de memórias.' },
 ];
 
-let tfIndex = 0, tfScore = 0, tfAnswered = false;
+// Embaralha o banco e pega 10 perguntas por rodada
+let tfQueue    = [];
+let tfIndex    = 0;
+let tfScore    = 0;
+let tfAnswered = false;
+let tfTimer    = null;
+let tfTimeLeft = 0;
+const TF_TIME_PER_Q = 12; // segundos por pergunta
 
 function startTrueFalseGame() {
-    tfIndex = 0; tfScore = 0; tfAnswered = false;
+    // Embaralha e sorteia 10 perguntas
+    tfQueue    = [...TF_BANK].sort(() => Math.random() - 0.5).slice(0, 10);
+    tfIndex    = 0;
+    tfScore    = 0;
+    tfAnswered = false;
+    clearInterval(tfTimer);
     renderTFQuestion();
 }
 
 function renderTFQuestion() {
-    const el = document.getElementById('trueFalseQuestion');
-    const fb = document.getElementById('trueFalseFeedback');
-    const sc = document.getElementById('trueFalseScore');
-    const pr = document.getElementById('tfProgress');
+    const el      = document.getElementById('trueFalseQuestion');
+    const fb      = document.getElementById('trueFalseFeedback');
+    const sc      = document.getElementById('trueFalseScore');
+    const pr      = document.getElementById('tfProgress');
+    const barWrap = document.getElementById('tfTimerBar');
+    const barFill = document.getElementById('tfTimerFill');
     tfAnswered = false;
+    clearInterval(tfTimer);
 
-    if (tfIndex >= TF_QUESTIONS.length) {
-        const pct = Math.round((tfScore / TF_QUESTIONS.length) * 100);
-        el.textContent = '🏁 Fim do jogo!';
-        fb.textContent = `Você acertou ${tfScore}/${TF_QUESTIONS.length} (${pct}%)!`;
-        fb.style.background = pct >= 60 ? '#dcfce7' : '#fee2e2';
-        fb.style.color = pct >= 60 ? '#16a34a' : '#dc2626';
-        sc.textContent = '';
+    if (tfIndex >= tfQueue.length) {
+        // Fim de jogo
+        const pct = Math.round((tfScore / tfQueue.length) * 100);
+        const medal = pct === 100 ? '🏆' : pct >= 70 ? '🥈' : pct >= 50 ? '🥉' : '💪';
+        el.textContent  = `${medal} Fim do jogo!`;
+        fb.textContent  = `Você acertou ${tfScore}/${tfQueue.length} (${pct}%)`;
+        fb.style.background = pct >= 70 ? '#dcfce7' : pct >= 50 ? '#fef3c7' : '#fee2e2';
+        fb.style.color      = pct >= 70 ? '#16a34a' : pct >= 50 ? '#d97706' : '#dc2626';
+        if (sc) sc.textContent = '';
         if (pr) pr.textContent = '';
+        if (barWrap) barWrap.style.display = 'none';
         registerGame();
         return;
     }
 
-    el.textContent = TF_QUESTIONS[tfIndex].q;
-    fb.textContent = '';
+    const q = tfQueue[tfIndex];
+    el.textContent      = q.q;
+    fb.textContent      = '';
     fb.style.background = 'transparent';
-    sc.textContent = `Pergunta ${tfIndex + 1} de ${TF_QUESTIONS.length}`;
-    if (pr) pr.textContent = `${tfScore} acerto(s) até agora`;
+    fb.style.color      = '';
+    if (sc) sc.textContent = `Pergunta ${tfIndex + 1} de ${tfQueue.length}`;
+    if (pr) {
+        // Bolinhas de progresso
+        pr.innerHTML = tfQueue.map((_, i) => {
+            if (i < tfIndex) {
+                const wasCorrect = pr.dataset[`q${i}`] === '1';
+                return `<span class="tf-dot ${wasCorrect ? 'dot-ok' : 'dot-err'}"></span>`;
+            }
+            return `<span class="tf-dot ${i === tfIndex ? 'dot-active' : ''}"></span>`;
+        }).join('');
+    }
+
+    // Timer
+    tfTimeLeft = TF_TIME_PER_Q;
+    if (barWrap) barWrap.style.display = 'block';
+    if (barFill) {
+        barFill.style.transition = 'none';
+        barFill.style.width = '100%';
+        // Força reflow antes de animar
+        barFill.offsetWidth;
+        barFill.style.transition = `width ${TF_TIME_PER_Q}s linear`;
+        barFill.style.width = '0%';
+    }
+    updateTFTimer();
+    tfTimer = setInterval(() => {
+        tfTimeLeft--;
+        updateTFTimer();
+        if (tfTimeLeft <= 0) {
+            clearInterval(tfTimer);
+            // Tempo esgotado — conta como erro
+            if (!tfAnswered) {
+                tfAnswered = true;
+                const q2 = tfQueue[tfIndex];
+                if (fb) {
+                    fb.textContent  = `⏰ Tempo! A resposta era: ${q2.a ? 'Verdadeiro' : 'Falso'}. ${q2.exp}`;
+                    fb.style.background = '#fee2e2';
+                    fb.style.color      = '#dc2626';
+                }
+                if (pr) pr.dataset[`q${tfIndex}`] = '0';
+                tfIndex++;
+                setTimeout(renderTFQuestion, 2200);
+            }
+        }
+    }, 1000);
+}
+
+function updateTFTimer() {
+    const el = document.getElementById('tfTimerCount');
+    if (el) {
+        el.textContent = `${tfTimeLeft}s`;
+        el.style.color = tfTimeLeft <= 4 ? '#ef4444' : 'var(--text-accent)';
+    }
 }
 
 function answerTrueFalse(answer) {
     if (tfAnswered) return;
     tfAnswered = true;
-    const q = TF_QUESTIONS[tfIndex];
+    clearInterval(tfTimer);
+
+    const q       = tfQueue[tfIndex];
     const correct = (answer === 'true') === q.a;
-    const fb = document.getElementById('trueFalseFeedback');
+    const fb      = document.getElementById('trueFalseFeedback');
+    const pr      = document.getElementById('tfProgress');
+
+    // Para a barra visualmente
+    const barFill = document.getElementById('tfTimerFill');
+    if (barFill) {
+        const cur = barFill.getBoundingClientRect().width / barFill.parentElement.getBoundingClientRect().width * 100;
+        barFill.style.transition = 'none';
+        barFill.style.width = `${cur}%`;
+    }
+
     if (correct) {
         tfScore++;
-        fb.textContent = `✅ Correto! ${q.exp}`;
+        fb.textContent  = `✅ Correto! ${q.exp}`;
         fb.style.background = '#dcfce7';
-        fb.style.color = '#16a34a';
+        fb.style.color      = '#16a34a';
+        if (pr) pr.dataset[`q${tfIndex}`] = '1';
     } else {
-        fb.textContent = `❌ Errado! ${q.exp}`;
+        fb.textContent  = `❌ Errado! A resposta era: ${q.a ? 'Verdadeiro' : 'Falso'}. ${q.exp}`;
         fb.style.background = '#fee2e2';
-        fb.style.color = '#dc2626';
+        fb.style.color      = '#dc2626';
+        if (pr) pr.dataset[`q${tfIndex}`] = '0';
     }
+
+    const sc = document.getElementById('trueFalseScore');
+    if (sc) sc.textContent = `Pergunta ${tfIndex + 1} de ${tfQueue.length}`;
+
     tfIndex++;
-    setTimeout(renderTFQuestion, 2200);
+    setTimeout(renderTFQuestion, 2400);
 }
 
 // ── JOGO: Memória — Pares ──────────────────────────────
-const MEMORY_EMOJIS = ['🧠', '⭐', '🎯', '🎮', '🚀', '💡', '🌈', '🦋'];
+// ── JOGO: Memória com Dificuldade Progressiva ─────────
+const MEMORY_LEVELS = [
+    { level: 1, pairs: 4,  cols: 4, label: 'Fácil',   emojis: ['🧠','⭐','🎯','🎮'] },
+    { level: 2, pairs: 6,  cols: 4, label: 'Médio',   emojis: ['🧠','⭐','🎯','🎮','🚀','💡'] },
+    { level: 3, pairs: 8,  cols: 4, label: 'Difícil', emojis: ['🧠','⭐','🎯','🎮','🚀','💡','🌈','🦋'] },
+    { level: 4, pairs: 10, cols: 5, label: 'Expert',  emojis: ['🧠','⭐','🎯','🎮','🚀','💡','🌈','🦋','🔥','🎨'] },
+    { level: 5, pairs: 12, cols: 6, label: 'Mestre',  emojis: ['🧠','⭐','🎯','🎮','🚀','💡','🌈','🦋','🔥','🎨','🏆','🦄'] },
+];
+
+let memLevel = 0;
 let memFirst = null, memSecond = null, memAttempts = 0, memFound = 0;
 let memTimerInterval = null, memTimerSec = 0;
+let memLocked = false;
 
-function startMemoryPairsGame() {
-    memFirst = null; memSecond = null;
+function startMemoryPairsGame(resetLevel = true) {
+    if (resetLevel) memLevel = 0;
+    memFirst = null; memSecond = null; memLocked = false;
     memAttempts = 0; memFound = 0; memTimerSec = 0;
     clearInterval(memTimerInterval);
 
-    const update = () => {
-        const a = document.getElementById('memoryAttempts');
-        const f = document.getElementById('memoryFound');
-        const t = document.getElementById('memoryTime');
-        if (a) a.textContent = memAttempts;
-        if (f) f.textContent = memFound;
-        if (t) t.textContent = `${memTimerSec}s`;
-    };
-    update();
+    const lvl = MEMORY_LEVELS[memLevel];
+
+    // Atualiza UI de nível
+    const lvlEl = document.getElementById('memoryLevel');
+    const pairsEl = document.getElementById('memoryFound');
+    const totalEl = document.getElementById('memoryTotal');
+    if (lvlEl)   lvlEl.textContent   = `Nível ${lvl.level} — ${lvl.label}`;
+    if (pairsEl) pairsEl.textContent = '0';
+    if (totalEl) totalEl.textContent = lvl.pairs;
+    document.getElementById('memoryAttempts').textContent = '0';
+    document.getElementById('memoryTime').textContent     = '0s';
+    document.getElementById('memoryPairsFeedback').textContent = '';
 
     memTimerInterval = setInterval(() => {
         memTimerSec++;
@@ -780,129 +784,285 @@ function startMemoryPairsGame() {
         if (t) t.textContent = `${memTimerSec}s`;
     }, 1000);
 
-    document.getElementById('memoryPairsFeedback').textContent = '';
-
     const board = document.getElementById('memoryPairsBoard');
     board.innerHTML = '';
+    board.style.gridTemplateColumns = `repeat(${lvl.cols}, 1fr)`;
 
-    const pairs = [...MEMORY_EMOJIS, ...MEMORY_EMOJIS].sort(() => Math.random() - 0.5);
+    const pairs = [...lvl.emojis, ...lvl.emojis].sort(() => Math.random() - 0.5);
     pairs.forEach(emoji => {
         const tile = document.createElement('div');
         tile.className = 'memory-tile';
-        tile.innerHTML = `<span class="tile-back">${emoji}</span>`;
+        tile.innerHTML = `
+            <div class="tile-inner">
+                <div class="tile-front"></div>
+                <div class="tile-back">${emoji}</div>
+            </div>`;
         tile.dataset.val = emoji;
-        tile.addEventListener('click', () => flipMemoryTile(tile, update));
+        tile.addEventListener('click', () => flipMemoryTile(tile));
         board.appendChild(tile);
     });
 }
 
-function flipMemoryTile(tile, updateStats) {
-    if (tile.classList.contains('flipped') || tile.classList.contains('matched') || memSecond) return;
+function flipMemoryTile(tile) {
+    if (memLocked) return;
+    if (tile.classList.contains('flipped') || tile.classList.contains('matched')) return;
+
     tile.classList.add('flipped');
 
-    if (!memFirst) {
-        memFirst = tile;
-        return;
-    }
+    if (!memFirst) { memFirst = tile; return; }
+
     memSecond = tile;
+    memLocked = true;
     memAttempts++;
-    if (updateStats) updateStats();
+    document.getElementById('memoryAttempts').textContent = memAttempts;
 
     if (memFirst.dataset.val === memSecond.dataset.val) {
         memFirst.classList.add('matched');
         memSecond.classList.add('matched');
         memFound++;
-        if (updateStats) updateStats();
+        document.getElementById('memoryFound').textContent = memFound;
         memFirst = null; memSecond = null;
-        if (memFound === MEMORY_EMOJIS.length) {
+        memLocked = false;
+
+        const lvl = MEMORY_LEVELS[memLevel];
+        if (memFound === lvl.pairs) {
             clearInterval(memTimerInterval);
-            document.getElementById('memoryPairsFeedback').textContent =
-                `🎉 Parabéns! Todos os pares em ${memAttempts} tentativas e ${memTimerSec}s!`;
-            registerGame();
+            const isLast = memLevel === MEMORY_LEVELS.length - 1;
+            const fb = document.getElementById('memoryPairsFeedback');
+
+            if (!isLast) {
+                fb.textContent = `✅ Nível ${lvl.level} completo em ${memTimerSec}s! Próximo nível em 2s...`;
+                fb.style.color = '#16a34a';
+                registerGame();
+                memLevel++;
+                setTimeout(() => startMemoryPairsGame(false), 2000);
+            } else {
+                fb.textContent = `🏆 Mestre da Memória! Todos os níveis em ${memAttempts} tentativas!`;
+                fb.style.color = '#f59e0b';
+                registerGame();
+            }
         }
     } else {
         setTimeout(() => {
             memFirst.classList.remove('flipped');
             memSecond.classList.remove('flipped');
             memFirst = null; memSecond = null;
+            memLocked = false;
         }, 900);
     }
 }
 
 // ── JOGO: Caça-Palavras ────────────────────────────────
-const WORD_LIST = ['FOCO', 'ATENÇÃO', 'MEMÓRIA', 'ESTUDO', 'PLANO', 'TEMPO', 'META', 'HÁBITO'];
-let wsWord = '', wsGrid = [], wsSelected = [];
+// ── JOGO: Caça-Palavras (refatorado) ──────────────────
+const WORD_LIST = [
+    'FOCO', 'ATENCAO', 'MEMORIA', 'ESTUDO', 'PLANO', 'TEMPO',
+    'META', 'HABITO', 'TAREFA', 'ROTINA', 'CALMA', 'FORCA',
+    'MENTE', 'RITMO', 'TREINO', 'PAUSA', 'ORDEM', 'PRAZO',
+    'IDEIA', 'LOGICA', 'ALERTA', 'DESAFIO', 'SOLUCAO', 'INICIO'
+];
+
+// Direções: [deltaRow, deltaCol]
+const WS_DIRS = [
+    [0,  1],   // →  horizontal
+    [1,  0],   // ↓  vertical
+    [1,  1],   // ↘  diagonal
+    [1, -1],   // ↙  diagonal inversa
+];
+
+const WS_COLS  = 8;
+const WS_ROWS  = 8;
+const WS_TOTAL = WS_COLS * WS_ROWS;
+const ALPHA    = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+let wsWord        = '';
+let wsGrid        = [];       // letras da grade (flat array)
+let wsWordIndices = new Set(); // índices que pertencem à palavra escondida
+let wsSelected    = [];        // índices selecionados pelo jogador
+let wsSelCells    = [];        // elementos DOM selecionados
+let wsIsDragging  = false;
+let wsScore       = 0;
+let wsRound       = 0;
 
 function startWordSearch() {
-    wsWord = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
-    wsGrid = []; wsSelected = [];
+    // Escolhe palavra que não tenha sido usada recentemente
+    wsRound++;
+    const candidates = WORD_LIST.filter(w => w !== wsWord);
+    wsWord = candidates[Math.floor(Math.random() * candidates.length)];
 
-    document.getElementById('wordSearchHint').textContent = `🔎 Encontre a palavra: ${wsWord}`;
+    wsGrid        = [];
+    wsWordIndices = new Set();
+    wsSelected    = [];
+    wsSelCells    = [];
+    wsIsDragging  = false;
+
     document.getElementById('wordSearchFeedback').textContent = '';
+    document.getElementById('wordSearchHint').textContent     = `🔎 Encontre: ${wsWord}`;
 
-    const ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const TOTAL = 36;
-    for (let i = 0; i < TOTAL; i++) wsGrid.push(ALPHA[Math.floor(Math.random() * ALPHA.length)]);
+    const scoreEl = document.getElementById('wsScore');
+    const roundEl = document.getElementById('wsRound');
+    if (scoreEl) scoreEl.textContent = wsScore;
+    if (roundEl) roundEl.textContent = wsRound;
 
-    // Inserir palavra horizontalmente em posição aleatória (sem ultrapassar linha)
-    const cols = 6;
-    const maxStart = TOTAL - wsWord.length;
-    let start = Math.floor(Math.random() * maxStart);
-    // Ajuste para não quebrar linhas
-    const row = Math.floor(start / cols);
-    if (start + wsWord.length > (row + 1) * cols) start = row * cols;
-    for (let i = 0; i < wsWord.length; i++) wsGrid[start + i] = wsWord[i];
+    // Preenche grade com letras aleatórias
+    for (let i = 0; i < WS_TOTAL; i++) {
+        wsGrid.push(ALPHA[Math.floor(Math.random() * ALPHA.length)]);
+    }
 
-    const gridEl = document.getElementById('wordGrid');
-    gridEl.innerHTML = '';
-    wsGrid.forEach((letter, idx) => {
-        const cell = document.createElement('div');
-        cell.className = 'word-cell';
-        cell.textContent = letter;
-        cell.addEventListener('click', () => selectWordCell(idx, cell));
-        gridEl.appendChild(cell);
-    });
-}
+    // Tenta inserir a palavra em direção e posição aleatórias
+    let placed = false;
+    let attempts = 0;
+    while (!placed && attempts < 200) {
+        attempts++;
+        const dir  = WS_DIRS[Math.floor(Math.random() * WS_DIRS.length)];
+        const [dr, dc] = dir;
+        const len  = wsWord.length;
 
-function selectWordCell(idx, cell) {
-    if (cell.classList.contains('selected') || cell.classList.contains('correct')) return;
-    wsSelected.push(idx);
-    cell.classList.add('selected');
+        // Calcula limites de start
+        const rowMax = dr === 0 ? WS_ROWS - 1 : dr > 0 ? WS_ROWS - len : len - 1;
+        const colMax = dc === 0 ? WS_COLS - 1 : dc > 0 ? WS_COLS - len : len - 1;
+        const colMin = dc < 0  ? len - 1 : 0;
 
-    const formed = wsSelected.map(i => wsGrid[i]).join('');
-    const fb = document.getElementById('wordSearchFeedback');
+        if (rowMax < 0 || colMax < colMin) continue;
 
-    if (wsSelected.length === wsWord.length) {
-        if (formed === wsWord) {
-            document.querySelectorAll('.word-cell.selected').forEach(c => {
-                c.classList.remove('selected');
-                c.classList.add('correct');
+        const startRow = Math.floor(Math.random() * (rowMax + 1));
+        const startCol = colMin + Math.floor(Math.random() * (colMax - colMin + 1));
+
+        // Verifica se cabe sem conflito ou sobrescrevendo letra diferente
+        const indices = [];
+        let ok = true;
+        for (let i = 0; i < len; i++) {
+            const r = startRow + dr * i;
+            const c = startCol + dc * i;
+            const idx = r * WS_COLS + c;
+            if (wsGrid[idx] !== wsWord[i] && wsWordIndices.has(idx)) { ok = false; break; }
+            indices.push(idx);
+        }
+
+        if (ok) {
+            indices.forEach((idx, i) => {
+                wsGrid[idx] = wsWord[i];
+                wsWordIndices.add(idx);
             });
-            fb.textContent = `✅ Palavra "${wsWord}" encontrada!`;
-            fb.style.color = '#16a34a';
-            registerGame();
-            setTimeout(startWordSearch, 2000);
-        } else {
-            fb.textContent = `❌ Você formou "${formed}". Continue tentando!`;
-            fb.style.color = '#dc2626';
-            setTimeout(() => {
-                document.querySelectorAll('.word-cell.selected').forEach(c => c.classList.remove('selected'));
-                wsSelected = [];
-                fb.textContent = '';
-            }, 1200);
+            placed = true;
         }
     }
+
+    renderWordGrid();
+}
+
+function renderWordGrid() {
+    const gridEl = document.getElementById('wordGrid');
+    gridEl.innerHTML = '';
+    gridEl.style.gridTemplateColumns = `repeat(${WS_COLS}, 1fr)`;
+
+    wsGrid.forEach((letter, idx) => {
+        const cell = document.createElement('div');
+        cell.className   = 'word-cell';
+        cell.textContent = letter;
+        cell.dataset.idx = idx;
+
+        // Suporte a clique E drag
+        cell.addEventListener('mousedown',  () => wsStartSelect(idx, cell));
+        cell.addEventListener('mouseenter', () => wsExtendSelect(idx, cell));
+        cell.addEventListener('touchstart', e => { e.preventDefault(); wsStartSelect(idx, cell); }, { passive: false });
+        cell.addEventListener('touchmove',  e => {
+            e.preventDefault();
+            const t = e.touches[0];
+            const el = document.elementFromPoint(t.clientX, t.clientY);
+            if (el && el.classList.contains('word-cell')) {
+                wsExtendSelect(Number(el.dataset.idx), el);
+            }
+        }, { passive: false });
+
+        gridEl.appendChild(cell);
+    });
+
+    // Confirmar seleção ao soltar o mouse em qualquer lugar
+    document.addEventListener('mouseup',  wsConfirmSelect, { once: false });
+    document.addEventListener('touchend', wsConfirmSelect, { once: false });
+}
+
+function wsStartSelect(idx, cell) {
+    wsIsDragging = true;
+    wsSelected   = [idx];
+    wsSelCells   = [cell];
+    cell.classList.add('selected');
+}
+
+function wsExtendSelect(idx, cell) {
+    if (!wsIsDragging) return;
+    if (cell.classList.contains('correct')) return;
+    if (wsSelected.includes(idx)) return;
+
+    wsSelected.push(idx);
+    wsSelCells.push(cell);
+    cell.classList.add('selected');
+}
+
+function wsConfirmSelect() {
+    if (!wsIsDragging) return;
+    wsIsDragging = false;
+
+    const formed = wsSelected.map(i => wsGrid[i]).join('');
+    const fb     = document.getElementById('wordSearchFeedback');
+
+    // Verifica se a seleção é contígua e em linha reta
+    const isValid = wsIsLine(wsSelected);
+    const isMatch = isValid && (formed === wsWord || formed === [...wsWord].reverse().join(''));
+
+    if (isMatch) {
+        wsSelCells.forEach(c => {
+            c.classList.remove('selected');
+            c.classList.add('correct');
+        });
+        wsScore += 10;
+        fb.textContent = `✅ "${wsWord}" encontrada! +10 pontos`;
+        fb.style.color = '#16a34a';
+        registerGame();
+
+        const scoreEl = document.getElementById('wsScore');
+        if (scoreEl) scoreEl.textContent = wsScore;
+
+        setTimeout(startWordSearch, 1800);
+    } else {
+        wsSelCells.forEach(c => {
+            c.classList.remove('selected');
+            c.classList.add('wrong-flash');
+            setTimeout(() => c.classList.remove('wrong-flash'), 400);
+        });
+        if (wsSelected.length >= 2) {
+            fb.textContent = `❌ Não é a palavra. Continue tentando!`;
+            fb.style.color = '#dc2626';
+            setTimeout(() => { fb.textContent = ''; }, 1000);
+        }
+    }
+
+    wsSelected  = [];
+    wsSelCells  = [];
+}
+
+function wsIsLine(indices) {
+    if (indices.length < 2) return true;
+    const rows = indices.map(i => Math.floor(i / WS_COLS));
+    const cols = indices.map(i => i % WS_COLS);
+    const dr   = rows[1] - rows[0];
+    const dc   = cols[1] - cols[0];
+    for (let i = 1; i < indices.length; i++) {
+        if (rows[i] - rows[i-1] !== dr) return false;
+        if (cols[i] - cols[i-1] !== dc) return false;
+    }
+    return true;
 }
 
 // ── JOGO: Sequência Lógica ─────────────────────────────
 const SEQUENCES = [
-    { seq: [2, 4, 6, '?'], ans: 8, hint: '+2' },
-    { seq: [1, 3, 5, '?'], ans: 7, hint: '+2' },
-    { seq: [5, 10, 15, '?'], ans: 20, hint: '+5' },
-    { seq: [10, 9, 8, '?'], ans: 7, hint: '-1' },
-    { seq: [2, 6, 18, '?'], ans: 54, hint: '×3' },
-    { seq: [1, 4, 9, '?'], ans: 16, hint: 'quadrados' },
-    { seq: [3, 6, 12, '?'], ans: 24, hint: '×2' },
+    { seq: [2, 4, 6, '?'],    ans: 8,    hint: '+2' },
+    { seq: [1, 3, 5, '?'],    ans: 7,    hint: '+2' },
+    { seq: [5, 10, 15, '?'],  ans: 20,   hint: '+5' },
+    { seq: [10, 9, 8, '?'],   ans: 7,    hint: '-1' },
+    { seq: [2, 6, 18, '?'],   ans: 54,   hint: '×3' },
+    { seq: [1, 4, 9, '?'],    ans: 16,   hint: 'quadrados' },
+    { seq: [3, 6, 12, '?'],   ans: 24,   hint: '×2' },
     { seq: [100, 50, 25, '?'], ans: 12.5, hint: '÷2' }
 ];
 let seqLevel = 0, seqScore = 0, seqAnswered = false;
@@ -910,7 +1070,6 @@ let seqLevel = 0, seqScore = 0, seqAnswered = false;
 function startSequenceGame() {
     if (seqLevel >= SEQUENCES.length) seqLevel = 0;
     seqAnswered = false;
-
     const cur = SEQUENCES[seqLevel];
     document.getElementById('sequenceLevel').textContent = `Nível ${seqLevel + 1}`;
     document.getElementById('sequenceScore').textContent = `Pontos: ${seqScore}`;
@@ -918,20 +1077,18 @@ function startSequenceGame() {
     document.getElementById('sequenceFeedback').className = 'sequence-feedback';
     document.getElementById('sequenceQuestion').textContent = cur.seq.join('  →  ');
 
-    // Gerar opções
     const opts = new Set([cur.ans]);
     const offsets = [1, 2, 3, 4, 5, 6, 7, 8, 10];
     while (opts.size < 4) {
-        const off = offsets[Math.floor(Math.random() * offsets.length)];
+        const off  = offsets[Math.floor(Math.random() * offsets.length)];
         const sign = Math.random() > 0.5 ? 1 : -1;
         const fake = cur.ans + sign * off;
         if (fake !== cur.ans && fake > 0) opts.add(fake);
     }
-    const optArr = [...opts].sort(() => Math.random() - 0.5);
 
     const optContainer = document.getElementById('sequenceOptions');
     optContainer.innerHTML = '';
-    optArr.forEach(opt => {
+    [...opts].sort(() => Math.random() - 0.5).forEach(opt => {
         const btn = document.createElement('button');
         btn.className = 'sequence-opt-btn';
         btn.textContent = opt;
@@ -944,7 +1101,7 @@ function answerSequence(selected, btn) {
     if (seqAnswered) return;
     seqAnswered = true;
     const cur = SEQUENCES[seqLevel];
-    const fb = document.getElementById('sequenceFeedback');
+    const fb  = document.getElementById('sequenceFeedback');
 
     if (selected === cur.ans) {
         btn.classList.add('correct');
@@ -965,4 +1122,160 @@ function answerSequence(selected, btn) {
         fb.className = 'sequence-feedback wrong';
     }
     document.getElementById('sequenceScore').textContent = `Pontos: ${seqScore}`;
+}
+
+// ── JOGO: Encontre as Diferenças ──────────────────────
+const DIFF_POOL = ['🧠','⭐','🎯','🎮','🚀','💡','🌈','🦋','🔥','🎨','🏆','🦄',
+                   '🍎','🌙','🎸','🐶','🌺','🎪','🦊','🍕','🎭','🌊','🐱','🎲'];
+
+const DIFF_LEVELS = [
+    { level: 1, grid: 4, diffs: 3, time: 60,  label: 'Fácil'   },
+    { level: 2, grid: 5, diffs: 4, time: 50,  label: 'Médio'   },
+    { level: 3, grid: 6, diffs: 5, time: 40,  label: 'Difícil' },
+];
+
+let diffLevel       = 0;
+let diffGrid        = [];
+let diffPositions   = new Set(); // índices com diferença no painel B
+let diffFound       = new Set();
+let diffTimer       = null;
+let diffTimeLeft    = 60;
+
+function openDiffGame() {
+    openModal('diffGameModal');
+    diffLevel = 0;
+    startDiffGame();
+}
+
+function startDiffGame() {
+    clearInterval(diffTimer);
+    diffFound    = new Set();
+    diffPositions = new Set();
+
+    const lvl   = DIFF_LEVELS[diffLevel];
+    const total = lvl.grid * lvl.grid;
+    diffTimeLeft = lvl.time;
+
+    // Seleciona emojis únicos para preencher o grid
+    const pool = [...DIFF_POOL].sort(() => Math.random() - 0.5);
+    diffGrid = Array.from({ length: total }, (_, i) => pool[i % pool.length]);
+
+    // Escolhe índices aleatórios para diferenciar no painel B
+    while (diffPositions.size < lvl.diffs) {
+        diffPositions.add(Math.floor(Math.random() * total));
+    }
+
+    // Atualiza header
+    const lvlEl = document.getElementById('diffLevel');
+    if (lvlEl) lvlEl.textContent = `Nível ${lvl.level} — ${lvl.label}`;
+    updateDiffStats();
+    renderDiffBoards(lvl);
+
+    document.getElementById('diffFeedback').textContent = '';
+
+    // Timer
+    updateDiffTimer();
+    diffTimer = setInterval(() => {
+        diffTimeLeft--;
+        updateDiffTimer();
+        if (diffTimeLeft <= 0) {
+            clearInterval(diffTimer);
+            const fb = document.getElementById('diffFeedback');
+            fb.textContent = `⏰ Tempo esgotado! Você encontrou ${diffFound.size}/${lvl.diffs} diferenças.`;
+            fb.style.color = '#dc2626';
+            // Revela as não encontradas
+            document.querySelectorAll('.diff-cell.diff-b:not(.found)').forEach(c => c.classList.add('missed'));
+        }
+    }, 1000);
+}
+
+function renderDiffBoards(lvl) {
+    const total   = lvl.grid * lvl.grid;
+    const boardA  = document.getElementById('diffBoardA');
+    const boardB  = document.getElementById('diffBoardB');
+    boardA.innerHTML = '';
+    boardB.innerHTML = '';
+    boardA.style.gridTemplateColumns = `repeat(${lvl.grid}, 1fr)`;
+    boardB.style.gridTemplateColumns = `repeat(${lvl.grid}, 1fr)`;
+
+    // Pool diferente para substituição
+    const altPool = [...DIFF_POOL].filter(e => !diffGrid.includes(e));
+    if (altPool.length < lvl.diffs) altPool.push(...DIFF_POOL);
+
+    const diffEmojis = [...altPool].sort(() => Math.random() - 0.5).slice(0, lvl.diffs);
+    const posArr     = [...diffPositions];
+
+    for (let i = 0; i < total; i++) {
+        // Painel A — imutável
+        const cellA = document.createElement('div');
+        cellA.className = 'diff-cell diff-a';
+        cellA.textContent = diffGrid[i];
+        boardA.appendChild(cellA);
+
+        // Painel B — com diferenças
+        const cellB = document.createElement('div');
+        cellB.className = 'diff-cell diff-b';
+        const diffIdx = posArr.indexOf(i);
+        const isChanged = diffIdx !== -1;
+        cellB.textContent = isChanged ? diffEmojis[diffIdx] : diffGrid[i];
+        cellB.dataset.idx = i;
+        cellB.dataset.isDiff = isChanged ? '1' : '0';
+        cellB.addEventListener('click', () => onDiffClick(cellB));
+        boardB.appendChild(cellB);
+    }
+}
+
+function onDiffClick(cell) {
+    if (diffFound.size >= DIFF_LEVELS[diffLevel].diffs) return;
+    const idx    = cell.dataset.idx;
+    const isDiff = cell.dataset.isDiff === '1';
+
+    if (isDiff && !diffFound.has(idx)) {
+        diffFound.add(idx);
+        cell.classList.add('found');
+
+        // Marca célula correspondente no painel A
+        const cellsA = document.querySelectorAll('.diff-cell.diff-a');
+        if (cellsA[idx]) cellsA[idx].classList.add('found-a');
+
+        updateDiffStats();
+
+        const lvl = DIFF_LEVELS[diffLevel];
+        if (diffFound.size === lvl.diffs) {
+            clearInterval(diffTimer);
+            const fb = document.getElementById('diffFeedback');
+            const isLast = diffLevel === DIFF_LEVELS.length - 1;
+
+            if (!isLast) {
+                fb.textContent  = `✅ Nível ${lvl.level} completo! Próximo nível em 2s...`;
+                fb.style.color  = '#16a34a';
+                registerGame();
+                diffLevel++;
+                setTimeout(startDiffGame, 2000);
+            } else {
+                fb.textContent = `🏆 Campeão! Encontrou todas as diferenças nos 3 níveis!`;
+                fb.style.color = '#f59e0b';
+                registerGame();
+            }
+        }
+    } else if (!isDiff) {
+        cell.classList.add('wrong-click');
+        setTimeout(() => cell.classList.remove('wrong-click'), 500);
+    }
+}
+
+function updateDiffStats() {
+    const lvl = DIFF_LEVELS[diffLevel];
+    const foundEl = document.getElementById('diffFound');
+    const totalEl = document.getElementById('diffTotal');
+    if (foundEl) foundEl.textContent = diffFound.size;
+    if (totalEl) totalEl.textContent = lvl.diffs;
+}
+
+function updateDiffTimer() {
+    const el = document.getElementById('diffTimer');
+    if (el) {
+        el.textContent = `${diffTimeLeft}s`;
+        el.style.color = diffTimeLeft <= 10 ? '#ef4444' : 'var(--text-accent)';
+    }
 }
