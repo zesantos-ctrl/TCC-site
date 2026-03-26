@@ -24,9 +24,10 @@
                 </div>
                 <ul class="nav-menu" id="navMenu">
                     <li><a href="#home">Início</a></li>
-                    <li><a href="#games">Jogos</a></li>
+                    <li><a href="jogos/jogo.html">Jogos</a></li>
                     <li><a href="#tools">Ferramentas</a></li>
                     <li><a href="#about">Sobre TDAH</a></li>
+                    <li><a href="./psicologos/psicologos.html">Psicólogos</a></li>
                     <li><a href="./pomodoro/pomodoro.html">Pomodoro</a></li>
                     <li><a href="./calender/calender.html">Calendário</a></li>
                     <li><a href="./contato/contato.html">Contato</a></li>
@@ -92,7 +93,7 @@
         </div>
     </section>
 
-    <!-- JOGOS -->
+    <!-- JOGOS — Teaser CTA -->
     <section id="games" class="games-section">
         <div class="container">
             <div class="section-header">
@@ -100,106 +101,44 @@
                 <h2>Jogos Cognitivos</h2>
                 <p class="section-subtitle">Desenvolva suas habilidades de forma divertida</p>
             </div>
-            <div class="games-grid">
 
-                <div class="game-card" onclick="openGame('memoryPairs')">
-                    <div class="game-card-glow"></div>
-                    <div class="game-icon"><i class="fas fa-th"></i></div>
-                    <h3>Jogo da Memória</h3>
-                    <p>Encontre os pares escondidos e melhore sua memória visual</p>
-                    <div class="game-footer">
-                        <div class="game-stats">
-                            <span><i class="fas fa-clock"></i> 5-10 min</span>
-                            <span class="difficulty easy"><i class="fas fa-star"></i> Fácil</span>
-                        </div>
-                        <button class="play-btn"><i class="fas fa-play"></i></button>
-                    </div>
+            <div
+                style="background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:3.5rem 2rem;text-align:center;max-width:680px;margin:0 auto;position:relative;overflow:hidden;box-shadow:var(--shadow-lg);">
+                <div
+                    style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:300px;height:300px;background:radial-gradient(circle,rgba(91,110,245,.18),transparent 70%);pointer-events:none;">
                 </div>
-
-                <div class="game-card" onclick="openGame('wordSearch')">
-                    <div class="game-card-glow"></div>
-                    <div class="game-icon"><i class="fas fa-search"></i></div>
-                    <h3>Encontre a Palavra</h3>
-                    <p>Teste seu foco encontrando a palavra escondida na grade</p>
-                    <div class="game-footer">
-                        <div class="game-stats">
-                            <span><i class="fas fa-clock"></i> 3-5 min</span>
-                            <span class="difficulty easy"><i class="fas fa-star"></i> Fácil</span>
-                        </div>
-                        <button class="play-btn"><i class="fas fa-play"></i></button>
-                    </div>
+                <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-bottom:2rem;">
+                    <div
+                        style="width:58px;height:58px;border-radius:var(--radius-md);background:linear-gradient(135deg,var(--grad-start),var(--grad-end));display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#fff;box-shadow:var(--shadow-sm);">
+                        🃏</div>
+                    <div
+                        style="width:58px;height:58px;border-radius:var(--radius-md);background:linear-gradient(135deg,#06b6d4,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#fff;box-shadow:var(--shadow-sm);">
+                        🔎</div>
+                    <div
+                        style="width:58px;height:58px;border-radius:var(--radius-md);background:linear-gradient(135deg,#f59e0b,#ef4444);display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#fff;box-shadow:var(--shadow-sm);">
+                        ⚡</div>
+                    <div
+                        style="width:58px;height:58px;border-radius:var(--radius-md);background:linear-gradient(135deg,#10b981,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#fff;box-shadow:var(--shadow-sm);">
+                        🔢</div>
+                    <div
+                        style="width:58px;height:58px;border-radius:var(--radius-md);background:linear-gradient(135deg,#8b5cf6,#ec4899);display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#fff;box-shadow:var(--shadow-sm);">
+                        👁️</div>
+                    <div
+                        style="width:58px;height:58px;border-radius:var(--radius-md);background:linear-gradient(135deg,#f97316,#fbbf24);display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#fff;box-shadow:var(--shadow-sm);">
+                        🧠</div>
+                    <div
+                        style="width:58px;height:58px;border-radius:var(--radius-md);background:linear-gradient(135deg,var(--grad-start),#10b981);display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#fff;box-shadow:var(--shadow-sm);">
+                        📝</div>
                 </div>
-
-                <div class="game-card" onclick="openGame('organize')">
-                    <div class="game-card-glow"></div>
-                    <div class="game-icon"><i class="fas fa-sort"></i></div>
-                    <h3>Organize a Rotina</h3>
-                    <p>Aprenda a organizar tarefas e prioridades com drag & drop</p>
-                    <div class="game-footer">
-                        <div class="game-stats">
-                            <span><i class="fas fa-clock"></i> 10-15 min</span>
-                            <span class="difficulty easy"><i class="fas fa-star"></i> Fácil</span>
-                        </div>
-                        <button class="play-btn"><i class="fas fa-play"></i></button>
-                    </div>
-                </div>
-
-                <div class="game-card" onclick="openGame('sequence')">
-                    <div class="game-card-glow"></div>
-                    <div class="game-icon"><i class="fas fa-list-ol"></i></div>
-                    <h3>Sequência Lógica</h3>
-                    <p>Desenvolva raciocínio lógico completando sequências numéricas</p>
-                    <div class="game-footer">
-                        <div class="game-stats">
-                            <span><i class="fas fa-clock"></i> 5-8 min</span>
-                            <span class="difficulty medium"><i class="fas fa-star"></i> Médio</span>
-                        </div>
-                        <button class="play-btn"><i class="fas fa-play"></i></button>
-                    </div>
-                </div>
-
-                <div class="game-card" onclick="openColorGame()">
-                    <div class="game-card-glow"></div>
-                    <div class="game-icon"><i class="fas fa-bolt"></i></div>
-                    <h3>Jogo de Atenção</h3>
-                    <p>Teste sua rapidez clicando na cor certa antes do tempo acabar</p>
-                    <div class="game-footer">
-                        <div class="game-stats">
-                            <span><i class="fas fa-clock"></i> 1-5 min</span>
-                            <span class="difficulty easy"><i class="fas fa-star"></i> Fácil</span>
-                        </div>
-                        <button class="play-btn"><i class="fas fa-play"></i></button>
-                    </div>
-                </div>
-
-                <div class="game-card" onclick="openGame('trueFalse')">
-                    <div class="game-card-glow"></div>
-                    <div class="game-icon"><i class="fas fa-question-circle"></i></div>
-                    <h3>Verdadeiro ou Falso</h3>
-                    <p>Teste conhecimentos sobre foco, organização e produtividade</p>
-                    <div class="game-footer">
-                        <div class="game-stats">
-                            <span><i class="fas fa-clock"></i> 3-5 min</span>
-                            <span class="difficulty easy"><i class="fas fa-star"></i> Fácil</span>
-                        </div>
-                        <button class="play-btn"><i class="fas fa-play"></i></button>
-                    </div>
-                </div>
-
-                <div class="game-card" onclick="openGame('diffGame')">
-                    <div class="game-card-glow"></div>
-                    <div class="game-icon"><i class="fas fa-eye"></i></div>
-                    <h3>Encontre as Diferenças</h3>
-                    <p>Compare dois painéis e encontre o que mudou — 3 níveis progressivos</p>
-                    <div class="game-footer">
-                        <div class="game-stats">
-                            <span><i class="fas fa-clock"></i> 2-5 min</span>
-                            <span class="difficulty medium"><i class="fas fa-star"></i> Médio</span>
-                        </div>
-                        <button class="play-btn"><i class="fas fa-play"></i></button>
-                    </div>
-                </div>
-
+                <h3 style="font-size:1.6rem;font-weight:900;margin-bottom:.7rem;color:var(--text-primary);">7 jogos
+                    cognitivos esperando por você!</h3>
+                <p style="color:var(--text-tertiary);font-size:1rem;max-width:480px;margin:0 auto 2rem;">Memória,
+                    Caça-Palavras, Atenção, Sequência Lógica, Diferenças e muito mais. Todos desenvolvidos para treinar
+                    foco e raciocínio de um jeito divertido.</p>
+                <a href="jogos.html" class="btn-primary"
+                    style="display:inline-flex;align-items:center;gap:.6rem;text-decoration:none;font-size:1.05rem;padding:.85rem 2.2rem;">
+                    <i class="fas fa-gamepad"></i> Ir para os Jogos
+                </a>
             </div>
         </div>
     </section>
@@ -359,9 +298,10 @@
                 <div class="footer-section">
                     <h4>Links Úteis</h4>
                     <ul>
-                        <li><a href="#games">Jogos</a></li>
+                        <li><a href="jogos.html">Jogos</a></li>
                         <li><a href="#tools">Ferramentas</a></li>
                         <li><a href="#about">Sobre TDAH</a></li>
+                        <li><a href="./psicologos/psicologos.html">Psicólogos</a></li>
                         <li><a href="./pomodoro/pomodoro.html">Pomodoro &amp; Kanban</a></li>
                         <li><a href="./calender/calender.html">Calendário</a></li>
                     </ul>

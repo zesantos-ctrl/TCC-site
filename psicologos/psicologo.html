@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Psicólogos Parceiros — NeuroGame</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="psicologos.css">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <span>NeuroGame</span>
+                </div>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="../index.html#home">Início</a></li>
+                    <li><a href="../jogos.html">Jogos</a></li>
+                    <li><a href="../index.html#tools">Ferramentas</a></li>
+                    <li><a href="../index.html#about">Sobre TDAH</a></li>
+                    <li><a href="psicologos.html" class="active">Psicólogos</a></li>
+                    <li><a href="../pomodoro/pomodoro.html">Pomodoro</a></li>
+                    <li><a href="../calender/calender.html">Calendário</a></li>
+                    <li><a href="../contato/contato.html">Contato</a></li>
+                    <li id="navLoginLink"><a href="#" onclick="openModal('loginModal'); return false;">Login</a></li>
+                    <li id="navUserGreet" style="display:none">
+                        <div class="nav-user">
+                            <span class="nav-avatar" id="navUserAvatar">U</span>
+                            <span id="navUserName">Usuário</span>
+                            <button class="nav-logout-btn" onclick="logoutUser()" title="Sair">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+                <button class="theme-toggle-icon" id="theme-toggle-btn" aria-label="Alternar tema">
+                    <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                    </svg>
+                    <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" style="display:none">
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <path d="M12 2v2M12 20v2m-7.07-14.07 1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2m-4.34 5.66-1.41 1.41M6.34 6.34 4.93 4.93" />
+                    </svg>
+                </button>
+                <div class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- PAGE HERO -->
+    <div class="page-hero">
+        <div class="container">
+            <a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Voltar ao início</a>
+            <div class="hero-badge">🧑‍⚕️ Profissionais Parceiros</div>
+            <h1>Psicólogos Especializados</h1>
+            <p>Encontre profissionais com experiência em TDAH, neuropsicologia e desenvolvimento cognitivo</p>
+
+            <!-- Stats Row -->
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="hero-stat-num">48+</span>
+                    <span class="hero-stat-label">Profissionais parceiros</span>
+                </div>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat">
+                    <span class="hero-stat-num">2.300+</span>
+                    <span class="hero-stat-label">Pacientes atendidos</span>
+                </div>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat">
+                    <span class="hero-stat-num">4.9 ★</span>
+                    <span class="hero-stat-label">Avaliação média</span>
+                </div>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat">
+                    <span class="hero-stat-num">24h</span>
+                    <span class="hero-stat-label">Tempo de resposta</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <section class="psico-section">
+        <div class="container">
+
+            <!-- Info Banner -->
+            <div class="info-banner">
+                <i class="fas fa-shield-alt"></i>
+                <p>Todos os profissionais listados possuem <strong>registro ativo no CRP</strong> e especialização em TDAH ou neuropsicologia. O NeuroGame não realiza consultas — indicamos profissionais parceiros de confiança.</p>
+            </div>
+
+            <!-- Search + Filter Bar -->
+            <div class="search-filter-row">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar por nome ou especialidade..." oninput="buscarPsico(this.value)" />
+                    <button class="search-clear" id="searchClear" onclick="limparBusca()" style="display:none"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+
+            <div class="filter-bar">
+                <button class="filter-btn active" onclick="filterPsico('todos', this)">Todos</button>
+                <button class="filter-btn" onclick="filterPsico('online', this)">🖥️ Online</button>
+                <button class="filter-btn" onclick="filterPsico('presencial', this)">📍 Presencial</button>
+                <button class="filter-btn" onclick="filterPsico('hibrido', this)">🔄 Híbrido</button>
+                <button class="filter-btn" onclick="filterPsico('tdah', this)">🧠 TDAH</button>
+                <button class="filter-btn" onclick="filterPsico('infantil', this)">👦 Infantil</button>
+                <button class="filter-btn" onclick="filterPsico('adolescente', this)">🎓 Adolescente</button>
+            </div>
+
+            <!-- Contador de resultados -->
+            <p class="results-count" id="resultsCount">Exibindo <strong>6</strong> profissionais</p>
+
+            <!-- Grid de Psicólogos -->
+            <div class="psico-grid" id="psicoGrid">
+
+                <!-- Card 1 -->
+                <div class="psico-card" data-tags="online tdah adolescente" data-name="dra ana martins neuropsicologia">
+                    <div class="psico-disponivel disponivel">
+                        <i class="fas fa-circle"></i> Disponível esta semana
+                    </div>
+                    <div class="psico-header">
+                        <div class="psico-avatar">AM</div>
+                        <div class="psico-info">
+                            <h3>Dra. Ana Martins</h3>
+                            <span class="psico-crp">CRP 06/123456</span>
+                        </div>
+                    </div>
+                    <span class="psico-badge online"><i class="fas fa-circle"></i> Atendimento Online</span>
+                    <div class="psico-specialties">
+                        <span class="specialty-tag">TDAH</span>
+                        <span class="specialty-tag">Neuropsicologia</span>
+                        <span class="specialty-tag">Adolescentes</span>
+                    </div>
+                    <div class="psico-meta">
+                        <span><i class="fas fa-graduation-cap"></i> USP — Especialização em Neuropsicologia</span>
+                        <span><i class="fas fa-briefcase"></i> 8 anos de experiência</span>
+                        <span><i class="fas fa-dollar-sign"></i> R$ 150 – R$ 200 / sessão</span>
+                        <span><i class="fas fa-clock"></i> Seg, Qua, Sex · 9h às 18h</span>
+                        <span><i class="fas fa-comments"></i> Abordagem: Cognitivo-Comportamental (TCC)</span>
+                        <span><i class="fas fa-language"></i> Português, Inglês</span>
+                    </div>
+                    <div class="psico-tags-extra">
+                        <span class="tag-extra">Avaliação neuropsicológica</span>
+                        <span class="tag-extra">Orientação para pais</span>
+                        <span class="tag-extra">Psicoeducação</span>
+                    </div>
+                    <div class="psico-rating">
+                        <span class="stars">★★★★★</span>
+                        <span>4.9 <em>(124 avaliações)</em></span>
+                    </div>
+                    <div class="psico-proxima">
+                        <i class="fas fa-calendar-check"></i> Próxima vaga: <strong>Segunda-feira, 29/03</strong>
+                    </div>
+                    <div class="psico-actions">
+                        <button class="btn-agendar" onclick="abrirAgendamento('Dra. Ana Martins')">
+                            <i class="fas fa-calendar-plus"></i> Agendar
+                        </button>
+                        <button class="btn-perfil" onclick="abrirPerfil('ana')">
+                            <i class="fas fa-user"></i> Perfil
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="psico-card" data-tags="presencial tdah infantil" data-name="dr rafael silva psicologia infantil avaliação cognitiva">
+                    <div class="psico-header">
+                        <div class="psico-avatar" style="background: linear-gradient(135deg, #06b6d4, #3b82f6);">RS</div>
+                        <div class="psico-info">
+                            <h3>Dr. Rafael Silva</h3>
+                            <span class="psico-crp">CRP 06/234567</span>
+                        </div>
+                    </div>
+                    <span class="psico-badge presencial"><i class="fas fa-map-marker-alt"></i> Presencial · Pinheiros, SP</span>
+                    <div class="psico-specialties">
+                        <span class="specialty-tag">TDAH</span>
+                        <span class="specialty-tag">Psicologia Infantil</span>
+                        <span class="specialty-tag">Avaliação Cognitiva</span>
+                    </div>
+                    <div class="psico-meta">
+                        <span><i class="fas fa-graduation-cap"></i> UNICAMP — Mestrado em Neurociências</span>
+                        <span><i class="fas fa-briefcase"></i> 12 anos de experiência</span>
+                        <span><i class="fas fa-dollar-sign"></i> R$ 180 – R$ 250 / sessão</span>
+                        <span><i class="fas fa-map-marker-alt"></i> São Paulo — Pinheiros (próx. Metrô)</span>
+                        <span><i class="fas fa-comments"></i> Abordagem: Psicanálise + Neurociências</span>
+                        <span><i class="fas fa-language"></i> Português, Espanhol</span>
+                    </div>
+                    <div class="psico-tags-extra">
+                        <span class="tag-extra">Diagnóstico de TDAH</span>
+                        <span class="tag-extra">Laudos escolares</span>
+                        <span class="tag-extra">Dificuldades de aprendizagem</span>
+                    </div>
+                    <div class="psico-rating">
+                        <span class="stars">★★★★★</span>
+                        <span>4.8 <em>(89 avaliações)</em></span>
+                    </div>
+                    <div class="psico-proxima aguardando">
+                        <i class="fas fa-calendar-times"></i> Próxima vaga: <strong>Lista de espera (≈ 2 semanas)</strong>
+                    </div>
+                    <div class="psico-actions">
+                        <button class="btn-agendar" onclick="abrirAgendamento('Dr. Rafael Silva')">
+                            <i class="fas fa-calendar-plus"></i> Agendar
+                        </button>
+                        <button class="btn-perfil" onclick="abrirPerfil('rafael')">
+                            <i class="fas fa-user"></i> Perfil
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="psico-card destaque" data-tags="hibrido tdah infantil adolescente" data-name="dra larissa oliveira tcc infantil adolescente">
+                    <div class="psico-destaque-badge">⭐ Mais bem avaliada</div>
+                    <div class="psico-disponivel disponivel">
+                        <i class="fas fa-circle"></i> Disponível amanhã
+                    </div>
+                    <div class="psico-header">
+                        <div class="psico-avatar" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">LO</div>
+                        <div class="psico-info">
+                            <h3>Dra. Larissa Oliveira</h3>
+                            <span class="psico-crp">CRP 06/345678</span>
+                        </div>
+                    </div>
+                    <span class="psico-badge hibrido"><i class="fas fa-sync-alt"></i> Híbrido</span>
+                    <div class="psico-specialties">
+                        <span class="specialty-tag">TDAH</span>
+                        <span class="specialty-tag">TCC</span>
+                        <span class="specialty-tag">Infantil</span>
+                        <span class="specialty-tag">Adolescente</span>
+                    </div>
+                    <div class="psico-meta">
+                        <span><i class="fas fa-graduation-cap"></i> PUC-SP — Especialização em TCC</span>
+                        <span><i class="fas fa-briefcase"></i> 6 anos de experiência</span>
+                        <span><i class="fas fa-dollar-sign"></i> R$ 130 – R$ 180 / sessão</span>
+                        <span><i class="fas fa-clock"></i> Ter, Qui · 8h às 20h</span>
+                        <span><i class="fas fa-comments"></i> Abordagem: TCC Focada em Atenção</span>
+                        <span><i class="fas fa-language"></i> Português</span>
+                    </div>
+                    <div class="psico-tags-extra">
+                        <span class="tag-extra">Regulação emocional</span>
+                        <span class="tag-extra">Técnicas de foco</span>
+                        <span class="tag-extra">Suporte familiar</span>
+                    </div>
+                    <div class="psico-rating">
+                        <span class="stars">★★★★★</span>
+                        <span>5.0 <em>(62 avaliações)</em></span>
+                    </div>
+                    <div class="psico-proxima disponivel">
+                        <i class="fas fa-calendar-check"></i> Próxima vaga: <strong>Amanhã, 27/03 às 14h</strong>
+                    </div>
+                    <div class="psico-actions">
+                        <button class="btn-agendar" onclick="abrirAgendamento('Dra. Larissa Oliveira')">
+                            <i class="fas fa-calendar-plus"></i> Agendar
+                        </button>
+                        <button class="btn-perfil" onclick="abrirPerfil('larissa')">
+                            <i class="fas fa-user"></i> Perfil
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="psico-card" data-tags="online tdah adolescente" data-name="dr marcos costa ansiedade adultos adolescente">
+                    <div class="psico-disponivel disponivel">
+                        <i class="fas fa-circle"></i> Disponível hoje
+                    </div>
+                    <div class="psico-header">
+                        <div class="psico-avatar" style="background: linear-gradient(135deg, #10b981, #3b82f6);">MC</div>
+                        <div class="psico-info">
+                            <h3>Dr. Marcos Costa</h3>
+                            <span class="psico-crp">CRP 06/456789</span>
+                        </div>
+                    </div>
+                    <span class="psico-badge online"><i class="fas fa-circle"></i> Atendimento Online</span>
+                    <div class="psico-specialties">
+                        <span class="specialty-tag">TDAH</span>
+                        <span class="specialty-tag">Ansiedade</span>
+                        <span class="specialty-tag">Adolescentes</span>
+                        <span class="specialty-tag">Adultos</span>
+                    </div>
+                    <div class="psico-meta">
+                        <span><i class="fas fa-graduation-cap"></i> UNIFESP — Psicologia Clínica</span>
+                        <span><i class="fas fa-briefcase"></i> 10 anos de experiência</span>
+                        <span><i class="fas fa-dollar-sign"></i> R$ 160 – R$ 220 / sessão</span>
+                        <span><i class="fas fa-clock"></i> Seg a Sex · 8h às 22h</span>
+                        <span><i class="fas fa-comments"></i> Abordagem: Terapia de Aceitação e Compromisso (ACT)</span>
+                        <span><i class="fas fa-language"></i> Português, Inglês</span>
+                    </div>
+                    <div class="psico-tags-extra">
+                        <span class="tag-extra">TDAH em adultos</span>
+                        <span class="tag-extra">Ansiedade comórbida</span>
+                        <span class="tag-extra">Produtividade</span>
+                    </div>
+                    <div class="psico-rating">
+                        <span class="stars">★★★★☆</span>
+                        <span>4.7 <em>(201 avaliações)</em></span>
+                    </div>
+                    <div class="psico-proxima disponivel">
+                        <i class="fas fa-calendar-check"></i> Próxima vaga: <strong>Hoje · 19h ou 20h30</strong>
+                    </div>
+                    <div class="psico-actions">
+                        <button class="btn-agendar" onclick="abrirAgendamento('Dr. Marcos Costa')">
+                            <i class="fas fa-calendar-plus"></i> Agendar
+                        </button>
+                        <button class="btn-perfil" onclick="abrirPerfil('marcos')">
+                            <i class="fas fa-user"></i> Perfil
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="psico-card" data-tags="presencial infantil tdah" data-name="dra camila ferreira ludoterapia infantil">
+                    <div class="psico-header">
+                        <div class="psico-avatar" style="background: linear-gradient(135deg, #8b5cf6, #ec4899);">CF</div>
+                        <div class="psico-info">
+                            <h3>Dra. Camila Ferreira</h3>
+                            <span class="psico-crp">CRP 06/567890</span>
+                        </div>
+                    </div>
+                    <span class="psico-badge presencial"><i class="fas fa-map-marker-alt"></i> Presencial · Moema, SP</span>
+                    <div class="psico-specialties">
+                        <span class="specialty-tag">Psicologia Infantil</span>
+                        <span class="specialty-tag">TDAH</span>
+                        <span class="specialty-tag">Ludoterapia</span>
+                    </div>
+                    <div class="psico-meta">
+                        <span><i class="fas fa-graduation-cap"></i> UNESP — Especialização em Psicologia Infantil</span>
+                        <span><i class="fas fa-briefcase"></i> 9 anos de experiência</span>
+                        <span><i class="fas fa-dollar-sign"></i> R$ 140 – R$ 190 / sessão</span>
+                        <span><i class="fas fa-map-marker-alt"></i> São Paulo — Moema</span>
+                        <span><i class="fas fa-comments"></i> Abordagem: Ludoterapia + TCC Infantil</span>
+                        <span><i class="fas fa-language"></i> Português</span>
+                    </div>
+                    <div class="psico-tags-extra">
+                        <span class="tag-extra">Crianças 4–12 anos</span>
+                        <span class="tag-extra">Jogos terapêuticos</span>
+                        <span class="tag-extra">Escola e família</span>
+                    </div>
+                    <div class="psico-rating">
+                        <span class="stars">★★★★★</span>
+                        <span>4.9 <em>(77 avaliações)</em></span>
+                    </div>
+                    <div class="psico-proxima aguardando">
+                        <i class="fas fa-calendar-times"></i> Próxima vaga: <strong>Quarta, 02/04</strong>
+                    </div>
+                    <div class="psico-actions">
+                        <button class="btn-agendar" onclick="abrirAgendamento('Dra. Camila Ferreira')">
+                            <i class="fas fa-calendar-plus"></i> Agendar
+                        </button>
+                        <button class="btn-perfil" onclick="abrirPerfil('camila')">
+                            <i class="fas fa-user"></i> Perfil
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="psico-card" data-tags="hibrido tdah adolescente" data-name="dr bruno rocha neuropsicologia doutorado">
+                    <div class="psico-header">
+                        <div class="psico-avatar" style="background: linear-gradient(135deg, #ef4444, #f97316);">BR</div>
+                        <div class="psico-info">
+                            <h3>Dr. Bruno Rocha</h3>
+                            <span class="psico-crp">CRP 06/678901</span>
+                        </div>
+                    </div>
+                    <span class="psico-badge hibrido"><i class="fas fa-sync-alt"></i> Híbrido</span>
+                    <div class="psico-specialties">
+                        <span class="specialty-tag">TDAH</span>
+                        <span class="specialty-tag">Neuropsicologia</span>
+                        <span class="specialty-tag">Adolescentes</span>
+                    </div>
+                    <div class="psico-meta">
+                        <span><i class="fas fa-graduation-cap"></i> USP — Doutorado em Neuropsicologia</span>
+                        <span><i class="fas fa-briefcase"></i> 15 anos de experiência</span>
+                        <span><i class="fas fa-dollar-sign"></i> R$ 200 – R$ 300 / sessão</span>
+                        <span><i class="fas fa-clock"></i> Qua, Qui, Sex · 10h às 19h</span>
+                        <span><i class="fas fa-comments"></i> Abordagem: Neuropsicologia Cognitiva + EMDR</span>
+                        <span><i class="fas fa-language"></i> Português, Inglês, Francês</span>
+                    </div>
+                    <div class="psico-tags-extra">
+                        <span class="tag-extra">Laudos periciais</span>
+                        <span class="tag-extra">Reabilitação cognitiva</span>
+                        <span class="tag-extra">Pesquisa clínica</span>
+                    </div>
+                    <div class="psico-rating">
+                        <span class="stars">★★★★★</span>
+                        <span>4.8 <em>(155 avaliações)</em></span>
+                    </div>
+                    <div class="psico-proxima disponivel">
+                        <i class="fas fa-calendar-check"></i> Próxima vaga: <strong>Quinta, 27/03 às 10h</strong>
+                    </div>
+                    <div class="psico-actions">
+                        <button class="btn-agendar" onclick="abrirAgendamento('Dr. Bruno Rocha')">
+                            <i class="fas fa-calendar-plus"></i> Agendar
+                        </button>
+                        <button class="btn-perfil" onclick="abrirPerfil('bruno')">
+                            <i class="fas fa-user"></i> Perfil
+                        </button>
+                    </div>
+                </div>
+
+            </div><!-- /.psico-grid -->
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display:none">
+                <i class="fas fa-search"></i>
+                <h3>Nenhum profissional encontrado</h3>
+                <p>Tente outros termos ou remova os filtros aplicados.</p>
+                <button class="filter-btn active" onclick="limparTudo()">Ver todos os profissionais</button>
+            </div>
+
+            <!-- ── SEÇÃO: COMO FUNCIONA ── -->
+            <div class="como-funciona">
+                <h2><i class="fas fa-route"></i> Como funciona?</h2>
+                <div class="passos-grid">
+                    <div class="passo">
+                        <div class="passo-num">01</div>
+                        <div class="passo-icon"><i class="fas fa-filter"></i></div>
+                        <h4>Filtre e escolha</h4>
+                        <p>Use os filtros para encontrar o profissional ideal pelo seu perfil: online, presencial, especialidade ou faixa etária.</p>
+                    </div>
+                    <div class="passo">
+                        <div class="passo-num">02</div>
+                        <div class="passo-icon"><i class="fas fa-calendar-plus"></i></div>
+                        <h4>Solicite o agendamento</h4>
+                        <p>Preencha o formulário com seus dados e preferência de horário. A solicitação vai direto para o profissional.</p>
+                    </div>
+                    <div class="passo">
+                        <div class="passo-num">03</div>
+                        <div class="passo-icon"><i class="fas fa-phone-alt"></i></div>
+                        <h4>Aguarde o contato</h4>
+                        <p>O profissional entrará em contato em até <strong>24 horas</strong> para confirmar o horário e enviar as instruções.</p>
+                    </div>
+                    <div class="passo">
+                        <div class="passo-num">04</div>
+                        <div class="passo-icon"><i class="fas fa-heart"></i></div>
+                        <h4>Inicie sua jornada</h4>
+                        <p>Comece o acompanhamento especializado e use o NeuroGame como ferramenta complementar ao longo do processo.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── SEÇÃO: DEPOIMENTOS ── -->
+            <div class="depoimentos-section">
+                <h2>O que famílias dizem</h2>
+                <p class="depoimentos-sub">Histórias reais de quem encontrou o profissional certo pelo NeuroGame</p>
+                <div class="depoimentos-grid">
+                    <div class="depoimento-card">
+                        <div class="depoimento-stars">★★★★★</div>
+                        <p>"Meu filho de 9 anos foi diagnosticado com TDAH há 6 meses. A Dra. Larissa mudou completamente nossa dinâmica em casa. Recomendo demais!"</p>
+                        <div class="depoimento-autor">
+                            <div class="depoimento-avatar">PM</div>
+                            <div>
+                                <strong>Patrícia M.</strong>
+                                <span>Mãe do Lucas, 9 anos</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="depoimento-card">
+                        <div class="depoimento-stars">★★★★★</div>
+                        <p>"Encontrei o Dr. Marcos pela plataforma e foi a melhor decisão. Como adulto com TDAH, finalmente consigo trabalhar com mais foco e menos culpa."</p>
+                        <div class="depoimento-autor">
+                            <div class="depoimento-avatar">TG</div>
+                            <div>
+                                <strong>Thiago G.</strong>
+                                <span>Paciente, 28 anos</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="depoimento-card">
+                        <div class="depoimento-stars">★★★★★</div>
+                        <p>"O processo de agendamento foi simples e rápido. Em 30 minutos já tinha uma consulta marcada com a Dra. Ana. O NeuroGame facilita muito!"</p>
+                        <div class="depoimento-autor">
+                            <div class="depoimento-avatar">RF</div>
+                            <div>
+                                <strong>Roberto F.</strong>
+                                <span>Pai da Isa, 14 anos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── SEÇÃO: FAQ ── -->
+            <div class="faq-section">
+                <h2><i class="fas fa-question-circle"></i> Perguntas Frequentes</h2>
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>O NeuroGame realiza consultas psicológicas?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Não. O NeuroGame é uma plataforma de jogos cognitivos e ferramentas de produtividade para jovens com TDAH. Indicamos profissionais parceiros especializados, mas não prestamos serviços clínicos. O acompanhamento psicológico acontece diretamente entre você e o profissional escolhido.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>Como os psicólogos são selecionados para a plataforma?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Todos os profissionais passam por um processo de verificação: confirmamos o CRP ativo, solicitamos comprovação de especialização em TDAH ou neuropsicologia, e coletamos referências. Profissionais com avaliações abaixo de 4.5 são removidos automaticamente da listagem.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>O NeuroGame cobra alguma taxa pelo agendamento?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Não cobramos nada pelo uso da plataforma de indicação. O valor que você vê nos cards é cobrado diretamente pelo profissional, sem taxas adicionais da nossa parte.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>E se eu não me identificar com o profissional?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>É totalmente normal que a primeira escolha não seja a definitiva. A relação terapêutica é essencial para o processo. Se não se sentir confortável, entre em contato pelo nosso formulário e te ajudamos a encontrar outro profissional da lista.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>Existe opção de consulta com plano de saúde?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Alguns profissionais aceitam planos de saúde — verifique diretamente com o profissional durante o primeiro contato. Você também pode solicitar recibo para reembolso junto ao seu plano, dependendo da cobertura.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="psico-cta">
+                <h2>É psicólogo especializado em TDAH?</h2>
+                <p>Cadastre-se como profissional parceiro e ajude mais famílias a encontrar o apoio que precisam.</p>
+                <a href="../contato/contato.html" class="btn-cta-white">
+                    <i class="fas fa-user-md"></i> Quero ser parceiro
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <i class="fas fa-brain"></i>
+                        <span>NeuroGame</span>
+                    </div>
+                    <p>Desenvolvido por <strong>BrightMind Studios</strong></p>
+                    <p>Apoio cognitivo para jovens com TDAH</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Links Úteis</h4>
+                    <ul>
+                        <li><a href="../jogos.html">Jogos</a></li>
+                        <li><a href="../index.html#tools">Ferramentas</a></li>
+                        <li><a href="../index.html#about">Sobre TDAH</a></li>
+                        <li><a href="psicologos.html">Psicólogos</a></li>
+                        <li><a href="../pomodoro/pomodoro.html">Pomodoro &amp; Kanban</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contato</h4>
+                    <p><i class="fas fa-envelope"></i> contato@neurogame.com.br</p>
+                    <p><i class="fas fa-phone"></i> (11) 9999-9999</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 BrightMind Studios. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL AGENDAMENTO -->
+    <div class="modal" id="agendamentoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="agendTitulo">📅 Agendar Consulta</h3>
+                <button class="close-modal" onclick="fecharAgendamento()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="agendamento-form" id="agendForm">
+                    <div class="form-group">
+                        <label>Seu nome</label>
+                        <input type="text" placeholder="Digite seu nome completo" />
+                    </div>
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        <input type="email" placeholder="seu@email.com" />
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone / WhatsApp</label>
+                        <input type="tel" placeholder="(11) 9 0000-0000" />
+                    </div>
+                    <div class="form-group">
+                        <label>Data preferida</label>
+                        <input type="date" />
+                    </div>
+                    <div class="form-group">
+                        <label>Horário preferido</label>
+                        <select>
+                            <option>Manhã (8h – 12h)</option>
+                            <option>Tarde (12h – 18h)</option>
+                            <option>Noite (18h – 21h)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Observações (opcional)</label>
+                        <textarea placeholder="Descreva brevemente o motivo da consulta ou dúvidas..."></textarea>
+                    </div>
+                    <button class="btn-submit-agend" onclick="confirmarAgendamento()">
+                        <i class="fas fa-check"></i> Confirmar Agendamento
+                    </button>
+                </div>
+                <div class="agend-success" id="agendSuccess">
+                    <div class="check-icon"><i class="fas fa-check-circle"></i></div>
+                    <h4>Solicitação enviada!</h4>
+                    <p>O profissional entrará em contato em até 24 horas para confirmar o horário.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PERFIL -->
+    <div class="modal" id="perfilModal">
+        <div class="modal-content modal-perfil-content">
+            <div class="modal-header">
+                <h3 id="perfilTitulo">👤 Perfil do Profissional</h3>
+                <button class="close-modal" onclick="fecharPerfil()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="perfilBody">
+                <!-- conteúdo dinâmico -->
+            </div>
+        </div>
+    </div>
+
+    <script src="psicologos.js"></script>
+</body>
+
+</html>
